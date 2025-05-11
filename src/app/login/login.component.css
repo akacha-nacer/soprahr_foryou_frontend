@@ -1,0 +1,137 @@
+/* Reset all margins and paddings */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensure full height */
+}
+
+html {
+  background: #f1f6f6;
+  background-image: url(http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/dark_embroidery.png);
+  font-family: 'Helvetica Neue', Arial, Sans-Serif;
+}
+
+body {
+  overflow: hidden; /* Prevent scrolling to avoid unwanted white space */
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Make the container take full height */
+  width: 100%;
+  background-image: url('/assets/images/mountainsG.png');
+  background-size: cover; /* Ensure the background image covers the full area */
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden; /* Prevent overflow of content */
+}
+
+.login-wrap img {
+  width: 200px;
+  height: auto;
+  display: block;
+  margin: auto;
+}
+
+h5 {
+  margin-left: 90px;
+}
+
+.login-wrap {
+  position: relative;
+  background: white;
+  width: 900px;
+  height: 480px;
+  border-radius: 5px;
+  box-shadow: 3px 3px 10px #333;
+  padding: 15px;
+  z-index: 1; /* Ensure it's above the background image */
+}
+
+.login-wrap h3 {
+  text-align: center;
+  font-weight: 200;
+  font-size: 1.44em;
+  margin-top: 10px;
+  margin-bottom: 60px;
+  color: #34495e;
+}
+
+.login-wrap .form {
+  padding-top: 20px;
+}
+
+.login-wrap .form input[type="text"],
+.login-wrap .form input[type="password"],
+.login-wrap .form button {
+  width: 80%;
+  margin-left: 10%;
+  margin-bottom: 25px;
+  height: 40px;
+  border-radius: 5px;
+  outline: 0;
+  -moz-outline-style: none;
+}
+
+.login-wrap .form input[type="text"],
+.login-wrap .form input[type="password"] {
+  border: 1px solid #bbb;
+  padding: 0 0 0 10px;
+  font-size: 14px;
+}
+
+.login-wrap .form input[type="text"]:focus,
+.login-wrap .form input[type="password"]:focus {
+  border: 1px solid #3498db;
+}
+
+.login-wrap .form a {
+  text-align: center;
+  font-size: 10px;
+  color: #3498db;
+}
+
+.login-wrap .form a p {
+  padding-bottom: 10px;
+}
+
+.login-wrap .form button {
+  margin-top: 20px;
+  background: #e62010;
+  border: none;
+  color: white;
+  font-size: 18px;
+  font-weight: 200;
+  cursor: pointer;
+  transition: box-shadow .4s ease;
+  width: auto;
+  padding: 10px 20px;
+  display: inline-block;
+  margin-left: 370px;
+}
+
+.login-wrap .form button:hover {
+  box-shadow: 1px 1px 5px #555;
+}
+
+.login-wrap .form button:active {
+  box-shadow: 1px 1px 7px #222;
+}
+
+.login-wrap:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  border-radius: 5px 5px 0 0;
+}

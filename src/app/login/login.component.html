@@ -1,0 +1,20 @@
+
+
+<div class="login-container">
+<div class="login-wrap">
+  <img src="assets/images/sopra-hr.png" alt="Logo" class="login-logo">
+  <h3><strong>Bienvenue sur 4YOU</strong>, connectez-vous pour accéder à votre espace.</h3>
+  <h5>Les champs indiqués par une * sont obligatoires.</h5>
+  <div class="form">
+  <form class="login100-form validate-form p-b-33 p-t-5" (ngSubmit)="onSubmit()" #loginForm="ngForm">
+
+          <input type="text"  name="identifiant" [(ngModel)]="identifiant" placeholder="Votre identifiant*" required>
+          <input type="password"  name="password" [(ngModel)]="password" placeholder="Votre mot de passe*" required>
+          <button type="submit" [disabled]="!loginForm.form.valid"> Me connecter </button>
+
+  </form>
+  </div>
+</div>
+</div>
+
+
