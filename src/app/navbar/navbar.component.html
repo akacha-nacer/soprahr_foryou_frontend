@@ -1,0 +1,34 @@
+<div class="navbar">
+  <div class="navbar-left">
+    <div class="dropdown">
+      <button class="dropbtn" (click)="toggleDropdown()">
+        <img src="assets/images/dropD.png" alt="Dropdown Icon" class="dropdown-icon">
+      </button>
+      <div class="dropdown-content" [ngClass]="{'active': isDropdownOpen}" [@slideInOut]="isDropdownOpen ? 'in' : 'out'">
+        <a href="#" routerLink="/link1"><img src="assets/images/home.png"  class="dropdown-option-icon"> Accueil</a>
+        <a href="#" routerLink="/link2"><img src="assets/images/compass.png"  class="dropdown-option-icon"> Gestion administrative/Paie</a>
+        <a href="#" routerLink="/link3"><img src="assets/images/dossier.png"  class="dropdown-option-icon"> Dossier numérique</a>
+        <a href="#" routerLink="/link4"><img src="assets/images/admin.png"  class="dropdown-option-icon">Administration</a>
+        <a href="#" routerLink="/link5"><img src="assets/images/preferences.png"  class="dropdown-option-icon">Mes préférences</a>
+        <a href="#" routerLink="/link6"><img src="assets/images/accessibility.png"  class="dropdown-option-icon"> Accessibilité </a>
+        <a href="#" routerLink="/link7"><img src="assets/images/steria.png"  class="dropdown-option-icon"> À propos</a>
+        <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png"  class="dropdown-option-icon"> Déconnexion</a>
+      </div>
+    </div>
+    <a href="#home" routerLink="/home">
+      <img src="assets/images/4you_naceur_black.png" alt="Home Icon" class="home-icon">
+    </a>
+    <a href="#news" routerLink="/news">News</a>
+  </div>
+  <div class="navbar-right">
+    <a href="#home" routerLink="/home" class="search-link">
+      <img src="assets/images/search.png"  class="search-button">
+    </a>
+    <a href="#home" routerLink="/home">
+      <img src="assets/images/wha.png"  class="home-icon">
+    </a>
+    <a href="#auth" routerLink="/auth">
+      <img src="assets/images/disconnect.png"  class="home-icon">
+    </a>
+  </div>
+</div>

@@ -3,3 +3,64 @@ html, body {
   margin: 0 !important;
   padding: 0 !important;
 }
+
+.custom-icon {
+  display: inline-block;
+  width: 45px;
+  height: 45px;
+  background-image: url('assets/images/4you_naceur_red.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+}
+
+
+
+.navbar, app-navbar {
+  overflow: visible !important;
+}
+
+.dropdown-content {
+  position: absolute;
+  min-width: 300px;
+  z-index: 9999;
+  top: 60px; /* Adjusted to start at the bottom of the 60px navbar/button */
+  left: 0;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background-color: #4a4a4a;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.dropdown-content a {
+  background-color: #3e495b;
+  color: #ffffff;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center; /* This centers the content vertically */
+  justify-content: flex-start; /* This aligns the content to the left horizontally */
+  text-align: left; /* Ensures text alignment is to the left */
+  line-height: normal;
+  min-height: 50px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 0.01px solid #252d3a;
+}
+
+.dropdown-content a i {
+  margin-right: 15px;
+  font-size: 25px;
+}
+
+.dropdown-content a:hover {
+  background-color: #666;
+}
+
+.dropdown-content a.logout-option {
+  background-color: #252d3a;
+}
