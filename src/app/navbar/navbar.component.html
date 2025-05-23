@@ -18,13 +18,23 @@
     <a href="#home" routerLink="/home">
       <img src="assets/images/4you_naceur_black.png" alt="Home Icon" class="home-icon">
     </a>
-    <a href="#news" routerLink="/news">News</a>
+    <div class="toggle-container" (click)="toggleSwitch()">
+      <div class="toggle-switch" [ngClass]="{'toggle-on': isToggleOn}">
+        <div class="toggle-circle" [@slideToggle]="isToggleOn ? 'on' : 'off'">
+          <img [src]="isToggleOn ? 'assets/images/manager.png' : 'assets/images/employe.png'" class="toggle-icon">
+        </div>
+      </div>
+      <span class="toggle-text">{{ isToggleOn ? 'Espace gestionnaire' : 'Mon espace' }}</span>
+    </div>
   </div>
   <div class="navbar-right">
-    <a href="#home" routerLink="/home" class="search-link">
-      <img src="assets/images/search.png"  class="search-button">
+    <a href="#home" routerLink="/home" class="search-link" (click)="toggleSearch($event)">
+      <img src="assets/images/search.png" class="search-button">
+      <div class="search-field" [@slideLeftRight]="isSearchOpen ? 'in' : 'out'">
+        <input type="text" placeholder="Rechercher..." />
+      </div>
     </a>
-    <a href="#home" routerLink="/home">
+    <a  (click)="openPopupQuestionRH($event)">
       <img src="assets/images/wha.png"  class="home-icon">
     </a>
     <a href="#auth" routerLink="/auth">

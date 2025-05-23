@@ -1,0 +1,18 @@
+<div class="popup-container">
+  <button mat-icon-button class="close-button" (click)="onClose()">
+    <img src="assets/images/close.png" class="close-icon">
+  </button>
+  <h3 class="popup-title">Poser une question RH</h3>
+  <br><br>
+  <div class="popup-body">
+    <p class="popup-question">Souhaitez-vous créer une question RH ?</p>
+    <mat-checkbox class="popup-checkbox" [(ngModel)]="includeImage">
+      Inclure une copie de l'écran actuellement en arrière-plan
+    </mat-checkbox>
+  </div>
+  <br>
+  <div class="popup-buttons">
+    <button type="button" class="cancel-button" (click)="onNo()">Annuler</button>
+    <button type="button" class="yes-button" (click)="onYes()">Oui</button>
+  </div>
+</div>

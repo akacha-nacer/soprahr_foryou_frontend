@@ -1,4 +1,3 @@
-
 .navbar {
   background-color: #000000;
   font-family: Arial;
@@ -11,7 +10,6 @@
   margin: 0;
   padding: 0;
 }
-
 
 .navbar a {
   font-size: 16px;
@@ -26,7 +24,6 @@
   box-sizing: border-box;
 }
 
-
 .dropdown {
   position: relative;
   height: 100%;
@@ -34,7 +31,6 @@
   align-items: stretch;
   margin: 0;
 }
-
 
 .dropdown .dropbtn {
   font-size: 16px;
@@ -51,23 +47,22 @@
   box-sizing: border-box;
 }
 
-
 .navbar a:hover {
   background-color: #8e8e8e;
 }
 
 .navbar a.search-link {
-  border-radius: 50%; /* Rond par défaut */
-  width: 40px; /* Taille fixe pour un cercle parfait */
-  height: 40px; /* Taille fixe pour un cercle parfait */
-  padding: 0; /* Supprime le padding pour éviter le décalage */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   justify-content: center;
-  transform: translate(-10px, 10px); /* Déplace à gauche (-10px) et vers le bas (5px) */
+  transform: translate(-10px, 10px);
+  position: relative;
 }
 
-/* Hover effect for search link */
 .navbar a.search-link:hover {
-  background-color: #8e8e8e; /* Fond gris au survol */
+  background-color: #8e8e8e;
 }
 
 .dropdown .dropbtn:hover {
@@ -87,7 +82,6 @@
   pointer-events: none;
 }
 
-
 .dropbtn i {
   pointer-events: none;
 }
@@ -98,12 +92,10 @@
   pointer-events: none;
 }
 
-
 .navbar-left {
   display: flex;
   align-items: stretch;
 }
-
 
 .navbar-right {
   display: flex;
@@ -116,3 +108,71 @@
   pointer-events: none;
 }
 
+/* Search field styles */
+.search-field {
+  position: absolute;
+  top: 0;
+  right: 0; /* Démarre à la droite du bouton */
+  height: 40px; /* Même hauteur que le bouton */
+  background-color: #333;
+  overflow: hidden;
+  border-radius: 20px;
+  transform: translateX(0); /* Supprime le décalage initial */
+  z-index: 10; /* S'assure que le champ est au-dessus des autres éléments */
+}
+
+.search-field input {
+  height: 100%;
+  width: 100%;
+  padding: 0 10px;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  color: white;
+  font-size: 16px;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0 16px;
+}
+
+.toggle-switch {
+  width: 60px;
+  height: 30px;
+  background-color: #c3c7cf;
+  border-radius: 15px;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-switch.toggle-on {
+  background-color: #c3c7cf;
+}
+
+.toggle-circle {
+  width: 26px;
+  height: 26px;
+  background-color: #020202;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.toggle-text {
+  margin-left: 10px;
+  color: white;
+  font-size: 16px;
+}
