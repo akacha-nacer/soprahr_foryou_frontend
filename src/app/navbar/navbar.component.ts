@@ -21,20 +21,22 @@ import { PopupQuestionRhComponent } from '../popup-question-rh/popup-question-rh
       })),
       state('out', style({
         maxHeight: '0px',
-        opacity: 0,
+        opacity: 1,
         visibility: 'hidden',
         overflow: 'hidden'
       })),
       transition('out => in', [
-        animate('300ms ease-in')
+        style({ overflow: 'hidden', opacity: 1, visibility: 'visible' }),
+        animate('300ms linear')
       ]),
       transition('in => out', [
-        animate('300ms ease-out')
+        style({ overflow: 'hidden', opacity: 1 }),
+        animate('300ms linear', style({ maxHeight: '0px', visibility: 'hidden' }))
       ])
     ]),
     trigger('slideLeftRight', [
       state('in', style({
-        width: '200px',
+        width: '300px',
         opacity: 1,
         visibility: 'visible'
       })),
@@ -67,12 +69,53 @@ export class NavbarComponent {
   isDropdownOpen = false;
   isSearchOpen = false;
   isToggleOn = false;
+  isSubDropdownOpen = false;
+  isSubDropdownOpen1 = false;
+  isSubDropdownOpen2 = false;
+  isAnimatingSubDropdown = false;
 
   constructor(private dialog: MatDialog) {}
 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
-    console.log('Dropdown toggled:', this.isDropdownOpen);
+    if (this.isDropdownOpen) {
+      this.isSubDropdownOpen = false;
+      this.isSubDropdownOpen1 = false;
+      this.isSubDropdownOpen2 = false;
+    }
+  }
+
+  toggleSubDropdown(event: Event) {
+    event.preventDefault();
+    this.isAnimatingSubDropdown = true;
+    this.isSubDropdownOpen = !this.isSubDropdownOpen;
+    if (this.isSubDropdownOpen) {
+      this.isSubDropdownOpen1 = false;
+      this.isSubDropdownOpen2 = false;
+    } else {
+      // Close children when closing this dropdown
+      this.isSubDropdownOpen1 = false;
+      this.isSubDropdownOpen2 = false;
+    }
+    setTimeout(() => {
+      this.isAnimatingSubDropdown = false;
+    }, 300);
+  }
+
+  toggleSubDropdown1(event: Event) {
+    event.preventDefault();
+    this.isSubDropdownOpen1 = !this.isSubDropdownOpen1;
+    if (this.isSubDropdownOpen1) {
+      this.isSubDropdownOpen2 = false;
+    } else {
+      // Close child when closing this dropdown
+      this.isSubDropdownOpen2 = false;
+    }
+  }
+
+  toggleSubDropdown2(event: Event) {
+    event.preventDefault();
+    this.isSubDropdownOpen2 = !this.isSubDropdownOpen2;
   }
 
   toggleSearch(event: Event) {
@@ -90,7 +133,7 @@ export class NavbarComponent {
     event.preventDefault();
     const dialogRef = this.dialog.open(PopupQuestionRhComponent, {
       width: '550px',
-      backdropClass: 'custom-backdrop' // Custom overlay class
+      backdropClass: 'custom-backdrop'
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -98,17 +141,34 @@ export class NavbarComponent {
     });
   }
 
+  onSearchButtonClicked() {
+    console.log('Search button clicked');
+    this.isSearchOpen = false;
+  }
+
+  onInputClick(event: Event) {
+    event.stopPropagation();
+    console.log('Input clicked, propagation stopped');
+  }
+
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent) {
     const dropdownButton = (event.target as HTMLElement).closest('.dropbtn');
     const dropdownContent = (event.target as HTMLElement).closest('.dropdown-content');
-    const searchButton = (event.target as HTMLElement).closest('.search-link');
+    const searchLink = (event.target as HTMLElement).closest('.search-link');
+    const searchInput = (event.target as HTMLElement).closest('.search-input');
+    const searchField = (event.target as HTMLElement).closest('.search-field');
+
+    console.log('Click target:', event.target, 'SearchLink:', searchLink, 'SearchInput:', searchInput, 'SearchField:', searchField);
 
     if (!dropdownButton && !dropdownContent && this.isDropdownOpen) {
       this.isDropdownOpen = false;
+      this.isSubDropdownOpen = false;
+      this.isSubDropdownOpen1 = false;
+      this.isSubDropdownOpen2 = false;
       console.log('Dropdown closed (outside click):', this.isDropdownOpen);
     }
-    if (!searchButton && this.isSearchOpen) {
+    if (!searchLink && !searchInput && !searchField && this.isSearchOpen) {
       this.isSearchOpen = false;
       console.log('Search closed (outside click):', this.isSearchOpen);
     }

@@ -4,15 +4,53 @@
       <button class="dropbtn" (click)="toggleDropdown()">
         <img src="assets/images/dropD.png" alt="Dropdown Icon" class="dropdown-icon">
       </button>
-      <div class="dropdown-content" [ngClass]="{'active': isDropdownOpen}" [@slideInOut]="isDropdownOpen ? 'in' : 'out'">
-        <a href="#" routerLink="/link1"><img src="assets/images/home.png"  class="dropdown-option-icon"> Accueil</a>
-        <a href="#" routerLink="/link2"><img src="assets/images/compass.png"  class="dropdown-option-icon"> Gestion administrative/Paie</a>
-        <a href="#" routerLink="/link3"><img src="assets/images/dossier.png"  class="dropdown-option-icon"> Dossier numérique</a>
-        <a href="#" routerLink="/link4"><img src="assets/images/admin.png"  class="dropdown-option-icon">Administration</a>
-        <a href="#" routerLink="/link5"><img src="assets/images/preferences.png"  class="dropdown-option-icon">Mes préférences</a>
-        <a href="#" routerLink="/link6"><img src="assets/images/accessibility.png"  class="dropdown-option-icon"> Accessibilité </a>
-        <a href="#" routerLink="/link7"><img src="assets/images/steria.png"  class="dropdown-option-icon"> À propos</a>
-        <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png"  class="dropdown-option-icon"> Déconnexion</a>
+      <div class="dropdown-content" [ngClass]="{'active': isDropdownOpen}" [@slideInOut]="isDropdownOpen ? 'in' : 'out'"
+           [style.overflow]="isSubDropdownOpen || isSubDropdownOpen1 || isAnimatingSubDropdown ? 'visible' : 'hidden'">
+        <a href="#" routerLink="/link1"><img src="assets/images/home.png" class="dropdown-option-icon"> Accueil</a>
+        <a href="#" (click)="toggleSubDropdown($event)">
+          <img src="assets/images/compass.png" class="dropdown-option-icon"> Gestion administrative/Paie <i class="fa fa-caret-right"></i>
+        </a>
+        <div class="sub-dropdown-content" [ngClass]="{'active': isSubDropdownOpen}" [@slideInOut]="isSubDropdownOpen ? 'in' : 'out'">
+          <a href="#" (click)="toggleSubDropdown1($event)">Dossier individuel <i class="fa fa-caret-right"></i></a>
+          <a href="#">RGPD</a>
+          <a href="#">Rémunération</a>
+          <a href="#">reporting</a>
+          <a href="#">Outils d'administration</a>
+          <a href="#">Mes rapports</a>
+        </div>
+
+        <div class="sub-dropdown-content1" [ngClass]="{'active': isSubDropdownOpen1}" [@slideInOut]="isSubDropdownOpen1 ? 'in' : 'out'">
+          <a href="#">Synthèse du dossier </a>
+          <a href="#" (click)="toggleSubDropdown2($event)">Entrée <i class="fa fa-caret-right"></i></a>
+          <a href="#">Mutation-sortie</a>
+          <a href="#">Détails du dossier</a>
+          <a href="#">Contrat</a>
+          <a href="#">Absence</a>
+          <a href="#">Rapports</a>
+          <a href="#">Production de la DPAE</a>
+          <a href="#">Indicateurs</a>
+          <a href="#">Configuration</a>
+        </div>
+
+        <div class="sub-dropdown-content2" [ngClass]="{'active': isSubDropdownOpen2}" [@slideInOut]="isSubDropdownOpen2 ? 'in' : 'out'">
+          <a href="#">Synthèse du dossier </a>
+          <a href="#">Entrée </a>
+          <a href="#">Mutation-sortie</a>
+          <a href="#">Détails du dossier</a>
+          <a href="#">Contrat</a>
+          <a href="#">Absence</a>
+          <a href="#">Rapports</a>
+          <a href="#">Production de la DPAE</a>
+          <a href="#">Indicateurs</a>
+          <a href="#">Configuration</a>
+        </div>
+
+        <a href="#" routerLink="/link3"><img src="assets/images/dossier.png" class="dropdown-option-icon"> Dossier numérique</a>
+        <a href="#" routerLink="/link4"><img src="assets/images/admin.png" class="dropdown-option-icon">Administration <i class="fa fa-caret-right"></i></a>
+        <a href="#" routerLink="/link5"><img src="assets/images/preferences.png" class="dropdown-option-icon">Mes préférences <i class="fa fa-caret-right"></i></a>
+        <a href="#" routerLink="/link6"><img src="assets/images/accessibility.png" class="dropdown-option-icon"> Accessibilité </a>
+        <a href="#" routerLink="/link7"><img src="assets/images/steria.png" class="dropdown-option-icon"> À propos</a>
+        <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png" class="dropdown-option-icon"> Déconnexion</a>
       </div>
     </div>
     <a href="#home" routerLink="/home">
@@ -28,17 +66,17 @@
     </div>
   </div>
   <div class="navbar-right">
-    <a href="#home" routerLink="/home" class="search-link" (click)="toggleSearch($event)">
+    <a class="search-link" (click)="toggleSearch($event)">
       <img src="assets/images/search.png" class="search-button">
       <div class="search-field" [@slideLeftRight]="isSearchOpen ? 'in' : 'out'">
-        <input type="text" placeholder="Rechercher..." />
+        <input type="text" class="search-input" placeholder="Rechercher une page..." (click)="onInputClick($event)" />
       </div>
     </a>
-    <a  (click)="openPopupQuestionRH($event)">
-      <img src="assets/images/wha.png"  class="home-icon">
+    <a (click)="openPopupQuestionRH($event)">
+      <img src="assets/images/wha.png" class="home-icon">
     </a>
     <a href="#auth" routerLink="/auth">
-      <img src="assets/images/disconnect.png"  class="home-icon">
+      <img src="assets/images/disconnect.png" class="home-icon">
     </a>
   </div>
 </div>

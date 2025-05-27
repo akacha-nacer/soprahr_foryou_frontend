@@ -12,7 +12,6 @@
 }
 
 .navbar a {
-  font-size: 16px;
   color: white;
   text-align: center;
   text-decoration: none;
@@ -82,8 +81,10 @@
   pointer-events: none;
 }
 
-.dropbtn i {
+.dropdown .dropbtn i {
   pointer-events: none;
+  font-size: 8px !important;
+  color: white;
 }
 
 .home-icon {
@@ -108,17 +109,16 @@
   pointer-events: none;
 }
 
-/* Search field styles */
 .search-field {
   position: absolute;
   top: 0;
-  right: 0; /* Démarre à la droite du bouton */
-  height: 40px; /* Même hauteur que le bouton */
-  background-color: #333;
+  right: 0;
+  height: 40px;
+  background-color: #ffffff;
   overflow: hidden;
   border-radius: 20px;
-  transform: translateX(0); /* Supprime le décalage initial */
-  z-index: 10; /* S'assure que le champ est au-dessus des autres éléments */
+  transform: translateX(0);
+  z-index: 10;
 }
 
 .search-field input {
@@ -128,7 +128,7 @@
   border: none;
   outline: none;
   background-color: transparent;
-  color: white;
+  color: #020202;
   font-size: 16px;
 }
 
@@ -175,4 +175,43 @@
   margin-left: 10px;
   color: white;
   font-size: 16px;
+}
+
+.fa fa-caret-right {
+  font-size: 2px;
+}
+
+/* Remove display toggle and let animation handle it */
+.sub-dropdown-content,
+.sub-dropdown-content1,
+.sub-dropdown-content2{
+  position: absolute;
+  min-width: 200px;
+  z-index: 9999;
+  max-height: 0px;
+  opacity: 1;
+  visibility: hidden;
+  overflow: hidden;
+  transition: none;
+}
+
+.sub-dropdown-content {
+  top: 50px;
+  left: 300px;
+}
+
+.sub-dropdown-content1 {
+  top: 50px;
+  left: 500px;
+}
+
+.sub-dropdown-content2 {
+  top: 85px;
+  left: 700px;
+}
+
+
+.sub-dropdown-content.active,
+.sub-dropdown-content1.active {
+  /* No visibility or opacity toggle here */
 }
