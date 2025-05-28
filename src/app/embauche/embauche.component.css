@@ -1,0 +1,94 @@
+.embauche-container {
+  display: flex;
+  height: calc(100vh - 60px); /* Adjust for navbar height */
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0; /* Remove any default margins */
+}
+
+/* Left Section */
+.main-section {
+  flex: 3; /* Keeps the width ratio */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%; /* Fills from top to bottom */
+  background: none; /* Remove background to blend into the page */
+  padding: 20px 0; /* Padding only top/bottom to avoid side gaps */
+  margin: 0; /* Remove margins */
+}
+
+.description-placeholder,
+.form-placeholder {
+  flex: 1;
+  background-color: #e0e0e0; /* Placeholder color for visibility */
+  border-radius: 0; /* Remove rounded corners */
+  margin: 0 20px; /* Add side margins to align content */
+}
+
+.description-placeholder {
+  height: 100px; /* Smaller section for description */
+}
+
+/* Right Section */
+.right-section {
+  flex: 1; /* Keeps the width ratio */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%; /* Fills from top to bottom */
+  padding: 20px; /* Padding around the right section */
+  background-color: #f5f5f5; /* Light gray background for contrast */
+}
+
+.progress-section {
+  background: linear-gradient(to bottom, #ffffff 100%, #ffffff 100%, #d0d0d0 100%, #ffffff 0%);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1; /* Allows it to fill its container */
+  padding: 0; /* Remove padding to let buttons fill to edges */
+  overflow: hidden; /* Ensure buttons don't overflow rounded corners */
+  border: none; /* Ensure no border from container interferes */
+}
+
+.progress-button {
+  width: 100%; /* Fills the container horizontally */
+  padding: 10px;
+  border: none;
+  border-radius: 0; /* Remove rounded corners for grid-like appearance */
+  background-color: #ffffff; /* Match container background */
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin: 0; /* Remove margins */
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+  position: relative; /* For potential separator adjustment */
+  flex: 1; /* Equal height for each button */
+}
+
+.progress-button:not(:last-child) {
+  background: linear-gradient(to bottom, transparent 99%, #d0d0d0 1%); /* Separator above the next button */
+}
+
+.progress-button.active {
+  background-color: #4a90e2; /* Highlighted color for "Créer" */
+  color: white;
+}
+
+.progress-button:hover {
+  background-color: #d0d0d0;
+}
+
+.progress-button.active:hover {
+  background-color: #357abd; /* Darker shade on hover */
+}
+
+.suggestions-section {
+  flex: 1; /* Fills the remaining space */
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

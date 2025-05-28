@@ -183,8 +183,7 @@
 
 /* Remove display toggle and let animation handle it */
 .sub-dropdown-content,
-.sub-dropdown-content1,
-.sub-dropdown-content2{
+.sub-dropdown-content1{
   position: absolute;
   min-width: 200px;
   z-index: 9999;
@@ -198,6 +197,17 @@
 .sub-dropdown-content {
   top: 50px;
   left: 300px;
+}
+
+.sub-dropdown-content2{
+  position: absolute;
+  min-width: 290px;
+  z-index: 9999;
+  max-height: 0px;
+  opacity: 1;
+  visibility: hidden;
+  overflow: hidden;
+  transition: none;
 }
 
 .sub-dropdown-content1 {
