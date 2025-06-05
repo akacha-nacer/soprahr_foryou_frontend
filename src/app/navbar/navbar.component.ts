@@ -159,7 +159,6 @@ export class NavbarComponent {
     const searchInput = (event.target as HTMLElement).closest('.search-input');
     const searchField = (event.target as HTMLElement).closest('.search-field');
 
-    console.log('Click target:', event.target, 'SearchLink:', searchLink, 'SearchInput:', searchInput, 'SearchField:', searchField);
 
     if (!dropdownButton && !dropdownContent && this.isDropdownOpen) {
       this.isDropdownOpen = false;

@@ -16,18 +16,25 @@
   background: none; /* Remove background to blend into the page */
   padding: 20px 0; /* Padding only top/bottom to avoid side gaps */
   margin: 0; /* Remove margins */
+  overflow-y: scroll; /* Force scrollbar to always be present */
+  scrollbar-width: none; /* For Firefox: hide scrollbar */
+  -ms-overflow-style: none; /* For IE and Edge */
+}
+
+/* WebKit browsers: Hide scrollbar */
+.main-section::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome, Safari, Edge */
 }
 
 .description-placeholder,
 .form-placeholder {
   flex: 1;
-  background-color: #e0e0e0; /* Placeholder color for visibility */
+  background-color: transparent; /* Placeholder color for visibility */
   border-radius: 0; /* Remove rounded corners */
-  margin: 0 20px; /* Add side margins to align content */
 }
 
 .description-placeholder {
-  height: 100px; /* Smaller section for description */
+  height: 95px; /* Smaller section for description */
 }
 
 /* Right Section */
@@ -60,7 +67,7 @@
   border-radius: 0; /* Remove rounded corners for grid-like appearance */
   background-color: #ffffff; /* Match container background */
   cursor: pointer;
-  font-size: 14px;
+  font-size: 17px;
   transition: background-color 0.3s ease;
   margin: 0; /* Remove margins */
   box-sizing: border-box; /* Ensure padding doesn't affect width */
@@ -91,4 +98,170 @@
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.description-section {
+  margin: 0 20px; /* Align with form-placeholder */
+  height: 150px; /* Match the height of description-placeholder */
+  display: flex;
+  margin-top: 10px;
+  flex-direction: column;
+  justify-content: space-between; /* Space out description and buttons */
+}
+
+.description-section p {
+  font-size: 14px; /* Smaller font size for compactness */
+  color: #666;
+  line-height: 1.4; /* Tighter line height */
+  margin: 0; /* Remove default margin */
+  text-overflow: ellipsis; /* Handle overflow text */
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-box-orient: vertical; /* For multi-line truncation */
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px; /* Space between description and buttons */
+}
+
+.action-btn {
+  padding: 8px 16px; /* Slightly smaller padding */
+  border: none; /* Remove default border */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); /* Slightly darker border */
+  border-radius: 20px; /* Rounded buttons as per image */
+  cursor: pointer;
+  font-size: 14px;
+  color: black;
+  transition: background-color 0.3s ease;
+}
+
+.action-btn.enabled {
+  background-color: transparent; /* Red for enabled buttons (like Quitter) */
+  color: black;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1); /* Keep darker border, add slight shadow */
+}
+
+.action-btn.enabled:hover {
+  background-color: #c3c7cf;
+  color: white;
+}
+
+/* Style pour les boutons désactivés */
+.action-btn:disabled {
+  background-color: #d9dcdf;
+  color: #9ca0a5;
+  cursor: not-allowed;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  opacity: 0.6; /* Réduire l'opacité pour indiquer qu'il est désactivé */
+}
+
+.action-btn.disabled {
+  background-color: #d9d9d9; /* Gray for disabled buttons (like Supprimer) */
+  color: #c3c7cf;
+  cursor: not-allowed;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); /* Maintain darker border for disabled state */
+}
+
+.form-section {
+  margin: 0 20px; /* Align with description */
+  flex: 1;
+}
+
+.form-header {
+  background-color: #252d3a;
+  color: white;
+  padding: 13px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espace entre la flèche et le titre */
+  margin-left: 7px;
+}
+
+.header-title {
+  margin: 0;
+}
+
+.header-symbol {
+  font-size: 12px;
+}
+
+.arrow {
+  display: inline-block;
+  font-size: 15px;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.form-content {
+  background-color: transparent;
+  padding: 20px;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+.create-dossier-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group h3 {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+  font-family: Arial, sans-serif;
+}
+
+.form-field input,
+.form-field select {
+  padding: 8px;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  font-family: Arial, sans-serif;
+  width: 250px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
+
+.validation-icon {
+  width: 30px;
+  height: 30px;
 }

@@ -1,9 +1,60 @@
 <div class="embauche-container">
   <!-- Left Section (Main Container) -->
   <div class="main-section">
-    <!-- Placeholder for forms and description -->
-    <div class="description-placeholder"></div>
-    <div class="form-placeholder"></div>
+    <!-- Description Section -->
+    <div class="description-section">
+      <p>Cette page vous permet de créer un dossier d’embauche pour un nouvel employé. Commencez par remplir le formulaire initial ci-dessous pour enregistrer les informations de base. Une fois soumis, vous pourrez compléter les sections supplémentaires pour finaliser le dossier. Vous pouvez également recommencer ou quitter à tout moment.</p>
+      <div class="action-buttons">
+        <button class="action-btn enabled">Quitter</button>
+        <button class="action-btn enabled">Recommencer</button>
+      </div>
+      <hr>
+    </div>
+    <div class="form-placeholder">
+      <!-- Form Section -->
+      <div class="form-section" sectionId="section1">
+        <!-- Collapsible Header -->
+        <div class="form-header" (click)="toggleForm('section1')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Créer le dossier d'une personne</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+
+        <!-- Form Content with Slide Animation -->
+        <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
+          <form [formGroup]="dossierForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
+            <!-- Créer le dossier d'une personne -->
+            <div class="form-group">
+              <div class="form-field">
+                <label>Date de Recrutement</label>
+                <input type="date" formControlName="dateRecrutement" required>
+              </div>
+              <div class="form-field">
+                <label>Code Société</label>
+                <input type="text" formControlName="codeSociete" placeholder="Code société" required>
+              </div>
+              <div class="form-field">
+                <label>Établissement</label>
+                <input type="text" formControlName="etablissement" placeholder="Établissement" required>
+              </div>
+              <div class="form-field">
+                <label>Matricule Salarié</label>
+                <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!dossierForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Right Section -->
