@@ -11,9 +11,8 @@
       <hr>
     </div>
     <div class="form-placeholder">
-      <!-- Form Section -->
+      <!-- Form Section 1: Créer le dossier d'une personne -->
       <div class="form-section" sectionId="section1">
-        <!-- Collapsible Header -->
         <div class="form-header" (click)="toggleForm('section1')">
           <div class="header-left">
             <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
@@ -23,14 +22,11 @@
             <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
           </span>
         </div>
-
-        <!-- Form Content with Slide Animation -->
         <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
           <form [formGroup]="dossierForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
-            <!-- Créer le dossier d'une personne -->
             <div class="form-group">
               <div class="form-field">
-                <label>Date de Recrutement</label>
+                <label class="label1">Date de Recrutement</label>
                 <input type="date" formControlName="dateRecrutement" required>
               </div>
               <div class="form-field">
@@ -46,10 +42,409 @@
                 <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required>
               </div>
             </div>
-
-            <!-- Submit Button -->
             <div class="form-actions">
               <button type="submit" class="action-btn enabled" [disabled]="!dossierForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Form Section 2: Renseignements individuels -->
+      <div class="form-section" sectionId="section2" *ngIf="showAdditionalSections" [@slideHeader]="section2AnimationState">
+        <div class="form-header" (click)="toggleForm('section2')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Renseignements individuels</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
+          <form [formGroup]="individualInfoForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
+            <div class="form-group">
+              <h3>Identité</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Qualité (Mr, Mme, ...)</label>
+                  <input type="text" formControlName="qualite" required>
+                </div>
+                <div class="form-field">
+                  <label>Nom usuel</label>
+                  <input type="text" formControlName="nomUsuel" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Nom patronymique</label>
+                  <input type="text" formControlName="nomPatronymique" required>
+                </div>
+                <div class="form-field">
+                  <label>Prénom</label>
+                  <input type="text" formControlName="prenom" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>2ème prénom</label>
+                  <input type="text" formControlName="deuxiemePrenom" required>
+                </div>
+                <div class="form-field">
+                  <label>Sexe</label>
+                  <select formControlName="sexe" required>
+                    <option value="" disabled selected>Sélectionnez</option>
+                    <option value="M">M</option>
+                    <option value="F">F</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Numéro INSEE</label>
+                  <input type="text" formControlName="numeroInsee" required>
+                </div>
+              </div>
+              <h3>Naissance</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Date de naissance</label>
+                  <input type="date" formControlName="dateNaissance" required>
+                </div>
+                <div class="form-field">
+                  <label>Ville de naissance</label>
+                  <input type="text" formControlName="villeNaissance" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Département de naissance</label>
+                  <input type="text" formControlName="departementNaissance" required>
+                </div>
+                <div class="form-field">
+                  <label>Pays de naissance</label>
+                  <input type="text" formControlName="paysNaissance" required>
+                </div>
+              </div>
+              <h3>Nationalité</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Pays (principal ou non)</label>
+                  <input type="text" formControlName="paysNationalite" required>
+                </div>
+              </div>
+              <h3>Situation familiale</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>État (célibataire, marié, divorcé)</label>
+                  <select formControlName="etatFamilial" required>
+                    <option value="" disabled selected>Sélectionnez</option>
+                    <option value="celibataire">Célibataire</option>
+                    <option value="marie">Marié</option>
+                    <option value="divorce">Divorcé</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Date d'effet</label>
+                  <input type="date" formControlName="dateEffet" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!individualInfoForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Form Section 3: Adresses -->
+      <div class="form-section" sectionId="section3" *ngIf="showAdditionalSections" [@slideHeader]="section3AnimationState">
+        <div class="form-header" (click)="toggleForm('section3')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Adresses</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+          <form [formGroup]="addressForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
+            <div class="form-group">
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Pays</label>
+                  <input type="text" formControlName="pays" required>
+                </div>
+                <div class="form-field">
+                  <label>Type d'adresse</label>
+                  <input type="text" formControlName="typeAdresse" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Adresse principale (Oui/Non)</label>
+                  <select formControlName="adressePrincipale" required>
+                    <option value="" disabled selected>Sélectionnez</option>
+                    <option value="true">Oui</option>
+                    <option value="false">Non</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Valable du .. au ..</label>
+                  <input type="date" formControlName="valableDu" required>
+                  <input type="date" formControlName="valableAu" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Voie (numéro)</label>
+                  <input type="text" formControlName="numeroVoie" required>
+                </div>
+                <div class="form-field">
+                  <label>Nature et nom de la voie</label>
+                  <input type="text" formControlName="natureVoie" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Complément d'adresse 1</label>
+                  <input type="text" formControlName="complement1" required>
+                </div>
+                <div class="form-field">
+                  <label>Complément d'adresse 2</label>
+                  <input type="text" formControlName="complement2" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Lieu-dit</label>
+                  <input type="text" formControlName="lieuDit" required>
+                </div>
+                <div class="form-field">
+                  <label>Code postal</label>
+                  <input type="text" formControlName="codePostal" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Commune</label>
+                  <input type="text" formControlName="commune" required>
+                </div>
+                <div class="form-field">
+                  <label>Code INSEE commune</label>
+                  <input type="text" formControlName="codeInseeCommune" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!addressForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Form Section 4: Affectations -->
+      <div class="form-section" sectionId="section4" *ngIf="showAdditionalSections" [@slideHeader]="section4AnimationState">
+        <div class="form-header" (click)="toggleForm('section4')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section4'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Affectations</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section4'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
+          <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit('section4')" class="create-dossier-form">
+            <div class="form-group">
+              <h3>Entrée</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Catégorie d'entrée</label>
+                  <input type="text" formControlName="categorieEntree" required>
+                </div>
+                <div class="form-field">
+                  <label>Motif d'entrée</label>
+                  <input type="text" formControlName="motifEntree" required>
+                </div>
+              </div>
+              <h3>Affectation</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Poste</label>
+                  <input type="text" formControlName="poste" required>
+                </div>
+                <div class="form-field">
+                  <label>Emploi</label>
+                  <input type="text" formControlName="emploi" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Unité organisationnelle</label>
+                  <input type="text" formControlName="uniteOrganisationnelle" required>
+                </div>
+              </div>
+              <h3>Calendrier</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Calendrier de paie</label>
+                  <input type="text" formControlName="calendrierPaie" required>
+                </div>
+              </div>
+              <h3>Cycles de travail</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Code</label>
+                  <input type="text" formControlName="codeCycle" required>
+                </div>
+                <div class="form-field">
+                  <label>Indexé</label>
+                  <select formControlName="indexe" required>
+                    <option value="" disabled selected>Sélectionnez</option>
+                    <option value="true">Oui</option>
+                    <option value="false">Non</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Modalité de gestion de temps</label>
+                  <input type="text" formControlName="modaliteGestion" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!assignmentForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Form Section 5: Carrière -->
+      <div class="form-section" sectionId="section5" *ngIf="showAdditionalSections" [@slideHeader]="section5AnimationState">
+        <div class="form-header" (click)="toggleForm('section5')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section5'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Carrière</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section5'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
+          <form [formGroup]="careerForm" (ngSubmit)="onSubmit('section5')" class="create-dossier-form">
+            <div class="form-group">
+              <h3>Suivi conventionnel</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Convention collective</label>
+                  <input type="text" formControlName="conventionCollective" required>
+                </div>
+                <div class="form-field">
+                  <label>Accord entreprise</label>
+                  <input type="text" formControlName="accordEntreprise" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Qualification (classification)</label>
+                  <input type="text" formControlName="qualification" required>
+                </div>
+                <div class="form-field">
+                  <label>Type de paie</label>
+                  <input type="text" formControlName="typePaie" required>
+                </div>
+              </div>
+              <h3>Régime spécial de cotisation</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Régime spécial</label>
+                  <input type="text" formControlName="regimeSpecial" required>
+                </div>
+              </div>
+              <h3>Contrat</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Nature</label>
+                  <input type="text" formControlName="natureContrat" required>
+                </div>
+                <div class="form-field">
+                  <label>Type</label>
+                  <input type="text" formControlName="typeContrat" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Durée</label>
+                  <input type="text" formControlName="duree" required>
+                </div>
+                <div class="form-field">
+                  <label>Date de fin prévue</label>
+                  <input type="date" formControlName="dateFinPrevue" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Date de début d'essai</label>
+                  <input type="date" formControlName="dateDebutEssai" required>
+                </div>
+                <div class="form-field">
+                  <label>Date de fin d'essai</label>
+                  <input type="date" formControlName="dateFinEssai" required>
+                </div>
+              </div>
+              <h3>Temps contractuel</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Type</label>
+                  <input type="text" formControlName="typeTemps" required>
+                </div>
+                <div class="form-field">
+                  <label>Modalité horaire</label>
+                  <input type="text" formControlName="modaliteHoraire" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Cadre au forfait jours</label>
+                  <select formControlName="forfaitJours" required>
+                    <option value="" disabled selected>Sélectionnez</option>
+                    <option value="true">Oui</option>
+                    <option value="false">Non</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label>Forfait annuel heures</label>
+                  <input type="number" formControlName="forfaitHeures" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Surcotisation</label>
+                  <input type="text" formControlName="surcotisation" required>
+                </div>
+                <div class="form-field">
+                  <label>Heures travaillées</label>
+                  <input type="text" formControlName="heuresTravaillees" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Heures payées</label>
+                  <input type="text" formControlName="heuresPayees" required>
+                </div>
+              </div>
+              <h3>Contrat d'apprentissage</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Date de début d'apprentissage</label>
+                  <input type="date" formControlName="dateDebutApprentissage" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!careerForm.valid">Envoyer</button>
             </div>
           </form>
         </div>
@@ -61,9 +456,9 @@
   <div class="right-section">
     <!-- Top Sub-Section (Progress Indicators/Buttons) -->
     <div class="progress-section">
-      <button class="progress-button active">Créer</button>
-      <button class="progress-button">En Cours</button>
-      <button class="progress-button">Historique</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}">Créer</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'En Cours'}">En Cours</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Historique'}">Historique</button>
     </div>
 
     <!-- Bottom Sub-Section (Suggestions) -->

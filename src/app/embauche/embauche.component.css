@@ -1,86 +1,86 @@
 .embauche-container {
   display: flex;
-  height: calc(100vh - 60px); /* Adjust for navbar height */
+  height: calc(100vh - 60px);
   width: 100%;
   box-sizing: border-box;
-  margin: 0; /* Remove any default margins */
+  margin: 0;
 }
 
 /* Left Section */
 .main-section {
-  flex: 3; /* Keeps the width ratio */
+  flex: 3;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  height: 100%; /* Fills from top to bottom */
-  background: none; /* Remove background to blend into the page */
-  padding: 20px 0; /* Padding only top/bottom to avoid side gaps */
-  margin: 0; /* Remove margins */
-  overflow-y: scroll; /* Force scrollbar to always be present */
-  scrollbar-width: none; /* For Firefox: hide scrollbar */
-  -ms-overflow-style: none; /* For IE and Edge */
+  gap: 0; /* Supprimer le gap entre les sections */
+  height: 100%;
+  background: none;
+  padding: 0; /* Supprimer le padding pour éviter les écarts */
+  margin: 0;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 /* WebKit browsers: Hide scrollbar */
 .main-section::-webkit-scrollbar {
-  display: none; /* Hide scrollbar in Chrome, Safari, Edge */
+  display: none;
 }
 
 .description-placeholder,
 .form-placeholder {
   flex: 1;
-  background-color: transparent; /* Placeholder color for visibility */
-  border-radius: 0; /* Remove rounded corners */
+  background-color: transparent;
+  border-radius: 0;
 }
 
 .description-placeholder {
-  height: 95px; /* Smaller section for description */
+  height: 95px;
 }
 
 /* Right Section */
 .right-section {
-  flex: 1; /* Keeps the width ratio */
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 100%; /* Fills from top to bottom */
-  padding: 20px; /* Padding around the right section */
-  background-color: #f5f5f5; /* Light gray background for contrast */
+  height: 100%;
+  padding: 20px;
+  background-color: #f5f5f5;
 }
 
 .progress-section {
   background: linear-gradient(to bottom, #ffffff 100%, #ffffff 100%, #d0d0d0 100%, #ffffff 0%);
   border-radius: 8px;
   display: flex;
-  flex-direction: column; /* Stack buttons vertically */
+  flex-direction: column;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  flex: 1; /* Allows it to fill its container */
-  padding: 0; /* Remove padding to let buttons fill to edges */
-  overflow: hidden; /* Ensure buttons don't overflow rounded corners */
-  border: none; /* Ensure no border from container interferes */
+  flex: 1;
+  padding: 0;
+  overflow: hidden;
+  border: none;
 }
 
 .progress-button {
-  width: 100%; /* Fills the container horizontally */
+  width: 100%;
   padding: 10px;
   border: none;
-  border-radius: 0; /* Remove rounded corners for grid-like appearance */
-  background-color: #ffffff; /* Match container background */
+  border-radius: 0;
+  background-color: #ffffff;
   cursor: pointer;
   font-size: 17px;
   transition: background-color 0.3s ease;
-  margin: 0; /* Remove margins */
-  box-sizing: border-box; /* Ensure padding doesn't affect width */
-  position: relative; /* For potential separator adjustment */
-  flex: 1; /* Equal height for each button */
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  flex: 1;
 }
 
 .progress-button:not(:last-child) {
-  background: linear-gradient(to bottom, transparent 99%, #d0d0d0 1%); /* Separator above the next button */
+  background: linear-gradient(to bottom, transparent 99%, #d0d0d0 1%);
 }
 
 .progress-button.active {
-  background-color: #4a90e2; /* Highlighted color for "Créer" */
+  background-color: #4a90e2;
   color: white;
 }
 
@@ -89,11 +89,11 @@
 }
 
 .progress-button.active:hover {
-  background-color: #357abd; /* Darker shade on hover */
+  background-color: #357abd;
 }
 
 .suggestions-section {
-  flex: 1; /* Fills the remaining space */
+  flex: 1;
   background-color: #ffffff;
   border-radius: 8px;
   padding: 20px;
@@ -101,36 +101,36 @@
 }
 
 .description-section {
-  margin: 0 20px; /* Align with form-placeholder */
-  height: 150px; /* Match the height of description-placeholder */
+  margin: 0 20px;
+  height: 150px;
   display: flex;
   margin-top: 10px;
   flex-direction: column;
-  justify-content: space-between; /* Space out description and buttons */
+  justify-content: space-between;
 }
 
 .description-section p {
-  font-size: 14px; /* Smaller font size for compactness */
+  font-size: 14px;
   color: #666;
-  line-height: 1.4; /* Tighter line height */
-  margin: 0; /* Remove default margin */
-  text-overflow: ellipsis; /* Handle overflow text */
+  line-height: 1.4;
+  margin: 0;
+  text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limit to 3 lines */
-  -webkit-box-orient: vertical; /* For multi-line truncation */
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .action-buttons {
   display: flex;
   gap: 10px;
-  margin-top: 10px; /* Space between description and buttons */
+  margin-top: 10px;
 }
 
 .action-btn {
-  padding: 8px 16px; /* Slightly smaller padding */
-  border: none; /* Remove default border */
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); /* Slightly darker border */
-  border-radius: 20px; /* Rounded buttons as per image */
+  padding: 8px 16px;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
   color: black;
@@ -138,9 +138,9 @@
 }
 
 .action-btn.enabled {
-  background-color: transparent; /* Red for enabled buttons (like Quitter) */
+  background-color: transparent;
   color: black;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1); /* Keep darker border, add slight shadow */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .action-btn.enabled:hover {
@@ -148,25 +148,24 @@
   color: white;
 }
 
-/* Style pour les boutons désactivés */
 .action-btn:disabled {
   background-color: #d9dcdf;
   color: #9ca0a5;
   cursor: not-allowed;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-  opacity: 0.6; /* Réduire l'opacité pour indiquer qu'il est désactivé */
+  opacity: 0.6;
 }
 
 .action-btn.disabled {
-  background-color: #d9d9d9; /* Gray for disabled buttons (like Supprimer) */
+  background-color: #d9d9d9;
   color: #c3c7cf;
   cursor: not-allowed;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2); /* Maintain darker border for disabled state */
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 
 .form-section {
-  margin: 0 20px; /* Align with description */
-  flex: 1;
+  margin: 0; /* Supprimer les marges pour coller les sections */
+  flex: 0;
 }
 
 .form-header {
@@ -180,12 +179,14 @@
   font-size: 16px;
   font-weight: bold;
   font-family: Arial, sans-serif;
+  margin-bottom: 0; /* Pas d'espace entre les headers */
+  border-bottom: 0; /* Supprimer toute bordure potentielle */
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espace entre la flèche et le titre */
+  gap: 10px;
   margin-left: 7px;
 }
 
@@ -206,9 +207,9 @@
 
 .form-content {
   background-color: transparent;
-  padding: 20px;
+  padding: 0px 20px;
   border-radius: 4px;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
 .create-dossier-form {
@@ -228,12 +229,21 @@
   font-weight: bold;
   color: #333;
   margin-bottom: 10px;
+  margin-top: 9px;
   font-family: Arial, sans-serif;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 200px;
 }
 
 .form-field label {
@@ -242,6 +252,16 @@
   margin-bottom: 5px;
   font-family: Arial, sans-serif;
 }
+
+.label1{
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  font-family: Arial, sans-serif;
+}
+
+
 
 .form-field input,
 .form-field select {
@@ -252,7 +272,7 @@
   font-size: 14px;
   color: #333;
   font-family: Arial, sans-serif;
-  width: 250px;
+  width: 100%;
 }
 
 .form-actions {
