@@ -63,6 +63,7 @@
         <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
           <form [formGroup]="individualInfoForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
             <div class="form-group">
+              <br>
               <h3>Identité</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -104,6 +105,7 @@
                   <input type="text" formControlName="numeroInsee" required>
                 </div>
               </div>
+              <br>
               <h3>Naissance</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -125,6 +127,7 @@
                   <input type="text" formControlName="paysNaissance" required>
                 </div>
               </div>
+              <br>
               <h3>Nationalité</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -132,6 +135,7 @@
                   <input type="text" formControlName="paysNationalite" required>
                 </div>
               </div>
+              <br>
               <h3>Situation familiale</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -170,6 +174,7 @@
         <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
           <form [formGroup]="addressForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
             <div class="form-group">
+              <br>
               <div class="form-row">
                 <div class="form-field">
                   <label>Pays</label>
@@ -257,6 +262,7 @@
         <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
           <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit('section4')" class="create-dossier-form">
             <div class="form-group">
+              <br>
               <h3>Entrée</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -268,6 +274,7 @@
                   <input type="text" formControlName="motifEntree" required>
                 </div>
               </div>
+              <br>
               <h3>Affectation</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -285,6 +292,7 @@
                   <input type="text" formControlName="uniteOrganisationnelle" required>
                 </div>
               </div>
+              <br>
               <h3>Calendrier</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -292,6 +300,7 @@
                   <input type="text" formControlName="calendrierPaie" required>
                 </div>
               </div>
+              <br>
               <h3>Cycles de travail</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -335,6 +344,7 @@
         <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
           <form [formGroup]="careerForm" (ngSubmit)="onSubmit('section5')" class="create-dossier-form">
             <div class="form-group">
+              <br>
               <h3>Suivi conventionnel</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -356,6 +366,7 @@
                   <input type="text" formControlName="typePaie" required>
                 </div>
               </div>
+              <br>
               <h3>Régime spécial de cotisation</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -363,6 +374,7 @@
                   <input type="text" formControlName="regimeSpecial" required>
                 </div>
               </div>
+              <br>
               <h3>Contrat</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -394,6 +406,7 @@
                   <input type="date" formControlName="dateFinEssai" required>
                 </div>
               </div>
+              <br>
               <h3>Temps contractuel</h3>
               <div class="form-row">
                 <div class="form-field">
@@ -435,6 +448,7 @@
                   <input type="text" formControlName="heuresPayees" required>
                 </div>
               </div>
+              <br>
               <h3>Contrat d'apprentissage</h3>
               <div class="form-row">
                 <div class="form-field">

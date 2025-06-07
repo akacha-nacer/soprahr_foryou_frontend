@@ -11,17 +11,16 @@
   flex: 3;
   display: flex;
   flex-direction: column;
-  gap: 0; /* Supprimer le gap entre les sections */
+  gap: 0;
   height: 100%;
   background: none;
-  padding: 0; /* Supprimer le padding pour éviter les écarts */
+  padding: 0;
   margin: 0;
   overflow-y: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-/* WebKit browsers: Hide scrollbar */
 .main-section::-webkit-scrollbar {
   display: none;
 }
@@ -92,6 +91,12 @@
   background-color: #357abd;
 }
 
+.progress-button:disabled {
+  background-color: #d9dcdf;
+  color: #9ca0a5;
+  cursor: not-allowed;
+}
+
 .suggestions-section {
   flex: 1;
   background-color: #ffffff;
@@ -156,15 +161,8 @@
   opacity: 0.6;
 }
 
-.action-btn.disabled {
-  background-color: #d9d9d9;
-  color: #c3c7cf;
-  cursor: not-allowed;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
-}
-
 .form-section {
-  margin: 0; /* Supprimer les marges pour coller les sections */
+  margin: 0;
   flex: 0;
 }
 
@@ -179,8 +177,8 @@
   font-size: 16px;
   font-weight: bold;
   font-family: Arial, sans-serif;
-  margin-bottom: 0; /* Pas d'espace entre les headers */
-  border-bottom: 0; /* Supprimer toute bordure potentielle */
+  margin-bottom: 0;
+  border-bottom: 0;
 }
 
 .header-left {
@@ -207,7 +205,7 @@
 
 .form-content {
   background-color: transparent;
-  padding: 0px 20px;
+  padding: 0px 20px; /* Padding réduit pour un formulaire compact */
   border-radius: 4px;
   margin-top: 2px;
 }
@@ -215,56 +213,55 @@
 .create-dossier-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 8px; /* Encore plus compact */
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0px; /* Espacement réduit */
 }
 
 .form-group h3 {
   font-size: 16px;
   font-weight: bold;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   font-family: Arial, sans-serif;
 }
 
-
 .form-row {
   display: flex;
-  gap: 20px;
+  gap: 10px;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-width: 200px;
+  min-width: 120px; /* Encore plus compact pour un formulaire simple */
 }
 
 .form-field label {
   font-size: 14px;
   color: #666;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   font-family: Arial, sans-serif;
 }
 
-.label1{
+.label1 {
   font-size: 14px;
   color: #666;
-  margin-bottom: 5px;
-  margin-top: 10px;
+  margin-bottom: 4px;
+  margin-top: 8px;
   font-family: Arial, sans-serif;
 }
 
-
-
 .form-field input,
-.form-field select {
+.form-field select,
+.form-field textarea {
   padding: 8px;
   border: none;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
@@ -273,15 +270,108 @@
   color: #333;
   font-family: Arial, sans-serif;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+/* Style pour l'input de fichier (bouton personnalisé) */
+.form-field input[type="file"] {
+  display: none; /* Masquer l'input natif */
+}
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+.file-upload-btn {
+  padding: 5px 13px;
+  border: 1px solid #a3a4aa; /* Fine bordure ajoutée */
+  border-radius: 5px;
+  background-color: #dad7d7;
+  color: #454d59 !important; /* Forcer la couleur du texte à noir */
+  cursor: pointer;
+  font-size: 14px;
+  padding-left: 8px;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.file-upload-btn:hover {
+  background-color: #7b8791; /* Couleur légèrement plus foncée au hover */
+}
+
+.file-upload-text {
+  font-size: 14px;
+  color: #666;
+  font-family: Arial, sans-serif;
+  white-space: nowrap;
+}
+
+/* Style pour les checkboxes */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 6px; /* Espacement serré entre checkbox et texte */
+  flex-wrap: nowrap;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0; /* Supprimer toute marge par défaut */
+  flex-shrink: 0; /* Empêcher la checkbox de rétrécir */
+}
+
+.checkbox-container label {
+  font-size: 14px;
+  color: #666;
+  margin: 0; /* Supprimer toute marge */
+  font-family: Arial, sans-serif;
+  line-height: 1.2;
+}
+
+.manager-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.manager-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.manager-name,
+.manager-poste {
+  font-size: 14px;
+  color: #333;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-start;
-  margin-top: 20px;
+  margin-top: 10px; /* Encore plus compact */
 }
 
 .validation-icon {
   width: 30px;
   height: 30px;
+}
+
+.upload-icon{
+  height: 20px;
+  width: 20px;
 }

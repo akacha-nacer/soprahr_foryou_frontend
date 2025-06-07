@@ -1,0 +1,151 @@
+<div class="embauche-container">
+  <!-- Left Section (Main Container) -->
+  <div class="main-section">
+    <!-- Description Section -->
+    <div class="description-section">
+      <p>Vous êtes malade, vous ne serez pas présent à votre poste. La démarche "Je suis malade" permet de prévenir par défaut votre manager, de gérer éventuellement vos réponses automatiques en cas d'absence du bureau. Vous pouvez envoyer le message par défaut ou le modifier afin de prévenir pour une absence ou un retard. Dans le cas d'une absence, vous complèterez les volets pour déclarer un arrêt de travail, et déposer votre justificatif. Dans le cas d'un retard, vous clôturerez la démarche à votre retour. Vous pouvez poser un congé par le lien suggéré dans la partie suggestions.</p>
+      <div class="action-buttons">
+        <button class="action-btn enabled">Quitter</button>
+        <button class="action-btn enabled">clôturer</button>
+      </div>
+      <hr>
+    </div>
+    <div class="form-placeholder">
+      <!-- Form Section 1: Je préviens -->
+      <div class="form-section" sectionId="section1">
+        <div class="form-header" (click)="toggleForm('section1')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Je préviens</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
+          <form [formGroup]="notifyForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
+            <div class="form-group">
+              <div class="form-field">
+                <br>
+                <label>Manager</label>
+                <div class="manager-info">
+                  <img src="assets/images/managerPhoto.jpg" alt="Manager Photo" class="manager-photo">
+                  <span class="manager-name">[Nom du Manager]</span>
+                  <span class="manager-poste">[Poste du Manager]</span>
+                </div>
+              </div>
+              <div class="form-field">
+                <label>Message</label>
+                <textarea formControlName="message" rows="5" required></textarea>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!notifyForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Form Section 2: Je déclare un arrêt -->
+      <div class="form-section" sectionId="section2">
+        <div class="form-header" (click)="toggleForm('section2')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Je déclare un arrêt</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
+          <form [formGroup]="declareForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
+            <div class="form-group">
+              <br>
+              <div class="form-field">
+                <div class="checkbox-container">
+                  <input type="checkbox" formControlName="isProlongation" id="isProlongation">
+                  <label for="isProlongation">Votre arrêt maladie est une prolongation de l'arrêt précédent</label>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Depuis</label>
+                  <input type="date" formControlName="dateDebut" required>
+                </div>
+                <div class="form-field">
+                  <label>Jusqu'à</label>
+                  <input type="date" formControlName="dateFin" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!declareForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Remplacer uniquement la section "Je justifie" dans maladie.component.html -->
+      <div class="form-section" sectionId="section3">
+        <div class="form-header" (click)="toggleForm('section3')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Je justifie</span>
+          </div>
+          <span class="header-symbol">
+      <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+    </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+          <form [formGroup]="justifyForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
+            <div class="form-group">
+              <div class="form-field">
+                <br>
+                <label>Justificatif</label>
+                <div class="file-upload-container">
+                  <label for="justificatif" class="file-upload-btn"><img src="assets/images/upload1.png"  class="upload-icon">  Choisir un fichier</label>
+                  <input id="justificatif" type="file" (change)="onFileChange($event)" accept=".pdf,.jpg,.jpeg,.png" required>
+                  <span class="file-upload-text">Formats acceptés : PDF, JPG, PNG</span>
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="checkbox-container">
+                  <input type="checkbox" formControlName="originalDepose" id="originalDepose" required>
+                  <label for="originalDepose">J'ai déposé l'original de l'arrêt maladie à l'entreprise.</label>
+                </div>
+              </div>
+              <div class="form-field">
+                <div class="checkbox-container">
+                  <input type="checkbox" formControlName="accidentTravail" id="accidentTravail">
+                  <label for="accidentTravail">Arrêt suite à un accident de travail.</label>
+                </div>
+              </div>
+              <div class="form-field" *ngIf="showAccidentDate">
+                <label>Date de l'accident</label>
+                <input type="date" formControlName="dateAccident" required>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="action-btn enabled" [disabled]="!justifyForm.valid">Envoyer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Section -->
+  <div class="right-section">
+    <!-- Top Sub-Section (Progress Indicators/Buttons) -->
+    <div class="progress-section">
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}">Créer</button>
+      <button class="progress-button" [disabled]="true">En Cours</button>
+      <button class="progress-button" [disabled]="true">Historique</button>
+    </div>
+
+    <!-- Bottom Sub-Section (Suggestions) -->
+    <div class="suggestions-section">
+      <p><a href="#">Poser un congé</a></p>
+    </div>
+  </div>
+</div>
