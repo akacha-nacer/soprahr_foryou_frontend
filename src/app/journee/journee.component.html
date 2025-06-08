@@ -1,0 +1,135 @@
+<div class="embauche-container">
+  <!-- Left Section (Main Container) -->
+  <div class="main-section">
+    <!-- Description Section -->
+    <div class="description-section">
+      <p>La démarche "Ma Journée" permet de gérer vos informations quotidiennes, telles que vos absences, anomalies, natures d'heures, pointages et références horaires. (Placeholder : description à compléter.)</p>
+      <div class="action-buttons">
+        <button class="action-btn enabled">Quitter</button>
+        <button class="action-btn enabled">Clôturer</button>
+      </div>
+      <hr>
+    </div>
+    <div class="form-placeholder">
+      <!-- Form Section 1: Mes Absences -->
+      <div class="form-section" sectionId="section1">
+        <div class="form-header" (click)="toggleForm('section1')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Mes Absences</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
+          <div class="create-dossier-form">
+            <div class="form-group">
+              <!-- Placeholder pour le contenu du formulaire -->
+              <p>Contenu du formulaire "Mes Absences" à définir.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Section 2: Mes Anomalies -->
+      <div class="form-section" sectionId="section2">
+        <div class="form-header" (click)="toggleForm('section2')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Mes Anomalies</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
+          <div class="create-dossier-form">
+            <div class="form-group">
+              <!-- Placeholder pour le contenu du formulaire -->
+              <p>Contenu du formulaire "Mes Anomalies" à définir.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Section 3: Mes Natures d'Heures -->
+      <div class="form-section" sectionId="section3">
+        <div class="form-header" (click)="toggleForm('section3')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Mes Natures d'Heures</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+          <div class="create-dossier-form">
+            <div class="form-group">
+              <!-- Placeholder pour le contenu du formulaire -->
+              <p>Contenu du formulaire "Mes Natures d'Heures" à définir.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Section 4: Mes Pointages -->
+      <div class="form-section" sectionId="section4">
+        <div class="form-header" (click)="toggleForm('section4')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section4'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Mes Pointages</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section4'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
+          <div class="create-dossier-form">
+            <div class="form-group">
+              <!-- Placeholder pour le contenu du formulaire -->
+              <p>Contenu du formulaire "Mes Pointages" à définir.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Section 5: Mes Références Horaires -->
+      <div class="form-section" sectionId="section5">
+        <div class="form-header" (click)="toggleForm('section5')">
+          <div class="header-left">
+            <span class="arrow">{{ sectionVisibility['section5'] ? '⮟' : '⮞' }}</span>
+            <span class="header-title">Mes Références Horaires</span>
+          </div>
+          <span class="header-symbol">
+            <img [src]="sectionValidationStates['section5'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+          </span>
+        </div>
+        <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
+          <div class="create-dossier-form">
+            <div class="form-group">
+              <!-- Placeholder pour le contenu du formulaire -->
+              <p>Contenu du formulaire "Mes Références Horaires" à définir.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Section -->
+  <div class="right-section">
+    <!-- Top Sub-Section (Progress Indicators/Buttons) -->
+    <div class="progress-section">
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}">Créer</button>
+      <button class="progress-button" [disabled]="true">En Cours</button>
+      <button class="progress-button" [disabled]="true">Historique</button>
+    </div>
+
+    <!-- Bottom Sub-Section (Suggestions) -->
+    <div class="suggestions-section">
+      <p><a href="#">Poser un congé</a></p>
+    </div>
+  </div>
+</div>
