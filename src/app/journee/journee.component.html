@@ -3,10 +3,10 @@
   <div class="main-section">
     <!-- Description Section -->
     <div class="description-section">
-      <p>La démarche "Ma Journée" permet de gérer vos informations quotidiennes, telles que vos absences, anomalies, natures d'heures, pointages et références horaires. (Placeholder : description à compléter.)</p>
+      <p>Depuis cette démarche, vous pouvez consulter les données d’une journée, sur votre temps de travail (vos anomalies,  vos absences, vos pointages, etc). Vous pourrez effectuer si nécessaire des mises à jour sur vos pointages et vos congés en utilisant les suggestions qui vous sont proposées.</p>
       <div class="action-buttons">
         <button class="action-btn enabled">Quitter</button>
-        <button class="action-btn enabled">Clôturer</button>
+        <button class="action-btn disabled">Supprimer</button>
       </div>
       <hr>
     </div>
@@ -58,18 +58,49 @@
         <div class="form-header" (click)="toggleForm('section3')">
           <div class="header-left">
             <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Mes Natures d'Heures</span>
+            <span class="header-title">Mes Natures d’Heures</span>
           </div>
           <span class="header-symbol">
             <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
           </span>
         </div>
         <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
-          <div class="create-dossier-form">
-            <div class="form-group">
-              <!-- Placeholder pour le contenu du formulaire -->
-              <p>Contenu du formulaire "Mes Natures d'Heures" à définir.</p>
+          <div class="nature-heures-container">
+            <div class="add-button-container">
+              <button class="add-nature-button" (click)="openAddNatureHeure()">Ajouter une nature d’heure</button>
             </div>
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Nature d’heures</th>
+                <th>Heure de début</th>
+                <th>Heure de fin</th>
+                <th>Durée</th>
+                <th>Saisie</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>Absence à tort</td>
+                <td>09:00</td>
+                <td>13:00</td>
+                <td>4h00</td>
+                <td></td>
+                <td>
+                  <button class="action-button detail-button" (click)="openDetail(natureHeuresData[0])">
+                    <img src="assets/images/searchJ.png" >
+                  </button>
+                  <button class="action-button edit-button" (click)="openEdit(natureHeuresData[0])">
+                    <img src="assets/images/editJ.png" >
+                  </button>
+                  <button class="action-button delete-button" (click)="deleteItem(natureHeuresData[0])">
+                    <img src="assets/images/deleteJ.png" >
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

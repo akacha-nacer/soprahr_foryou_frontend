@@ -373,3 +373,96 @@
   height: 20px;
   width: 20px;
 }
+
+/* Styles spécifiques pour "Mes Natures d'Heures" */
+.nature-heures-container {
+  padding: 10px 0;
+}
+
+.add-button-container {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.add-nature-button {
+  background-color: #3e505b;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.add-nature-button:hover {
+  background-color: #2c3a44;
+}
+
+.nature-heures-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nature-heures-table th,
+.nature-heures-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.nature-heures-table th {
+  background-color: #546170;
+  color: white;
+  border: solid #33434c 1px;
+  font-weight: bold;
+}
+
+.nature-heures-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.nature-heures-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.action-button {
+  background: none;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 18px;
+  color: #555;
+  border: solid #3e505b 1px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #d0d0d0;
+  color: #3e505b;
+}
+
+
+
+/* Nouvelle règle pour aligner les boutons côte à côte */
+.nature-heures-table td:last-child {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espacement entre les boutons */
+}
+
+.detail-button,
+.edit-button,
+.delete-button {
+  margin-right: 0;
+}
+
+
