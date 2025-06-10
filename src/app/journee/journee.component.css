@@ -450,8 +450,6 @@
   color: #3e505b;
 }
 
-
-
 /* Nouvelle règle pour aligner les boutons côte à côte */
 .nature-heures-table td:last-child {
   display: flex;
@@ -465,4 +463,47 @@
   margin-right: 0;
 }
 
+/* Styles pour la timeline */
+.timeline-container {
+  margin-top: 10px;
+}
 
+.timeline {
+  position: relative;
+  height: 30px;
+  background-color: #add8e6; /* Fond par défaut (bleu clair) */
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+}
+
+.tick {
+  position: absolute;
+  font-size: 12px;
+  color: #333;
+  text-align: center;
+  width: 40px;
+  transform: translateX(-50%);
+}
+
+.tick:nth-child(1) { left: 0%; } /* 00:00 */
+.tick:nth-child(2) { left: 83.3%; } /* 20:00 */
+.tick:nth-child(3) { left: 95.8%; } /* 23:00 */
+.tick:nth-child(4) { left: 100%; } /* 00:00 */
+
+.segment {
+  position: absolute;
+  height: 100%;
+}
+
+.work-hours {
+  left: 0%;
+  width: 83.3%; /* De 00:00 à 20:00 */
+  background-color: #4682b4; /* Bleu foncé */
+}
+
+.off-hours {
+  left: 83.3%;
+  width: 16.7%; /* De 20:00 à 00:00 */
+  background-color: #add8e6; /* Bleu clair */
+}

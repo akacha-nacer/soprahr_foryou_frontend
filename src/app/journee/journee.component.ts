@@ -29,7 +29,7 @@ import {PopupNatureHeureComponent} from '../popup-nature-heure/popup-nature-heur
     ])
   ]
 })
-export class JourneeComponent implements OnInit{
+export class JourneeComponent implements OnInit {
   natureHeuresForm: FormGroup;
   sectionVisibility: { [key: string]: boolean } = {};
   sectionValidationStates: { [key: string]: boolean } = {};
@@ -37,6 +37,8 @@ export class JourneeComponent implements OnInit{
   natureHeuresData = [
     { nature: 'Absence à tort', debut: '09:00', fin: '13:00', duree: '4h00', saisie: '' }
   ];
+  timelineHours = Array.from({ length: 25 }, (_, i) => (i === 0 ? '00:00' : `${i}:00`));
+  hasAnomaly = true; // Placeholder, à relier au backend plus tard
 
   constructor(private fb: FormBuilder, public dialog: MatDialog) {
     this.natureHeuresForm = this.fb.group({
@@ -122,5 +124,11 @@ export class JourneeComponent implements OnInit{
   deleteItem(item: any): void {
     console.log('Suppression de :', item);
     // Logique de suppression (à implémenter avec le backend plus tard)
+  }
+
+  toggleAnomalySection(): void {
+    if (this.hasAnomaly) {
+      this.sectionVisibility['section2'] = true; // Ouvre la section "Mes Anomalies"
+    }
   }
 }
