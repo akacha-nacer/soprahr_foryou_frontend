@@ -3,6 +3,9 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   padding: 24px;
   position: relative;
+  max-width: 80vw; /* 90% de la largeur de l'écran */
+  min-width: 300px; /* Largeur minimale pour éviter qu'il ne devienne trop petit */
+  margin: 0 auto; /* Centrage horizontal */
 }
 
 .close-button {
@@ -35,7 +38,9 @@
   padding-top: 56px;
   position: relative;
   z-index: 0;
-
+  /* Hauteur dynamique avec défilement si nécessaire */
+  max-height: 70vh; /* 80% de la hauteur de l'écran */
+  overflow-y: auto; /* Défilement vertical si le contenu déborde */
 }
 
 .form-field {
@@ -81,6 +86,8 @@
   display: flex;
   justify-content: left;
   gap: 16px;
+  margin-top: 16px; /* Espacement avec le bas du contenu */
+  padding-bottom: 16px; /* Padding pour éviter que les boutons soient collés au bas */
 }
 
 .popup-buttons .cancel-button {
@@ -134,4 +141,33 @@
 .close-icon {
   height: 15px;
   width: 15px;
+}
+
+/* Media Queries pour ajuster selon la taille de l'écran */
+@media (max-width: 600px) {
+  .popup-container {
+    max-width: 95vw; /* Plus large sur petits écrans */
+    padding: 16px;
+  }
+
+  .popup-body {
+    padding: 24px 16px;
+    max-height: 70vh; /* Réduit la hauteur max sur petits écrans */
+  }
+
+  .popup-buttons .yes-button,
+  .popup-buttons .cancel-button {
+    padding: 6px 12px !important;
+    min-width: 60px !important;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .popup-container {
+    max-width: 80vw; /* Ajustement pour tablettes */
+  }
+
+  .popup-body {
+    max-height: 75vh;
+  }
 }

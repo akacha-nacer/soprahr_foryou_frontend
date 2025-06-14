@@ -84,7 +84,6 @@ export class JourneeComponent implements OnInit {
 
   openAddNatureHeure(): void {
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
-      width: '700px',
       data: { type: 'add' }
     });
 
@@ -97,7 +96,7 @@ export class JourneeComponent implements OnInit {
 
   openDetail(item: any): void {
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
-      width: '700px',
+      // Supprimé width: '700px'
       data: { type: 'detail', item }
     });
 
@@ -110,7 +109,7 @@ export class JourneeComponent implements OnInit {
 
   openEdit(item: any): void {
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
-      width: '700px',
+      // Supprimé width: '700px'
       data: { type: 'edit', item }
     });
 

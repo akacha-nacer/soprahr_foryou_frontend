@@ -107,7 +107,7 @@
 
 .description-section {
   margin: 0 20px;
-  height: 150px;
+  height: 200px;
   display: flex;
   margin-top: 10px;
   flex-direction: column;
@@ -128,7 +128,7 @@
 .action-buttons {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 50px;
 }
 
 .action-btn {
