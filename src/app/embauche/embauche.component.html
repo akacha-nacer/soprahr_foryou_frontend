@@ -5,9 +5,9 @@
     <div class="description-section">
       <p>Cette page vous permet de créer un dossier d’embauche pour un nouvel employé. Commencez par remplir le formulaire initial ci-dessous pour enregistrer les informations de base. Une fois soumis, vous pourrez compléter les sections supplémentaires pour finaliser le dossier. Vous pouvez également recommencer ou quitter à tout moment.</p>
       <div class="action-buttons">
-        <button class="action-btn enabled" (click)="onFinalSubmit()" [disabled]="!areAllSectionsValid()">Valider Tout</button>
-        <button class="action-btn enabled">Quitter</button>
-        <button class="action-btn enabled" (click)="resetForms()">Recommencer</button>
+        <button class="action-btn enabled" (click)="onFinalSubmit()" [disabled]="!areAllSectionsValid()">Valider le  dossier</button>
+        <button class="action-btn enabled">Recommencer</button>
+        <button class="action-btn enabled" (click)="resetForms()">Quitter</button>
       </div>
       <hr>
     </div>
@@ -26,22 +26,26 @@
         <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
           <form [formGroup]="dossierForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
             <div class="form-group">
+              <div class="form-row">
               <div class="form-field">
                 <label class="label1">Date de Recrutement</label>
                 <input type="date" formControlName="dateRecrutement" required>
               </div>
               <div class="form-field">
-                <label>Code Société</label>
+                <label class="label1">Code Société</label>
                 <input type="text" formControlName="codeSociete" placeholder="Code société" required>
               </div>
+              </div>
+                <div class="form-row">
               <div class="form-field">
-                <label>Établissement</label>
+                <label >Établissement</label>
                 <input type="text" formControlName="etablissement" placeholder="Établissement" required>
               </div>
               <div class="form-field">
                 <label>Matricule Salarié</label>
                 <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required>
               </div>
+            </div>
             </div>
             <div class="form-actions">
               <button type="submit" class="action-btn enabled" [disabled]="!dossierForm.valid">Envoyer</button>
@@ -151,7 +155,7 @@
                         <img src="assets/images/deleteJ.png">
                       </button>
                       <button type="button" class="action-button" (click)="addNationality()" *ngIf="i === nationalites.length - 1">
-                        <img src="assets/images/add.png">
+                        <img src="assets/images/addE.png">
                       </button>
                     </div>
                   </div>
@@ -217,9 +221,16 @@
                   </select>
                 </div>
                 <div class="form-field">
-                  <label>Valable du .. au ..</label>
+                  <div class="form-row">
+                    <div class="form-field">
+                  <label>Valable du .. </label>
                   <input type="date" formControlName="valableDu" required>
+                    </div>
+                      <div class="form-field">
+                        <label>au ..</label>
                   <input type="date" formControlName="valableAu" required>
+                </div>
+                  </div>
                 </div>
               </div>
               <div class="form-row">
