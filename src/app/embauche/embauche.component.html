@@ -5,8 +5,9 @@
     <div class="description-section">
       <p>Cette page vous permet de créer un dossier d’embauche pour un nouvel employé. Commencez par remplir le formulaire initial ci-dessous pour enregistrer les informations de base. Une fois soumis, vous pourrez compléter les sections supplémentaires pour finaliser le dossier. Vous pouvez également recommencer ou quitter à tout moment.</p>
       <div class="action-buttons">
+        <button class="action-btn enabled" (click)="onFinalSubmit()" [disabled]="!areAllSectionsValid()">Valider Tout</button>
         <button class="action-btn enabled">Quitter</button>
-        <button class="action-btn enabled">Recommencer</button>
+        <button class="action-btn enabled" (click)="resetForms()">Recommencer</button>
       </div>
       <hr>
     </div>
@@ -129,10 +130,31 @@
               </div>
               <br>
               <h3>Nationalité</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Pays (principal ou non)</label>
-                  <input type="text" formControlName="paysNationalite" required>
+              <div formArrayName="nationalites" class="form-group">
+                <div *ngFor="let nat of nationalites.controls; let i=index" class="form-row" [formGroupName]="i">
+                  <div class="form-field">
+                    <label>Pays</label>
+                    <select formControlName="pays" required>
+                      <option value="" disabled selected>Sélectionnez un pays</option>
+                      <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <div class="checkbox-container">
+                      <input type="checkbox" formControlName="natPrincipale" (change)="onPrincipalChange(i, $event)">
+                      <label>Nationalité principale</label>
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <div class="button-group">
+                      <button type="button" class="action-button" (click)="removeNationality(i)" *ngIf="i > 0">
+                        <img src="assets/images/deleteJ.png">
+                      </button>
+                      <button type="button" class="action-button" (click)="addNationality()" *ngIf="i === nationalites.length - 1">
+                        <img src="assets/images/add.png">
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
               <br>
