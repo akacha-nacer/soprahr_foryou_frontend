@@ -9,6 +9,7 @@ import {NgIf} from '@angular/common';
 @Component({
   selector: 'app-popup-nature-heure',
   imports: [MatButtonModule, MatCheckboxModule, MatIconModule, FormsModule, NgIf],
+  standalone: true,
   templateUrl: './popup-nature-heure.component.html',
   styleUrl: './popup-nature-heure.component.css'
 })

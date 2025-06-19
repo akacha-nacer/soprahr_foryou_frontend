@@ -1,0 +1,15 @@
+<div class="popup-container">
+  <button mat-icon-button class="close-button" (click)="onClose()">
+    <img src="assets/images/close.png" class="close-icon">
+  </button>
+  <h3 class="popup-title">Confirmation</h3>
+  <br><br>
+  <div class="popup-body">
+    <p class="popup-question">{{ data.message }}</p>
+  </div>
+  <br>
+  <div class="popup-buttons">
+    <button type="button" class="cancel-button" (click)="onNo()">Non</button>
+    <button type="button" class="yes-button" (click)="onYes()">Oui</button>
+  </div>
+</div>
