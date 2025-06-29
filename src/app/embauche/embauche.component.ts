@@ -6,6 +6,8 @@ import {EmbaucheService} from '../services/embauche.service';
 import { DossierModel, RenseignementsIndividuels, Adresses, Affectations, Carriere, Nationalite } from '../models/DossierModel';
 import { HttpClientModule } from '@angular/common/http';
 import {CommonModule} from '@angular/common';
+import {PopupConfMaladieComponent} from '../popup-conf-maladie/popup-conf-maladie.component';
+import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-embauche',
@@ -15,7 +17,8 @@ import {CommonModule} from '@angular/common';
   imports: [
     HttpClientModule,
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
+    MatDialogModule
   ],
   animations: [
     trigger('slideDown', [
@@ -96,7 +99,7 @@ export class EmbaucheComponent implements OnInit {
     'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
   ];
 
-  constructor(private fb: FormBuilder, private dossierService: EmbaucheService) {
+  constructor(private fb: FormBuilder, private dossierService: EmbaucheService,private dialog: MatDialog) {
     this.dossierForm = this.fb.group({
       dateRecrutement: ['', [Validators.required]],
       codeSociete: ['', [Validators.required]],
@@ -279,16 +282,26 @@ export class EmbaucheComponent implements OnInit {
   }
 
   onFinalSubmit(): void {
+
+    const dialogRef = this.dialog.open(PopupConfMaladieComponent, {
+      width: '700px',
+      data: { message: "Voulez-vous valider définitivement toutes les informations du dossier d'embauche ?" }
+    });
+
     if (this.areAllSectionsValid()) {
-      this.dossierService.saveDossier(this.dossierData).subscribe({
-        next: (response) => {
-          console.log('Dossier saved:', response);
-          alert('Dossier soumis avec succès!');
-          this.resetForms();
-        },
-        error: (error) => {
-          console.error('Error saving dossier:', error);
-          alert('Erreur lors de la soumission du dossier.');
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.dossierService.saveDossier(this.dossierData).subscribe({
+            next: (response) => {
+              console.log('Dossier saved:', response);
+              alert('Dossier soumis avec succès!');
+              this.resetForms();
+            },
+            error: (error) => {
+              console.error('Error saving dossier:', error);
+              alert('Erreur lors de la soumission du dossier.');
+            }
+          });
         }
       });
     } else {

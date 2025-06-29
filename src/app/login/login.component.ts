@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {CommonModule} from '@angular/common';
 import {AlertModule} from 'ngx-bootstrap/alert';
+import {LoginResponseDTO} from '../models/LoginResponseDTO';
 type ExampleAlertType = { type: string; msg: string };
 
 @Component({
@@ -22,25 +23,20 @@ export class LoginComponent {
   showDangerAlert = false;
   dismissible = true;
   showForgotMessage = false;
+  errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     this.submitted = true;
-    this.authService.login(this.identifiant, this.password).subscribe(
-      response => {
-        if (response) {
-          this.router.navigate(['/welcome']);
-        } else {
-          console.error('User not found');
-
-        }
+    this.authService.login(this.identifiant,this.password).subscribe({
+      next: (response: LoginResponseDTO)=>{
+        this.router.navigate(['/espace_manager'])
       },
-      error => {
-        console.error('Login failed:', error);
-        this.showAlert();
+      error: (error:any) =>{
+        this.errorMessage = error.message || 'Login failed';
       }
-    );
+    });
   }
 
   showAlert(): void {

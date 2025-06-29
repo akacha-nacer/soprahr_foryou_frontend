@@ -1,0 +1,86 @@
+<div class="dashboard-container">
+  <div class="header-section">
+    <div class="background-image">
+      <img src="assets/images/bg_nacer.png" alt="Background Image" class="header-bg">
+    </div>
+    <div class="user-info-container">
+      <div class="user-info-section">
+        <div class="circular-image-placeholder"><img class="img1" src="assets/images/blank-avatar-women.jpg"></div>
+        <div class="user-details">
+          <span>Lazher Q11GESTRH1</span>
+          <span>CADRE SUPERIEUR</span>
+        </div>
+      </div>
+    </div>
+    <img src="assets/images/arrow.png" class="round-button" alt="Arrow Button">
+  </div>
+  <div class="main-content">
+    <div class="notification-wrapper">
+      <div class="notifications-section"
+           [@notificationSlide]="notificationState"
+           (@notificationSlide.start)="animationStart($event)"
+           (@notificationSlide.done)="animationDone($event)">
+        <div class="notification-item" (click)="toggleDemands()">Mes tâches (0)</div>
+        <div class="notification-item warning" (click)="toggleDemands()">Les demandes de mon équipe (3) <span>29/05/2025</span></div>
+      </div>
+      <div class="demands-section"
+           [@demandSlide]="demandState"
+           (@demandSlide.start)="animationStart($event)"
+           (@demandSlide.done)="animationDone($event)">
+        <div class="notif-search-container">
+          <img src="assets/images/arrowLeft.png" class="arrowLeft" (click)="goBack()"  alt="Arrow Button">
+          <div class="search-input-container">
+            <input type="text" placeholder=" Entrer un nom " class="search-bar">
+            <img src="assets/images/filtre.png" class="search-icon" alt="Search Icon">
+          </div>
+        </div>
+        <div class="demand-item" *ngFor="let demand of demands">
+          {{ demand.text }} <span>{{ demand.date }}</span>
+        </div>
+        <img src="assets/images/arrow.png" class="back-button" (click)="toggleDemands()" alt="Back Button">
+      </div>
+    </div>
+    <div class="cards-section">
+      <div class="card">
+        <div class="card-title">Absentéisme de mon équipe Responsable opérationnel (HIE) / Société FDP</div>
+        <div class="card-fraction">
+          <span class="numerator">0 j</span>
+          <div class="card-line"></div>
+          <span class="denominator">46 pers.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Absentéisme de mon équipe Responsable (HIE) / DEP QAI</div>
+        <div class="card-fraction">
+          <span class="numerator">0 j</span>
+          <div class="card-line"></div>
+          <span class="denominator">0 pers.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Absentéisme de mon équipe Responsable (HIE) / Infirmier</div>
+        <div class="card-fraction">
+          <span class="numerator">0 j</span>
+          <div class="card-line"></div>
+          <span class="denominator">21 pers.</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Micro-absentéisme de mon équipe Responsable (HIE) / DEP...</div>
+        <div class="card-fraction">
+          <span class="numerator">0 j</span>
+          <div class="card-line"></div>
+          <span class="denominator">0 pers.</span>
+        </div>
+      </div>
+    </div>
+    <div class="right-section">
+      <input type="text" placeholder=" Rechercher" class="search-bar">
+      <div class="demarches-section">
+        <div class="demarche-item"><span class="icon"> <img src="assets/images/wha.png"> </span> Mes questions RH</div>
+        <div class="demarche-item"><span class="icon"> <img src="assets/images/plc1.png"> </span> Le planning de mes collègues</div>
+        <div class="demarche-item"><span class="icon"> <img src="assets/images/conge2.png"></span> Mes congés</div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,6 @@ import {MatIconButton} from '@angular/material/button';
 @Component({
   selector: 'app-popup-conf-maladie',
   imports: [
-    MatCheckbox,
     MatIconButton
   ],
   standalone: true,

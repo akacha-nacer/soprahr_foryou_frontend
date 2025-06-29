@@ -1,14 +1,16 @@
 import { Component, HostListener } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import {Router, RouterModule} from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PopupQuestionRhComponent } from '../popup-question-rh/popup-question-rh.component';
+import {PopupConfMaladieComponent} from '../popup-conf-maladie/popup-conf-maladie.component';
+import {AuthService} from '../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatDialogModule],
+  imports: [CommonModule, RouterModule, MatDialogModule,RouterModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   animations: [
@@ -74,7 +76,7 @@ export class NavbarComponent {
   isSubDropdownOpen2 = false;
   isAnimatingSubDropdown = false;
 
-  constructor(private dialog: MatDialog) {}
+  constructor(private dialog: MatDialog,private router:Router, private authServcie:AuthService) {}
 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
@@ -172,4 +174,29 @@ export class NavbarComponent {
       console.log('Search closed (outside click):', this.isSearchOpen);
     }
   }
+
+  logout(){
+    const dialogRef = this.dialog.open(PopupConfMaladieComponent, {
+      width: '700px',
+      data: { message: "Voulez-vous vous déconnecter de votre session ?" }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.authServcie.logout();
+        this.router.navigate(['/auth']);
+      }
+    });
+  }
+
+  navigateToPage(route: string) {
+    this.router.navigate([route]);
+
+    this.isDropdownOpen = false;
+    this.isSubDropdownOpen = false;
+    this.isSubDropdownOpen1 = false;
+    this.isSubDropdownOpen2 = false;
+
+  }
+
 }
