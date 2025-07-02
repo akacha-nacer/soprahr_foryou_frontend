@@ -1,14 +1,16 @@
 .navbar {
   background-color: #000000;
-  font-family: Arial;
   z-index: 1;
   position: relative;
   height: 60px;
   display: flex;
+  font-size: 15px;
   justify-content: space-between;
   align-items: stretch;
   margin: 0;
   padding: 0;
+  font-family: 'OpenSansSemi', sans-serif ;
+
 }
 
 .navbar a {
@@ -196,12 +198,12 @@
 
 .sub-dropdown-content {
   top: 50px;
-  left: 300px;
+  left: 320px;
 }
 
 .sub-dropdown-content2{
   position: absolute;
-  min-width: 290px;
+  min-width: 300px;
   z-index: 9999;
   max-height: 0px;
   opacity: 1;
@@ -212,12 +214,12 @@
 
 .sub-dropdown-content1 {
   top: 50px;
-  left: 500px;
+  left: 520px;
 }
 
 .sub-dropdown-content2 {
   top: 85px;
-  left: 700px;
+  left: 720px;
 }
 
 

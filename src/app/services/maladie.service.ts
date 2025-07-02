@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AbsenceDeclaration } from '../models/AbsenceDeclarationModel';
 import { Notification } from '../models/NotificationModel';
+import {NotificationDTO} from '../models/NotificationDTOModel';
 
 @Injectable({
   providedIn: 'root'
@@ -40,5 +41,13 @@ export class MaladieService {
   closeSickLeave(employeeId: number): Observable<string> {
     const params = new HttpParams().set('employeeId', employeeId.toString());
     return this.http.post(`${this.apiUrl}/close`, null, { params, responseType: 'text' });
+  }
+
+  getNotificationsWithDeclarations(managerId: number| null): Observable<NotificationDTO[]> {
+    return this.http.get<NotificationDTO[]>(`${this.apiUrl}/manager/${managerId}/getnotif`);
+  }
+
+  validateNotification(notificationId: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/notifications/${notificationId}/validate`, { isValidated: true });
   }
 }

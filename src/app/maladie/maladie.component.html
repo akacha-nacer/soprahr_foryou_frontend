@@ -5,8 +5,8 @@
     <div class="description-section">
       <p>Vous êtes malade, vous ne serez pas présent à votre poste. La démarche "Je suis malade" permet de prévenir par défaut votre manager, de gérer éventuellement vos réponses automatiques en cas d'absence du bureau. Vous pouvez envoyer le message par défaut ou le modifier afin de prévenir pour une absence ou un retard. Dans le cas d'une absence, vous complèterez les volets pour déclarer un arrêt de travail, et déposer votre justificatif. Dans le cas d'un retard, vous clôturerez la démarche à votre retour. Vous pouvez poser un congé par le lien suggéré dans la partie suggestions.</p>
       <div class="action-buttons">
-        <button class="action-btn enabled">Clôturer</button>
-        <button class="action-btn enabled">Quitter</button>
+        <button class="action-btn enabled" (click)="cloturerMaladie()">Clôturer</button>
+        <button class="action-btn enabled" >Quitter</button>
       </div>
       <hr>
     </div>
@@ -34,9 +34,16 @@
                   <span class="manager-poste">[Poste du Manager]</span>
                 </div>
               </div>
+
               <div class="form-field">
                 <label>Message</label>
                 <textarea formControlName="message" rows="5" required></textarea>
+              </div>
+            </div>
+            <div class="form-field">
+              <div class="checkbox-container">
+                <input type="checkbox" formControlName="retard" id="retard">
+                <label for="retard">Je signale un retard.</label>
               </div>
             </div>
             <div class="form-actions">

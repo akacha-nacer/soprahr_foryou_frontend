@@ -3,4 +3,7 @@ export interface AbsenceDeclaration {
   isProlongation: boolean;
   dateDebut: string;
   dateFin: string;
+  cloturee?: boolean;
+  employeeId?: number;
+  notificationId?: number;
 }

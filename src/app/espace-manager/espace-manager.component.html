@@ -7,8 +7,9 @@
       <div class="user-info-section">
         <div class="circular-image-placeholder"><img class="img1" src="assets/images/blank-avatar-women.jpg"></div>
         <div class="user-details">
-          <span>Lazher Q11GESTRH1</span>
-          <span>CADRE SUPERIEUR</span>
+          <span class="nameId">Lazher Q11GESTRH1</span>
+          <span class="position1">CADRE SUPERIEUR</span>
+          <span class="folder1">0 <img src="assets/images/folder.png" class="folderIcon"></span>
         </div>
       </div>
     </div>
@@ -20,66 +21,124 @@
            [@notificationSlide]="notificationState"
            (@notificationSlide.start)="animationStart($event)"
            (@notificationSlide.done)="animationDone($event)">
-        <div class="notification-item" (click)="toggleDemands()">Mes tâches (0)</div>
-        <div class="notification-item warning" (click)="toggleDemands()">Les demandes de mon équipe (3) <span>29/05/2025</span></div>
+        <div class="notification-item">Mes tâches (0) <span>24/05/2025</span></div>
+        <div class="notification-item warning" (click)="toggleDemands()">
+          Les notifications de mon équipe ({{ notifications.length }}) <span>29/05/2025</span>
+        </div>
       </div>
       <div class="demands-section"
            [@demandSlide]="demandState"
            (@demandSlide.start)="animationStart($event)"
            (@demandSlide.done)="animationDone($event)">
         <div class="notif-search-container">
-          <img src="assets/images/arrowLeft.png" class="arrowLeft" (click)="goBack()"  alt="Arrow Button">
+          <img src="assets/images/arrowLeft.png" class="arrowLeft" (click)="goBackFromDemands()" alt="Back Button">
           <div class="search-input-container">
-            <input type="text" placeholder=" Entrer un nom " class="search-bar">
+            <input type="text" placeholder="Entrer un nom" class="search-bar">
             <img src="assets/images/filtre.png" class="search-icon" alt="Search Icon">
           </div>
         </div>
-        <div class="demand-item" *ngFor="let demand of demands">
-          {{ demand.text }} <span>{{ demand.date }}</span>
+        <div class="demand-item" *ngFor="let notification of notifications"
+             [class.disabled]="notification.retard || notification.cloturee || !notification.isValidated"
+             (click)="showDeclaration(notification)">
+          {{ notification.employeeName }}:
+          <span>{{ notification.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span *ngIf="notification.retard">(Retard - Aucun action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
+          <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
+          <button *ngIf="!notification.retard && !notification.cloturee && !notification.isValidated"
+                  class="action-btn enabled"
+                  (click)="validateNotification(notification); $event.stopPropagation()"
+                  aria-label="Valider la notification">Valider</button>
+          <button *ngIf="!notification.retard && !notification.cloturee && notification.isValidated"
+                  class="action-btn disabled"
+                  disabled
+                  aria-label="Demande validée">Demande validée</button>
         </div>
-        <img src="assets/images/arrow.png" class="back-button" (click)="toggleDemands()" alt="Back Button">
+        <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDemands()" alt="Back Button">
+      </div>
+      <div class="declarations-section"
+           [@declarationSlide]="declarationState"
+           (@declarationSlide.start)="animationStart($event)"
+           (@declarationSlide.done)="animationDone($event)">
+        <img src="assets/images/arrowLeft.png" class="arrowLeftD" (click)="goBackFromDeclarations()" alt="Back Button">
+        <div class="demand-item" *ngFor="let declaration of selectedNotification?.absenceDeclarations">
+          {{ declaration.isProlongation ? 'Prolongation' : 'Déclaration' }}
+          du {{ declaration.dateDebut | date:'dd/MM/yyyy' }}
+          au {{ declaration.dateFin | date:'dd/MM/yyyy' }}
+          ({{ declaration.cloturee ? 'Clôturée' : 'Non Clôturée' }})
+        </div>
+        <div class="demand-item" *ngIf="selectedNotification && selectedNotification.absenceDeclarations.length === 0">
+          Aucune déclaration associée
+        </div>
+        <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDeclarations()" alt="Back Button">
       </div>
     </div>
     <div class="cards-section">
       <div class="card">
         <div class="card-title">Absentéisme de mon équipe Responsable opérationnel (HIE) / Société FDP</div>
         <div class="card-fraction">
-          <span class="numerator">0 j</span>
+          <span class="numerator">0 <span class="text1"> j </span></span>
           <div class="card-line"></div>
-          <span class="denominator">46 pers.</span>
+          <span class="denominator">46 <span class="text1"> pers.</span></span>
         </div>
       </div>
       <div class="card">
         <div class="card-title">Absentéisme de mon équipe Responsable (HIE) / DEP QAI</div>
         <div class="card-fraction">
-          <span class="numerator">0 j</span>
+          <span class="numerator">0 <span class="text1"> j </span></span>
           <div class="card-line"></div>
-          <span class="denominator">0 pers.</span>
+          <span class="denominator">0 <span class="text1"> pers.</span></span>
         </div>
       </div>
       <div class="card">
         <div class="card-title">Absentéisme de mon équipe Responsable (HIE) / Infirmier</div>
         <div class="card-fraction">
-          <span class="numerator">0 j</span>
+          <span class="numerator">0 <span class="text1"> j </span></span>
           <div class="card-line"></div>
-          <span class="denominator">21 pers.</span>
+          <span class="denominator">21 <span class="text1"> pers.</span></span>
         </div>
       </div>
       <div class="card">
         <div class="card-title">Micro-absentéisme de mon équipe Responsable (HIE) / DEP...</div>
         <div class="card-fraction">
-          <span class="numerator">0 j</span>
+          <span class="numerator">0 <span class="text1"> j </span></span>
           <div class="card-line"></div>
-          <span class="denominator">0 pers.</span>
+          <span class="denominator">0 <span class="text1"> pers.</span></span>
+        </div>
+      </div>
+      <div class="card1">
+        <div class="card-title">Mon solde de congés</div>
+        <div class="card-fraction">
+          <span class="numerator">0 <span class="text1"> j </span></span>
+          <div class="card-line"></div>
+          <span class="denominator1">0 <span class="text1"> j </span></span>
+        </div>
+      </div>
+      <div class="card1">
+        <div class="card-title">Mes autres absences</div>
+        <div class="card-fraction">
+          <span class="numerator">1 <span class="text1"> j pris</span></span>
         </div>
       </div>
     </div>
+
     <div class="right-section">
       <input type="text" placeholder=" Rechercher" class="search-bar">
       <div class="demarches-section">
-        <div class="demarche-item"><span class="icon"> <img src="assets/images/wha.png"> </span> Mes questions RH</div>
-        <div class="demarche-item"><span class="icon"> <img src="assets/images/plc1.png"> </span> Le planning de mes collègues</div>
-        <div class="demarche-item"><span class="icon"> <img src="assets/images/conge2.png"></span> Mes congés</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/wha.png"></span> Mes questions RH</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/plc1.png"></span> Le planning de mes collègues</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mes congés</div>
+        <div class="demarche-item"><span class="icon"><img class="big" src="assets/images/calender.png"></span> Je gère le planning de mon équipe</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère le temps de travail de mon équipe</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je consulte les compteurs de mon équipe</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère les fins de période d'essai de mon équipe</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère les fins de contrats de mon équipe</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère les départs de mon équipe</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Ma journée</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mon planning hebdomadaire</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mes attestations</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je suis malade</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mon mode de transport</div>
+        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mon déménagement</div>
       </div>
     </div>
   </div>

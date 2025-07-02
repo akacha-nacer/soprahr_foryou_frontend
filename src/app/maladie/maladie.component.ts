@@ -50,7 +50,7 @@ export class MaladieComponent implements OnInit {
   absenceDeclarationId?: number | null = null;
 
   maladieData = {
-    notification: { message: '' } as Notification,
+    notification: { message: '' , retard: false} as Notification,
     absenceDeclaration: { isProlongation: false, dateDebut: '', dateFin: '' } as AbsenceDeclaration,
     justification: { justificatifFileName: '', originalDepose: false, accidentTravail: false, dateAccident: '' } as Justification
   };
@@ -61,7 +61,8 @@ export class MaladieComponent implements OnInit {
     private dialog: MatDialog
   ) {
     this.notifyForm = this.fb.group({
-      message: ['Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01', [Validators.required]]
+      message: ['Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01', [Validators.required]],
+      retard: [false],
     });
 
     this.declareForm = this.fb.group({
@@ -287,7 +288,7 @@ export class MaladieComponent implements OnInit {
   private updateMaladieData(sectionId: string, formValue: any): void {
     switch (sectionId) {
       case 'section1':
-        this.maladieData.notification = { message: formValue.message };
+        this.maladieData.notification = { message: formValue.message,retard: formValue.retard };
         break;
       case 'section2':
         this.maladieData.absenceDeclaration = { ...this.maladieData.absenceDeclaration, ...formValue };
@@ -307,6 +308,21 @@ export class MaladieComponent implements OnInit {
     return Object.values(this.sectionValidationStates).every(state => state);
   }
 
+
+  cloturerMaladie():void{
+    if (this.employeeId){
+      this.maladieService.closeSickLeave(this.employeeId).subscribe({
+        next: () =>{
+          alert('succès de la cloturation ')
+          this.resetForms();
+        }
+      });
+
+    }else {
+      alert('erreur  lors de la cloturation ')
+    }
+
+  }
   resetForms(): void {
     this.notifyForm.reset({
       message: 'Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01'
