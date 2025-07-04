@@ -115,7 +115,7 @@
 }
 
 .description-section p {
-  font-size: 14px;
+  font-size: 15px;
   color: #666;
   line-height: 1.4;
   margin: 0;
@@ -375,4 +375,16 @@
   height: 20px;
   width: 20px;
   margin-right: 5px;
+}
+
+
+.form-header.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.disable-message {
+  margin-top: 10px;
+  color: #6c757d;
+  font-size: 16px;
+  font-style: italic;
 }

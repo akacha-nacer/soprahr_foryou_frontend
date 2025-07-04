@@ -1,6 +1,5 @@
-export interface Justification {
-  id?: number;
-  contentType?: string;
+export interface JustificationDTO {
+  id: number;
   originalDepose: boolean;
   accidentTravail: boolean;
   dateAccident?: string;

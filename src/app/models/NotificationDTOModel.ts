@@ -7,7 +7,6 @@ export interface NotificationDTO {
   createdAt: string;
   employeeId: number;
   employeeName: string;
-  isValidated?: boolean;
-  absenceDeclarations: AbsenceDeclarationDTO[];
+  absenceDeclarations: AbsenceDeclarationDTO[] ;
   retard?:boolean;
 }

@@ -28,6 +28,10 @@ export class MaladieService {
     return this.http.post(`${this.apiUrl}/justify`, formData, { responseType: 'text' });
   }
 
+  getJustificationFile(justificationId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/justify/${justificationId}/file`, { responseType: 'blob' });
+  }
+
   getActiveNotification(employeeId: number): Observable<Notification | null> {
     const params = new HttpParams().set('employeeId', employeeId.toString());
     return this.http.get<Notification | null>(`${this.apiUrl}/notifications/active`, { params });
@@ -35,7 +39,7 @@ export class MaladieService {
 
   getActiveAbsenceDeclaration(employeeId: number): Observable<AbsenceDeclaration | null> {
     const params = new HttpParams().set('employeeId', employeeId.toString());
-    return this.http.get<AbsenceDeclaration | null>(`${this.apiUrl}/declarations/active`, { params });
+    return this.http.get<AbsenceDeclaration | null>(`${this.apiUrl}/declaration/active`, { params }); // Fixed endpoint URL
   }
 
   closeSickLeave(employeeId: number): Observable<string> {
@@ -47,7 +51,11 @@ export class MaladieService {
     return this.http.get<NotificationDTO[]>(`${this.apiUrl}/manager/${managerId}/getnotif`);
   }
 
-  validateNotification(notificationId: number): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/notifications/${notificationId}/validate`, { isValidated: true });
+  validateDeclaration(declarationId: number): Observable<void> {
+    return this.http.patch<void>(`${this.apiUrl}/declaration/${declarationId}/validate`, { isValidated: true });
+  }
+
+  downloadJustification(justificationId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/justifications/${justificationId}/download`, { responseType: 'blob' });
   }
 }

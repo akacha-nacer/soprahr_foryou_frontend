@@ -43,6 +43,8 @@ export class MaladieComponent implements OnInit {
   justifyForm: FormGroup;
   sectionVisibility: { [key: string]: boolean } = {};
   sectionValidationStates: { [key: string]: boolean } = {};
+  isNotificationFormDisabled: boolean = false;
+  isDeclarationFormDisabled: boolean = false;
   activeProgressButton: string = 'Créer';
   showAccidentDate: boolean = false;
   selectedFile: File | null = null;
@@ -50,9 +52,9 @@ export class MaladieComponent implements OnInit {
   absenceDeclarationId?: number | null = null;
 
   maladieData = {
-    notification: { message: '' , retard: false} as Notification,
+    notification: { message: '', retard: false } as Notification,
     absenceDeclaration: { isProlongation: false, dateDebut: '', dateFin: '' } as AbsenceDeclaration,
-    justification: { justificatifFileName: '', originalDepose: false, accidentTravail: false, dateAccident: '' } as Justification
+    justification: { contentType: '', originalDepose: false, accidentTravail: false, dateAccident: '' } as Justification
   };
 
   constructor(
@@ -73,14 +75,13 @@ export class MaladieComponent implements OnInit {
 
     this.justifyForm = this.fb.group({
       justificatif: ['', [Validators.required]],
-      originalDepose: [false, [Validators.requiredTrue]],
+      originalDepose: [false],
       accidentTravail: [false],
       dateAccident: ['']
     });
   }
 
   ngOnInit(): void {
-    // Retrieve user object from sessionStorage
     const storedUser = sessionStorage.getItem('user');
     console.log('Stored user from sessionStorage:', storedUser);
 
@@ -129,12 +130,14 @@ export class MaladieComponent implements OnInit {
       this.justifyForm.get('dateAccident')?.updateValueAndValidity();
     });
 
-    // Check for active notification and absence declaration
+    // Check for active notification
     this.maladieService.getActiveNotification(this.employeeId).subscribe({
       next: (notification) => {
         if (notification) {
           this.sectionValidationStates['section1'] = true;
           this.sectionVisibility['section1'] = false;
+          this.isNotificationFormDisabled = true;
+          this.notifyForm.disable();
         }
       },
       error: (error) => {
@@ -142,12 +145,15 @@ export class MaladieComponent implements OnInit {
       }
     });
 
+    // Check for active absence declaration
     this.maladieService.getActiveAbsenceDeclaration(this.employeeId).subscribe({
       next: (declaration) => {
         if (declaration && declaration.id) {
           this.absenceDeclarationId = declaration.id;
           this.sectionValidationStates['section2'] = true;
           this.sectionVisibility['section2'] = false;
+          this.isDeclarationFormDisabled = true;
+          this.declareForm.disable();
         }
       },
       error: (error) => {
@@ -157,6 +163,9 @@ export class MaladieComponent implements OnInit {
   }
 
   toggleForm(sectionId: string): void {
+    // Only toggle if the section is not disabled
+    if (sectionId === 'section1' && this.isNotificationFormDisabled) return;
+    if (sectionId === 'section2' && this.isDeclarationFormDisabled) return;
     this.sectionVisibility[sectionId] = !this.sectionVisibility[sectionId];
   }
 
@@ -208,6 +217,8 @@ export class MaladieComponent implements OnInit {
           console.log('Notification submitted:', response);
           this.sectionValidationStates[sectionId] = true;
           this.sectionVisibility[sectionId] = false;
+          this.isNotificationFormDisabled = true;
+          this.notifyForm.disable();
         },
         error: (error: any) => {
           console.error('Error submitting notification:', error);
@@ -222,6 +233,8 @@ export class MaladieComponent implements OnInit {
           this.absenceDeclarationId = response.id;
           this.sectionValidationStates[sectionId] = true;
           this.sectionVisibility[sectionId] = false;
+          this.isDeclarationFormDisabled = true;
+          this.declareForm.disable();
         },
         error: (error: any) => {
           console.error('Error submitting absence declaration:', error);
@@ -235,6 +248,7 @@ export class MaladieComponent implements OnInit {
           next: (declaration) => {
             if (declaration && declaration.id) {
               this.absenceDeclarationId = declaration.id;
+              console.log(this.absenceDeclarationId);
               this.submitJustification(sectionId);
             } else {
               alert('Erreur : Aucune déclaration d\'absence active.');
@@ -270,10 +284,6 @@ export class MaladieComponent implements OnInit {
     this.maladieService.saveJustification(formData, this.absenceDeclarationId).subscribe({
       next: (response: string) => {
         console.log('Justification submitted:', response);
-        const fileNameMatch = response.match(/File: (\S+)/);
-        if (fileNameMatch && fileNameMatch[1]) {
-          this.maladieData.justification.justificatifFileName = fileNameMatch[1];
-        }
         this.sectionValidationStates[sectionId] = true;
         this.sectionVisibility[sectionId] = false;
       },
@@ -288,7 +298,7 @@ export class MaladieComponent implements OnInit {
   private updateMaladieData(sectionId: string, formValue: any): void {
     switch (sectionId) {
       case 'section1':
-        this.maladieData.notification = { message: formValue.message,retard: formValue.retard };
+        this.maladieData.notification = { message: formValue.message, retard: formValue.retard };
         break;
       case 'section2':
         this.maladieData.absenceDeclaration = { ...this.maladieData.absenceDeclaration, ...formValue };
@@ -296,6 +306,7 @@ export class MaladieComponent implements OnInit {
       case 'section3':
         this.maladieData.justification = {
           ...this.maladieData.justification,
+          contentType: this.selectedFile ? this.selectedFile.type : '',
           originalDepose: formValue.originalDepose,
           accidentTravail: formValue.accidentTravail,
           dateAccident: formValue.dateAccident
@@ -308,21 +319,27 @@ export class MaladieComponent implements OnInit {
     return Object.values(this.sectionValidationStates).every(state => state);
   }
 
-
-  cloturerMaladie():void{
-    if (this.employeeId){
+  cloturerMaladie(): void {
+    if (this.employeeId) {
       this.maladieService.closeSickLeave(this.employeeId).subscribe({
-        next: () =>{
-          alert('succès de la cloturation ')
+        next: () => {
+          alert('Succès de la clôturation');
           this.resetForms();
+          // Re-enable forms after closing
+          this.isNotificationFormDisabled = false;
+          this.isDeclarationFormDisabled = false;
+          this.notifyForm.enable();
+          this.declareForm.enable();
+        },
+        error: () => {
+          alert('Erreur lors de la clôturation');
         }
       });
-
-    }else {
-      alert('erreur  lors de la cloturation ')
+    } else {
+      alert('Erreur lors de la clôturation');
     }
-
   }
+
   resetForms(): void {
     this.notifyForm.reset({
       message: 'Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01'
@@ -342,7 +359,7 @@ export class MaladieComponent implements OnInit {
     this.maladieData = {
       notification: { message: '' },
       absenceDeclaration: { isProlongation: false, dateDebut: '', dateFin: '' },
-      justification: { justificatifFileName: '', originalDepose: false, accidentTravail: false, dateAccident: '' }
+      justification: { contentType: '', originalDepose: false, accidentTravail: false, dateAccident: '' }
     };
     this.activeProgressButton = 'Créer';
     this.selectedFile = null;

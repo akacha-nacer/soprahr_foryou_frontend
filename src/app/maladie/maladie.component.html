@@ -6,14 +6,14 @@
       <p>Vous êtes malade, vous ne serez pas présent à votre poste. La démarche "Je suis malade" permet de prévenir par défaut votre manager, de gérer éventuellement vos réponses automatiques en cas d'absence du bureau. Vous pouvez envoyer le message par défaut ou le modifier afin de prévenir pour une absence ou un retard. Dans le cas d'une absence, vous complèterez les volets pour déclarer un arrêt de travail, et déposer votre justificatif. Dans le cas d'un retard, vous clôturerez la démarche à votre retour. Vous pouvez poser un congé par le lien suggéré dans la partie suggestions.</p>
       <div class="action-buttons">
         <button class="action-btn enabled" (click)="cloturerMaladie()">Clôturer</button>
-        <button class="action-btn enabled" >Quitter</button>
+        <button class="action-btn enabled">Quitter</button>
       </div>
       <hr>
     </div>
     <div class="form-placeholder">
       <!-- Form Section 1: Je préviens -->
       <div class="form-section" sectionId="section1">
-        <div class="form-header" (click)="toggleForm('section1')">
+        <div class="form-header" [class.disabled]="isNotificationFormDisabled" (click)="toggleForm('section1')">
           <div class="header-left">
             <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
             <span class="header-title">Je préviens</span>
@@ -34,28 +34,31 @@
                   <span class="manager-poste">[Poste du Manager]</span>
                 </div>
               </div>
-
               <div class="form-field">
                 <label>Message</label>
-                <textarea formControlName="message" rows="5" required></textarea>
+                <textarea formControlName="message" rows="5" required [disabled]="isNotificationFormDisabled"></textarea>
               </div>
             </div>
             <div class="form-field">
               <div class="checkbox-container">
-                <input type="checkbox" formControlName="retard" id="retard">
+                <input type="checkbox" formControlName="retard" id="retard" [disabled]="isNotificationFormDisabled">
                 <label for="retard">Je signale un retard.</label>
               </div>
             </div>
             <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!notifyForm.valid">Envoyer</button>
+              <button type="submit" class="action-btn" [ngClass]="{'enabled': !isNotificationFormDisabled, 'disabled': isNotificationFormDisabled}" [disabled]="!notifyForm.valid || isNotificationFormDisabled">Envoyer</button>
             </div>
           </form>
+          <div class="disable-message" *ngIf="isNotificationFormDisabled">
+            Une notification a déjà été envoyée. Veuillez clôturer pour en envoyer une autre.
+          </div>
         </div>
       </div>
 
+
       <!-- Form Section 2: Je déclare un arrêt -->
       <div class="form-section" sectionId="section2">
-        <div class="form-header" (click)="toggleForm('section2')">
+        <div class="form-header" [class.disabled]="isDeclarationFormDisabled" (click)="toggleForm('section2')">
           <div class="header-left">
             <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
             <span class="header-title">Je déclare un arrêt</span>
@@ -70,25 +73,28 @@
               <br>
               <div class="form-field">
                 <div class="checkbox-container">
-                  <input type="checkbox" formControlName="isProlongation" id="isProlongation">
+                  <input type="checkbox" formControlName="isProlongation" id="isProlongation" [disabled]="isDeclarationFormDisabled">
                   <label for="isProlongation">Votre arrêt maladie est une prolongation de l'arrêt précédent</label>
                 </div>
               </div>
               <div class="form-row">
                 <div class="form-field">
                   <label>Depuis</label>
-                  <input type="date" formControlName="dateDebut" required>
+                  <input type="date" formControlName="dateDebut" required [disabled]="isDeclarationFormDisabled">
                 </div>
                 <div class="form-field">
                   <label>Jusqu'à</label>
-                  <input type="date" formControlName="dateFin" required>
+                  <input type="date" formControlName="dateFin" required [disabled]="isDeclarationFormDisabled">
                 </div>
               </div>
             </div>
             <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!declareForm.valid">Envoyer</button>
+              <button type="submit" class="action-btn" [ngClass]="{'enabled': !isDeclarationFormDisabled, 'disabled': isDeclarationFormDisabled}" [disabled]="!declareForm.valid || isDeclarationFormDisabled">Envoyer</button>
             </div>
           </form>
+          <div class="disable-message" *ngIf="isDeclarationFormDisabled">
+            Une déclaration d'arrêt a déjà été envoyée. Veuillez clôturer pour en envoyer une autre.
+          </div>
         </div>
       </div>
 

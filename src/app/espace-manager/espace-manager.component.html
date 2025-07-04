@@ -38,17 +38,18 @@
           </div>
         </div>
         <div class="demand-item" *ngFor="let notification of notifications"
-             [class.disabled]="notification.retard || notification.cloturee || !notification.isValidated"
+             [class.disabled]="notification.cloturee"
              (click)="showDeclaration(notification)">
           {{ notification.employeeName }}:
           <span>{{ notification.createdAt | date:'dd/MM/yyyy' }}</span>
           <span *ngIf="notification.retard">(Retard - Aucun action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
           <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
-          <button *ngIf="!notification.retard && !notification.cloturee && !notification.isValidated"
+          <span *ngIf="!notification.retard && !notification.cloturee && notification.absenceDeclarations.length === 0">(Aucune déclaration)</span>
+          <button *ngIf="isDeclarationValidatable(notification)"
                   class="action-btn enabled"
                   (click)="validateNotification(notification); $event.stopPropagation()"
-                  aria-label="Valider la notification">Valider</button>
-          <button *ngIf="!notification.retard && !notification.cloturee && notification.isValidated"
+                  aria-label="Valider la déclaration">Valider</button>
+          <button *ngIf="!notification.retard && !notification.cloturee && isDeclarationValidatedOrClosed(notification)"
                   class="action-btn disabled"
                   disabled
                   aria-label="Demande validée">Demande validée</button>
@@ -60,13 +61,30 @@
            (@declarationSlide.start)="animationStart($event)"
            (@declarationSlide.done)="animationDone($event)">
         <img src="assets/images/arrowLeft.png" class="arrowLeftD" (click)="goBackFromDeclarations()" alt="Back Button">
-        <div class="demand-item" *ngFor="let declaration of selectedNotification?.absenceDeclarations">
-          {{ declaration.isProlongation ? 'Prolongation' : 'Déclaration' }}
-          du {{ declaration.dateDebut | date:'dd/MM/yyyy' }}
-          au {{ declaration.dateFin | date:'dd/MM/yyyy' }}
-          ({{ declaration.cloturee ? 'Clôturée' : 'Non Clôturée' }})
+        <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.message?.length ?? 0) > 0">
+          Message :
+          <span class="messageD">{{selectedNotification.message}}</span>
         </div>
-        <div class="demand-item" *ngIf="selectedNotification && selectedNotification.absenceDeclarations.length === 0">
+        <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.absenceDeclarations?.length ?? 0) > 0">
+          {{ selectedNotification.absenceDeclarations[0].isProlongation ? 'Prolongation :' : 'Déclaration :' }}
+          <span>du {{ selectedNotification.absenceDeclarations[0].dateDebut | date:'dd/MM/yyyy' }}</span>
+          <span>au {{ selectedNotification.absenceDeclarations[0].dateFin | date:'dd/MM/yyyy' }}</span>
+          <span>({{ selectedNotification.absenceDeclarations[0].cloturee ? 'Clôturée' : selectedNotification.absenceDeclarations[0].isValidated ? 'Validée' : 'Non Validée' }})</span>
+        </div>
+        <div class="demand-item" *ngIf="hasJustifications">
+          Justification(s):
+          <div class="justifications-list">
+            <div class="justification-item" *ngFor="let justification of selectedNotification!.absenceDeclarations![0].justifications;let i = index">
+              <span class="justification-number">{{ i + 1 }}. </span>
+              <span class="justText">{{ justification.originalDepose ? ' (Original déposé)' : ' (Original non déposé)' }}</span>
+              <button class="action-btnj enabled" (click)="downloadJustification(justification.id)">
+                <img src="assets/images/dwnld.png" class="folderIcon" alt="Download Icon">
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.absenceDeclarations?.length ?? 0) === 0 && !selectedNotification.retard">
           Aucune déclaration associée
         </div>
         <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDeclarations()" alt="Back Button">
@@ -120,7 +138,6 @@
         </div>
       </div>
     </div>
-
     <div class="right-section">
       <input type="text" placeholder=" Rechercher" class="search-bar">
       <div class="demarches-section">

@@ -253,6 +253,11 @@
 .demand-item span {
   font-family: 'OpenSansItalic', sans-serif;
   font-size: 15px;
+
+}
+
+.messageD{
+  max-width: 450px;
 }
 
 .demand-item:hover {
@@ -586,3 +591,49 @@
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
   opacity: 0.6;
 }
+
+
+.justText{
+  margin-right: 50px;
+}
+
+.action-btnj {
+  width: 40px; /* Fixed size for circular shape */
+  height: 40px;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  color: black;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  transition: background-color 0.3s ease;
+}
+
+.action-btnj img {
+  max-width: 24px; /* Scale image to fit */
+  max-height: 24px;
+  object-fit: contain; /* Prevent distortion */
+}
+
+.action-btnj.enabled {
+  background-color: transparent;
+  color: black;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btnj.enabled:hover {
+  background-color: #c3c7cf;
+  color: white;
+}
+
+.justifications-list {
+  margin-top: 8px;
+}
+.justification-item {
+  margin-bottom: 12px; /* Space between justification items */
+  display: block; /* Stack elements vertically */
+}
+

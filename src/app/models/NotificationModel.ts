@@ -5,6 +5,5 @@ export interface Notification {
   createdAt?: string;
   employeeId?: number;
   recipientId?: number;
-  isValidated?: boolean;
   retard?:boolean;
 }

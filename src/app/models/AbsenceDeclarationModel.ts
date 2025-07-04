@@ -6,4 +6,5 @@ export interface AbsenceDeclaration {
   cloturee?: boolean;
   employeeId?: number;
   notificationId?: number;
+  isValidated?: boolean;
 }

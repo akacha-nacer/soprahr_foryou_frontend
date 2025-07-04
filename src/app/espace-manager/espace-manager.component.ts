@@ -4,6 +4,8 @@ import { animate, AnimationEvent, state, style, transition, trigger } from '@ang
 import { MaladieService } from '../services/maladie.service';
 import { NotificationDTO } from '../models/NotificationDTOModel';
 
+
+
 @Component({
   selector: 'app-espace-manager',
   standalone: true,
@@ -73,6 +75,33 @@ export class EspaceManagerComponent implements OnInit {
     }
   }
 
+  isDeclarationValidatable(notification: NotificationDTO): boolean {
+    return (
+      !notification.retard &&
+      !notification.cloturee &&
+      notification.absenceDeclarations?.length > 0 &&
+      !notification.absenceDeclarations[0]?.isValidated &&
+      !notification.absenceDeclarations[0]?.cloturee
+    );
+  }
+
+  get hasJustifications(): boolean {
+    return (
+      this.selectedNotification != null &&
+      this.selectedNotification.absenceDeclarations != null &&
+      this.selectedNotification.absenceDeclarations.length > 0 &&
+      this.selectedNotification.absenceDeclarations[0].justifications != null &&
+      this.selectedNotification.absenceDeclarations[0].justifications.length > 0
+    );
+  }
+
+  isDeclarationValidatedOrClosed(notification: NotificationDTO): boolean {
+    return <boolean>(
+      notification.absenceDeclarations?.length > 0 &&
+      (notification.absenceDeclarations[0]?.isValidated || notification.absenceDeclarations[0]?.cloturee)
+    );
+  }
+
   toggleDemands() {
     if (this.isAnimating) return;
     this.showDemands = !this.showDemands;
@@ -83,7 +112,7 @@ export class EspaceManagerComponent implements OnInit {
   }
 
   showDeclaration(notification: NotificationDTO) {
-    if (this.isAnimating || notification.retard || notification.cloturee || !notification.isValidated) return;
+    if (this.isAnimating ) return;
     this.selectedNotification = notification;
     this.showDeclarations = true;
     this.showDemands = false;
@@ -108,16 +137,41 @@ export class EspaceManagerComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+
+  downloadJustification(justificationId: number) {
+    this.maladieService.downloadJustification(justificationId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `justification_${justificationId}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error('Error downloading justification:', err);
+        alert('Erreur lors du téléchargement du justificatif.');
+      }
+    });
+  }
   validateNotification(notification: NotificationDTO) {
     if (this.isAnimating) return;
-    this.maladieService.validateNotification(notification.id).subscribe({
+
+    if (!notification.absenceDeclarations || notification.absenceDeclarations.length === 0) {
+      console.error('No absence declarations found for notification:', notification);
+      alert('Erreur : Aucune déclaration d\'absence associée.');
+      return;
+    }
+
+    const declarationId = notification.absenceDeclarations[0].id;
+    this.maladieService.validateDeclaration(declarationId).subscribe({
       next: () => {
-        notification.isValidated = true;
+        notification.absenceDeclarations[0].isValidated = true;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error validating notification:', err);
-        alert('Erreur lors de la validation de la notification.');
+        console.error('Error validating declaration:', err);
+        alert('Erreur lors de la validation de la déclaration.');
       }
     });
   }
@@ -143,4 +197,6 @@ export class EspaceManagerComponent implements OnInit {
   get declarationState(): string {
     return this.currentSection === 'declarations' ? 'visible' : 'hidden';
   }
+
+
 }
