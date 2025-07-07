@@ -39,7 +39,7 @@
                 <div class="form-row">
               <div class="form-field">
                 <label >Établissement</label>
-                <input type="text" formControlName="etablissement" placeholder="Établissement" required>
+                <input type="text" formControlName="etablissement" placeholder="Établissement" required (click)="openetablissementpopup()">
               </div>
               <div class="form-field">
                 <label>Matricule Salarié</label>
@@ -72,8 +72,12 @@
               <h3>Identité</h3>
               <div class="form-row">
                 <div class="form-field">
-                  <label>Qualité (Mr, Mme, ...)</label>
-                  <input type="text" formControlName="qualite" required>
+                  <label>Qualité</label>
+                  <select formControlName="qualite" required>
+                    <option value="" disabled selected>Sélectionnez</option>
+                    <option value="M.">M.</option>
+                    <option value="Mme">Mme</option>
+                  </select>
                 </div>
                 <div class="form-field">
                   <label>Nom usuel</label>
@@ -99,8 +103,8 @@
                   <label>Sexe</label>
                   <select formControlName="sexe" required>
                     <option value="" disabled selected>Sélectionnez</option>
-                    <option value="M">M</option>
-                    <option value="F">F</option>
+                    <option value="M">Masculin</option>
+                    <option value="F">Féminin</option>
                   </select>
                 </div>
               </div>
@@ -125,7 +129,7 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Département de naissance</label>
-                  <input type="text" formControlName="departementNaissance" required>
+                  <input type="text" formControlName="departementNaissance" required (click)="opendepartementpopup()">
                 </div>
                 <div class="form-field">
                   <label>Pays de naissance</label>

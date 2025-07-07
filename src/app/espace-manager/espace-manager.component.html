@@ -5,11 +5,11 @@
     </div>
     <div class="user-info-container">
       <div class="user-info-section">
-        <div class="circular-image-placeholder"><img class="img1" src="assets/images/blank-avatar-women.jpg"></div>
+        <div class="circular-image-placeholder"><img *ngIf="!profilePicture" class="img1" src="assets/images/blank-avatar-women.jpg"><img *ngIf="profilePicture" class="img1" [src]="profilePicture"></div>
         <div class="user-details">
-          <span class="nameId">Lazher Q11GESTRH1</span>
-          <span class="position1">CADRE SUPERIEUR</span>
-          <span class="folder1">0 <img src="assets/images/folder.png" class="folderIcon"></span>
+          <span class="nameId" *ngIf="userFirstname && userIdentifiant">{{userFirstname}}  {{userIdentifiant}} </span>
+          <span class="position1" *ngIf="userPoste">{{userPoste}}</span>
+          <span class="folder1">0 <img  src="assets/images/folder.png" alt="Profile Picture" class="folderIcon"></span>
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@
         <div class="notif-search-container">
           <img src="assets/images/arrowLeft.png" class="arrowLeft" (click)="goBackFromDemands()" alt="Back Button">
           <div class="search-input-container">
-            <input type="text" placeholder="Entrer un nom" class="search-bar">
+            <input type="text" placeholder="Entrer un nom" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheItems()">
             <img src="assets/images/filtre.png" class="search-icon" alt="Search Icon">
           </div>
         </div>
@@ -83,7 +83,6 @@
             </div>
           </div>
         </div>
-
         <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.absenceDeclarations?.length ?? 0) === 0 && !selectedNotification.retard">
           Aucune déclaration associée
         </div>
@@ -139,23 +138,14 @@
       </div>
     </div>
     <div class="right-section">
-      <input type="text" placeholder=" Rechercher" class="search-bar">
+      <input type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheItems()">
       <div class="demarches-section">
-        <div class="demarche-item"><span class="icon"><img src="assets/images/wha.png"></span> Mes questions RH</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/plc1.png"></span> Le planning de mes collègues</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mes congés</div>
-        <div class="demarche-item"><span class="icon"><img class="big" src="assets/images/calender.png"></span> Je gère le planning de mon équipe</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère le temps de travail de mon équipe</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je consulte les compteurs de mon équipe</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère les fins de période d'essai de mon équipe</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère les fins de contrats de mon équipe</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je gère les départs de mon équipe</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Ma journée</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mon planning hebdomadaire</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mes attestations</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Je suis malade</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mon mode de transport</div>
-        <div class="demarche-item"><span class="icon"><img src="assets/images/conge2.png"></span> Mon déménagement</div>
+        <div class="demarche-item" *ngFor="let item of filteredDemarcheItems">
+          <span class="icon">
+            <img [src]="getImageForDemarcheItem(item)" [class.big]="item === 'Je gère le planning de mon équipe'">
+          </span>
+          {{ item }}
+        </div>
       </div>
     </div>
   </div>

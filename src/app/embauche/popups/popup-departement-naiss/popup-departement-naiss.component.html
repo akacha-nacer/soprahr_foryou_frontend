@@ -1,0 +1,59 @@
+<div class="popup-container">
+  <button mat-icon-button class="close-button" (click)="onClose()">
+    <img src="assets/images/close.png" class="close-icon">
+  </button>
+  <h3 class="popup-title">Sélectionner un département</h3>
+  <br><br>
+  <div class="popup-body">
+    <div class="search-bar-container">
+      <input
+        type="text"
+        placeholder="Rechercher"
+        class="search-bar"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="filterItems()"
+      />
+    </div>
+    <table class="nature-heures-table">
+      <thead>
+      <tr>
+        <th>Code</th>
+        <th>Libellé</th>
+        <th>Statut</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr
+        *ngFor="let row of paginatedDepartments; let i = index"
+        [class.selected-row]="selectedRow === row"
+        (click)="selectRow(row)"
+      >
+        <td>{{ row.code || 'N/A' }}</td>
+        <td>{{ row.libelle || 'N/A' }}</td>
+        <td>{{ row.status || 'N/A' }}</td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="pagination-controls" *ngIf="filteredDepartments.length > itemsPerPage">
+      <div class="pagination">
+        <a (click)="goToPage(1); $event.preventDefault()" [class.active]="currentPage === 1">«</a>
+        <a
+          *ngFor="let page of pageNumbers"
+          (click)="goToPage(page); $event.preventDefault()"
+          [class.active]="currentPage === page"
+        >
+          {{ page }}
+        </a>
+        <a (click)="goToPage(totalPages); $event.preventDefault()" [class.active]="currentPage === totalPages">»</a>
+      </div>
+    </div>
+    <div *ngIf="filteredDepartments.length === 0" class="no-results">
+      Aucun département trouvé.
+    </div>
+  </div>
+  <br>
+  <div class="popup-buttons">
+    <button type="button" class="cancel-button" (click)="onNo()">Annuler</button>
+    <button type="button" class="yes-button" (click)="onYes()">Alimenter</button>
+  </div>
+</div>

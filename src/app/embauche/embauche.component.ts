@@ -8,6 +8,9 @@ import { HttpClientModule } from '@angular/common/http';
 import {CommonModule} from '@angular/common';
 import {PopupConfMaladieComponent} from '../popup-conf-maladie/popup-conf-maladie.component';
 import {MatDialog, MatDialogModule} from '@angular/material/dialog';
+import {PopupNatureHeureComponent} from '../popup-nature-heure/popup-nature-heure.component';
+import {PopupEtablissementComponent} from './popups/popup-etablissement/popup-etablissement.component';
+import {PopupDepartementNaissComponent} from './popups/popup-departement-naiss/popup-departement-naiss.component';
 
 @Component({
   selector: 'app-embauche',
@@ -47,13 +50,15 @@ export class EmbaucheComponent implements OnInit {
   section4AnimationState: string = 'hidden';
   section5AnimationState: string = 'hidden';
   activeProgressButton: string = 'Créer';
+  departId : string ='';
 
-  // Model to store all form data
+
   dossierData: DossierModel = {
     dateRecrutement: '',
     codeSociete: '',
     etablissement: '',
     matriculeSalarie: '',
+    departementId : '',
     renseignementsIndividuels: {
       qualite: '',
       nomUsuel: '',
@@ -64,7 +69,6 @@ export class EmbaucheComponent implements OnInit {
       numeroInsee: '',
       dateNaissance: '',
       villeNaissance: '',
-      departementNaissance: '',
       paysNaissance: '',
       nationalites: [],
       etatFamilial: '',
@@ -265,6 +269,7 @@ export class EmbaucheComponent implements OnInit {
         break;
       case 'section2':
         this.dossierData.renseignementsIndividuels = { ...this.dossierData.renseignementsIndividuels, ...formValue };
+        this.dossierData.departementId = this.departId;
         break;
       case 'section3':
         const address: Adresses = { ...formValue };
@@ -332,6 +337,7 @@ export class EmbaucheComponent implements OnInit {
       codeSociete: '',
       etablissement: '',
       matriculeSalarie: '',
+      departementId: '',
       renseignementsIndividuels: {
         qualite: '',
         nomUsuel: '',
@@ -342,7 +348,7 @@ export class EmbaucheComponent implements OnInit {
         numeroInsee: '',
         dateNaissance: '',
         villeNaissance: '',
-        departementNaissance: '',
+
         paysNaissance: '',
         nationalites: [this.createNationality().value as Nationalite],
         etatFamilial: '',
@@ -353,5 +359,60 @@ export class EmbaucheComponent implements OnInit {
       carriere: []
     };
     this.activeProgressButton = 'Créer';
+  }
+
+
+  openetablissementpopup(): void {
+    const dialogRef = this.dialog.open(PopupEtablissementComponent, {
+      width: '700px',
+      maxWidth: '700px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez un établissement"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Etablissement sélectionné :', result);
+        this.dossierForm.patchValue({
+          etablissement: result.libelle
+        });
+      }
+    });
+  }
+
+  opendepartementpopup(): void {
+    const dialogRef = this.dialog.open(PopupDepartementNaissComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez un département"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Département sélectionné (ID) :', result);
+        this.departId = result;
+        this.dossierService.RetrieveDepartementNaiss().subscribe(depts => {
+          const selectedDept = depts.find(d => d.id === result);
+          if (selectedDept) {
+            this.individualInfoForm.patchValue({
+              departementNaissance: selectedDept.libelle
+            });
+          }
+        });
+      } else {
+        console.log('Aucun département sélectionné');
+      }
+    });
   }
 }

@@ -8,6 +8,8 @@ import { Notification } from '../models/NotificationModel';
 import { Justification } from '../models/JustificationModel';
 import { MatDialog } from '@angular/material/dialog';
 import { PopupConfMaladieComponent } from '../popup-conf-maladie/popup-conf-maladie.component';
+import {AuthService} from '../services/auth.service';
+import {LoginResponseDTO} from '../models/LoginResponseDTO';
 
 @Component({
   selector: 'app-maladie',
@@ -45,11 +47,14 @@ export class MaladieComponent implements OnInit {
   sectionValidationStates: { [key: string]: boolean } = {};
   isNotificationFormDisabled: boolean = false;
   isDeclarationFormDisabled: boolean = false;
+  isJustifyFormDisabled: boolean = false;
   activeProgressButton: string = 'Créer';
   showAccidentDate: boolean = false;
   selectedFile: File | null = null;
   employeeId: number | null = null;
   absenceDeclarationId?: number | null = null;
+  managerInfo: LoginResponseDTO | null = null;
+  ManagerPicture: string | null = null;
 
   maladieData = {
     notification: { message: '', retard: false } as Notification,
@@ -60,7 +65,8 @@ export class MaladieComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private maladieService: MaladieService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService
   ) {
     this.notifyForm = this.fb.group({
       message: ['Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01', [Validators.required]],
@@ -139,9 +145,41 @@ export class MaladieComponent implements OnInit {
           this.isNotificationFormDisabled = true;
           this.notifyForm.disable();
         }
+        if (notification?.retard){
+          this.sectionVisibility['section1'] = false;
+          this.sectionVisibility['section2'] = false;
+          this.sectionVisibility['section3'] = false;
+          this.isNotificationFormDisabled = true;
+          this.isDeclarationFormDisabled = true;
+          this.isJustifyFormDisabled = true;
+          this.notifyForm.disable();
+          this.declareForm.disable();
+          this.justifyForm.disable();
+        }
       },
       error: (error) => {
         console.error('Error fetching active notification:', error);
+      }
+    });
+
+    this.authService.getManagerInfo(this.employeeId).subscribe({
+      next: value => {
+        this.managerInfo = value; // Assign the entire object
+        this.authService.getProfilePicture(value.userID).subscribe({
+          next: (picture) => {
+            this.ManagerPicture = picture;
+          },
+          error: (err) => {
+            console.error('Error fetching profile picture:', err);
+            this.ManagerPicture = null;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error fetching manager info:', err);
+        this.managerInfo = null; // Reset on error
+        this.ManagerPicture = null;
+        alert('Erreur lors de la récupération des informations du manager.');
       }
     });
 
@@ -219,6 +257,10 @@ export class MaladieComponent implements OnInit {
           this.sectionVisibility[sectionId] = false;
           this.isNotificationFormDisabled = true;
           this.notifyForm.disable();
+          if (response.retard){
+            this.isJustifyFormDisabled = true;
+            this.isDeclarationFormDisabled = true ;
+          }
         },
         error: (error: any) => {
           console.error('Error submitting notification:', error);
@@ -328,6 +370,7 @@ export class MaladieComponent implements OnInit {
           // Re-enable forms after closing
           this.isNotificationFormDisabled = false;
           this.isDeclarationFormDisabled = false;
+          this.isJustifyFormDisabled = false ;
           this.notifyForm.enable();
           this.declareForm.enable();
         },

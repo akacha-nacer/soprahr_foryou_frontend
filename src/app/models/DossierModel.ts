@@ -4,6 +4,7 @@ export interface DossierModel {
   codeSociete: string;
   etablissement: string;
   matriculeSalarie: string;
+  departementId: string;
   renseignementsIndividuels: RenseignementsIndividuels;
   adresses: Adresses[];
   affectations: Affectations[];
@@ -20,7 +21,6 @@ export interface RenseignementsIndividuels {
   numeroInsee: string;
   dateNaissance: string;
   villeNaissance: string;
-  departementNaissance: string;
   paysNaissance: string;
   nationalites: Nationalite[];
   etatFamilial: string;

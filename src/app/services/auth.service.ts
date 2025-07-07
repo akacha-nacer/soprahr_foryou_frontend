@@ -9,6 +9,7 @@ import {LoginResponseDTO} from '../models/LoginResponseDTO';
 export class AuthService {
 
   private apiUrl = 'http://localhost:8080/user/login';
+  private apiUrl1 = 'http://localhost:8080/user';
 
   constructor(private http: HttpClient) {}
 
@@ -29,6 +30,18 @@ export class AuthService {
   getCurrentUser(): LoginResponseDTO | null {
     const user = sessionStorage.getItem('user');
     return user ? JSON.parse(user) : null;
+  }
+
+  getProfilePicture(userId: number): Observable<string> {
+    return this.http.get(`${this.apiUrl1}/${userId}/profile-picture`, { responseType: 'text' }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getManagerInfo(userId: number): Observable<LoginResponseDTO> {
+    return this.http.get<LoginResponseDTO>(`${this.apiUrl1}/getManagerInfo/${userId}`).pipe(
+      catchError(this.handleError)
+    );
   }
 
   private handleError(error: HttpErrorResponse): Observable<never> {

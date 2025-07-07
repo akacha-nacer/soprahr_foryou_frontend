@@ -1,0 +1,36 @@
+<div class="popup-container">
+  <button mat-icon-button class="close-button" (click)="onClose()">
+    <img src="assets/images/close.png" class="close-icon">
+  </button>
+  <h3 class="popup-title">Confirmation</h3>
+  <br><br>
+  <div class="popup-body">
+    <div class="search-bar-container">
+    <input type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterItems()" >
+    </div>
+    <table class="nature-heures-table">
+      <thead>
+      <tr>
+        <th>Modèle</th>
+        <th>Etablissement</th>
+        <th>Libellé</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let row of filteredRows; let i = index"
+          [class.selected-row]="selectedRow === row"
+          (click)="selectRow(row)">
+        <td>{{ row.modele }}</td>
+        <td>{{ row.etablissement || 'N/A' }}</td>
+        <td>{{ row.libelle }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <br>
+  <div class="popup-buttons">
+    <button type="button" class="cancel-button" (click)="onNo()">Annuler</button>
+    <button type="button" class="yes-button" (click)="onYes()">Alimenter</button>
+  </div>
+</div>

@@ -4,6 +4,7 @@ export interface LoginResponseDTO {
   lastname: string;
   identifiant: string;
   email: string;
-  role: 'MANAGER' | 'EMPLOYEE' | 'GESTIONNAIRE' | 'ADMIN'; // Matches the Role enum in backend
+  poste: string;
+  role: 'MANAGER' | 'EMPLOYEE' | 'GESTIONNAIRE' | 'ADMIN';
   message: string;
 }

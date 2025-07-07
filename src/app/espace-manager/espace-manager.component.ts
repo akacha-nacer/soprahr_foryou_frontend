@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
 import { animate, AnimationEvent, state, style, transition, trigger } from '@angular/animations';
 import { MaladieService } from '../services/maladie.service';
 import { NotificationDTO } from '../models/NotificationDTOModel';
-
-
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-espace-manager',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule], // Add FormsModule to imports
   templateUrl: './espace-manager.component.html',
   styleUrls: ['./espace-manager.component.css'],
   animations: [
@@ -40,8 +40,31 @@ export class EspaceManagerComponent implements OnInit {
   selectedNotification: NotificationDTO | null = null;
   notifications: NotificationDTO[] = [];
   managerId: number | null = null;
+  profilePicture: string | null = null;
+  userFirstname: string | null = null;
+  userIdentifiant: string | null = null;
+  userPoste: string | null = null;
+  searchTerm: string = '';
+  demarcheItems: string[] = [
+    'Mes questions RH',
+    'Le planning de mes collègues',
+    'Mes congés',
+    'Je gère le planning de mon équipe',
+    'Je gère le temps de travail de mon équipe',
+    'Je consulte les compteurs de mon équipe',
+    'Je gère les fins de période d\'essai de mon équipe',
+    'Je gère les fins de contrats de mon équipe',
+    'Je gère les départs de mon équipe',
+    'Ma journée',
+    'Mon planning hebdomadaire',
+    'Mes attestations',
+    'Je suis malade',
+    'Mon mode de transport',
+    'Mon déménagement'
+  ];
+  filteredDemarcheItems: string[] = [...this.demarcheItems];
 
-  constructor(private cdr: ChangeDetectorRef, private maladieService: MaladieService) {}
+  constructor(private cdr: ChangeDetectorRef, private maladieService: MaladieService, private authService: AuthService) {}
 
   ngOnInit() {
     const storedUser = sessionStorage.getItem('user');
@@ -51,6 +74,10 @@ export class EspaceManagerComponent implements OnInit {
       try {
         const user = JSON.parse(storedUser);
         this.managerId = user.userID !== undefined && user.userID !== null ? parseInt(user.userID, 10) : null;
+        this.userFirstname = user.firstname !== undefined && user.firstname !== null ? user.firstname : null;
+        this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
+        this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
+        console.log(this.managerId);
       } catch (e) {
         console.error('Error parsing user from sessionStorage:', e);
       }
@@ -59,6 +86,17 @@ export class EspaceManagerComponent implements OnInit {
     }
 
     if (this.managerId !== null) {
+      this.authService.getProfilePicture(this.managerId).subscribe({
+        next: (picture) => {
+          this.profilePicture = picture;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error fetching profile picture:', err);
+          this.profilePicture = null;
+          this.cdr.detectChanges();
+        }
+      });
       this.maladieService.getNotificationsWithDeclarations(this.managerId).subscribe({
         next: (notifications) => {
           this.notifications = notifications;
@@ -72,6 +110,26 @@ export class EspaceManagerComponent implements OnInit {
       });
     } else {
       console.warn('Cannot fetch notifications: managerId is null');
+    }
+  }
+
+  filterDemarcheItems() {
+    const search = this.searchTerm.toLowerCase().trim();
+    this.filteredDemarcheItems = this.demarcheItems.filter(item =>
+      item.toLowerCase().includes(search)
+    );
+    this.cdr.detectChanges();
+  }
+  getImageForDemarcheItem(item: string): string {
+    switch (item) {
+      case 'Mes questions RH':
+        return 'assets/images/wha.png';
+      case 'Le planning de mes collègues':
+        return 'assets/images/plc1.png';
+      case 'Je gère le planning de mon équipe':
+        return 'assets/images/calender.png';
+      default:
+        return 'assets/images/conge2.png';
     }
   }
 
@@ -112,7 +170,7 @@ export class EspaceManagerComponent implements OnInit {
   }
 
   showDeclaration(notification: NotificationDTO) {
-    if (this.isAnimating ) return;
+    if (this.isAnimating) return;
     this.selectedNotification = notification;
     this.showDeclarations = true;
     this.showDemands = false;
@@ -137,7 +195,6 @@ export class EspaceManagerComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-
   downloadJustification(justificationId: number) {
     this.maladieService.downloadJustification(justificationId).subscribe({
       next: (blob) => {
@@ -154,6 +211,7 @@ export class EspaceManagerComponent implements OnInit {
       }
     });
   }
+
   validateNotification(notification: NotificationDTO) {
     if (this.isAnimating) return;
 
@@ -197,6 +255,4 @@ export class EspaceManagerComponent implements OnInit {
   get declarationState(): string {
     return this.currentSection === 'declarations' ? 'visible' : 'hidden';
   }
-
-
 }
