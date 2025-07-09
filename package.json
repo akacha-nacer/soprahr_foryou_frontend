@@ -19,13 +19,17 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@types/d3": "^3.5.53",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",
+    "d3": "^3.5.17",
     "font-awesome": "^4.7.0",
     "ngx-bootstrap": "^19.0.2",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "vis-data": "^7.1.10",
+    "vis-timeline": "^7.7.4",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

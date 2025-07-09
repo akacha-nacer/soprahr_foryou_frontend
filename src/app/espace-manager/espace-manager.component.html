@@ -40,9 +40,15 @@
         <div class="demand-item" *ngFor="let notification of notifications"
              [class.disabled]="notification.cloturee"
              (click)="showDeclaration(notification)">
-          {{ notification.employeeName }}:
-          <span>{{ notification.createdAt | date:'dd/MM/yyyy' }}</span>
-          <span *ngIf="notification.retard">(Retard - Aucun action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
+          <img [src]="getEmployeePicture(notification.employeeId) || 'assets/images/managerPhoto.jpg'" alt="Manager Photo" class="manager-photo">
+
+          <div class="employeeNotif">
+            <span class="employee-name">{{ notification.employeeName }} </span>
+            <span class="employee-name">{{  notification.employeeIdentifiant }}</span>
+
+          </div>
+          <span class="employee-identifiant">- {{ notification.createdAt | date:'dd/MM/yyyy' }} -</span>
+          <span *ngIf="notification.retard">(Retard - Aucune action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
           <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
           <span *ngIf="!notification.retard && !notification.cloturee && notification.absenceDeclarations.length === 0">(Aucune déclaration)</span>
           <button *ngIf="isDeclarationValidatable(notification)"

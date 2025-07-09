@@ -39,7 +39,7 @@
                 <div class="form-row">
               <div class="form-field">
                 <label >Établissement</label>
-                <input type="text" formControlName="etablissement" placeholder="Établissement" required (click)="openetablissementpopup()">
+                <input type="text" formControlName="etablissement" placeholder="Établissement" required (click)="openetablissementpopup()" readonly>
               </div>
               <div class="form-field">
                 <label>Matricule Salarié</label>
@@ -66,7 +66,7 @@
           </span>
         </div>
         <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
-          <form [formGroup]="individualInfoForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
+          <form [formGroup]="individualInfoForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form"  >
             <div class="form-group">
               <br>
               <h3>Identité</h3>
@@ -129,7 +129,7 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Département de naissance</label>
-                  <input type="text" formControlName="departementNaissance" required (click)="opendepartementpopup()">
+                  <input type="text" formControlName="departementNaissance" required (click)="opendepartementpopup()" readonly>
                 </div>
                 <div class="form-field">
                   <label>Pays de naissance</label>

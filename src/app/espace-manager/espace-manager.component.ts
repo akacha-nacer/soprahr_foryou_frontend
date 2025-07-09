@@ -45,6 +45,7 @@ export class EspaceManagerComponent implements OnInit {
   userIdentifiant: string | null = null;
   userPoste: string | null = null;
   searchTerm: string = '';
+  employeePictures: Map<number, string | null> = new Map();
   demarcheItems: string[] = [
     'Mes questions RH',
     'Le planning de mes collègues',
@@ -100,7 +101,23 @@ export class EspaceManagerComponent implements OnInit {
       this.maladieService.getNotificationsWithDeclarations(this.managerId).subscribe({
         next: (notifications) => {
           this.notifications = notifications;
-          console.log(notifications);
+          console.log('Notifications:', notifications);
+          // Fetch profile picture for each employee
+          notifications.forEach(notification => {
+            if (notification.employeeId && !this.employeePictures.has(notification.employeeId)) {
+              this.authService.getProfilePicture(notification.employeeId).subscribe({
+                next: (picture) => {
+                  this.employeePictures.set(notification.employeeId, picture);
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for employeeId ${notification.employeeId}:`, err);
+                  this.employeePictures.set(notification.employeeId, null);
+                  this.cdr.detectChanges();
+                }
+              });
+            }
+          });
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -254,5 +271,9 @@ export class EspaceManagerComponent implements OnInit {
 
   get declarationState(): string {
     return this.currentSection === 'declarations' ? 'visible' : 'hidden';
+  }
+
+  getEmployeePicture(employeeId: number | null): string | null {
+    return employeeId ? this.employeePictures.get(employeeId) || null : null;
   }
 }

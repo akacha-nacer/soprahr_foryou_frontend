@@ -463,47 +463,167 @@
   margin-right: 0;
 }
 
-/* Styles pour la timeline */
-.timeline-container {
-  margin-top: 10px;
+/* Timeline styles */
+.timeline-wrapper {
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 240px; /* Ensure minimum height */
 }
 
-.timeline {
+#timelineContainer {
+  width: 100% !important;
+  height: 200px !important;
   position: relative;
-  height: 30px;
-  background-color: #add8e6; /* Fond par défaut (bleu clair) */
-  border: 1px solid #ccc;
-  display: flex;
-  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  overflow: visible !important;
 }
 
-.tick {
-  position: absolute;
-  font-size: 12px;
-  color: #333;
-  text-align: center;
-  width: 40px;
-  transform: translateX(-50%);
+/* Ensure the timeline is visible */
+.vis-timeline {
+  border: 1px solid #d1d1d1 !important;
+  background-color: #ffffff !important;
+  border-radius: 4px !important;
+  font-family: Arial, sans-serif !important;
+  position: relative !important;
+  overflow: visible !important;
+  width: 100% !important;
+  height: 200px !important;
 }
 
-.tick:nth-child(1) { left: 0%; } /* 00:00 */
-.tick:nth-child(2) { left: 83.3%; } /* 20:00 */
-.tick:nth-child(3) { left: 95.8%; } /* 23:00 */
-.tick:nth-child(4) { left: 100%; } /* 00:00 */
-
-.segment {
-  position: absolute;
-  height: 100%;
+/* Timeline panels */
+.vis-panel {
+  background-color: #ffffff !important;
+  overflow: visible !important;
 }
 
-.work-hours {
-  left: 0%;
-  width: 83.3%; /* De 00:00 à 20:00 */
-  background-color: #4682b4; /* Bleu foncé */
+.vis-panel.vis-left {
+  border-right: 1px solid #e0e0e0 !important;
 }
 
-.off-hours {
-  left: 83.3%;
-  width: 16.7%; /* De 20:00 à 00:00 */
-  background-color: #add8e6; /* Bleu clair */
+.vis-panel.vis-top {
+  border-bottom: 1px solid #e0e0e0 !important;
+}
+
+.vis-panel.vis-bottom {
+  border-top: 1px solid #e0e0e0 !important;
+}
+
+.vis-panel.vis-center {
+  overflow: visible !important;
+}
+
+/* Timeline content area */
+.vis-content {
+  background-color: #ffffff !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.vis-background {
+  background-color: #ffffff !important;
+}
+
+/* Timeline items */
+.vis-item {
+  background-color: #ff5555 !important;
+  border: 2px solid #b71c1c !important;
+  border-radius: 4px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  color: white !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+  transition: transform 0.2s ease !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+.vis-item:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.vis-item.vis-selected {
+  background-color: #d32f2f !important;
+  border-color: #8b0000 !important;
+}
+
+.vis-item.absence-item {
+  background-color: #ff5555 !important;
+  border-color: #b71c1c !important;
+}
+
+.vis-item .vis-item-content {
+  padding: 2px 6px !important;
+  color: white !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* Timeline axis styles */
+.vis-time-axis {
+  background-color: #fafafa !important;
+  border-top: 1px solid #e0e0e0 !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+.vis-time-axis .vis-text {
+  color: #333 !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  font-family: Arial, sans-serif !important;
+}
+
+.vis-time-axis .vis-grid.vis-minor {
+  border-left: 1px solid #e0e0e0 !important;
+}
+
+.vis-time-axis .vis-grid.vis-major {
+  border-left: 1px solid #b0b0b0 !important;
+}
+
+/* Current time indicator */
+.vis-current-time {
+  background-color: #0288d1 !important;
+  width: 2px !important;
+  opacity: 0.8 !important;
+  z-index: 5 !important;
+}
+
+/* Timeline labels */
+.vis-labelset {
+  background-color: #fafafa !important;
+  border-right: 1px solid #e0e0e0 !important;
+  overflow: visible !important;
+}
+
+.vis-label {
+  background-color: #fafafa !important;
+  color: #333 !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  font-size: 12px !important;
+  font-family: Arial, sans-serif !important;
+}
+
+/* Force visibility */
+.vis-timeline * {
+  visibility: visible !important;
+}
+
+/* Ensure proper stacking */
+.vis-timeline .vis-item-set {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.vis-timeline .vis-foreground {
+  position: relative !important;
+  z-index: 2 !important;
 }

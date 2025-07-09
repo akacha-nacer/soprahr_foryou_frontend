@@ -32,8 +32,8 @@
                   <img *ngIf="!ManagerPicture" src="assets/images/managerPhoto.jpg" alt="Manager Photo" class="manager-photo">
                   <img *ngIf="ManagerPicture" [src]="ManagerPicture" alt="Manager Photo" class="manager-photo">
 
-                  <span class="manager-name" *ngIf="managerInfo">{{this.managerInfo.firstname}} {{this.managerInfo?.lastname}}</span>
-                  <span class="manager-poste">[Poste du Manager]</span>
+                  <span class="manager-name" *ngIf="managerInfo">{{this.managerInfo.firstname}} {{this.managerInfo.lastname}}</span>
+                  <span class="manager-poste"*ngIf="managerInfo">{{this.managerInfo.poste}}</span>
                 </div>
               </div>
               <div class="form-field">
