@@ -85,13 +85,13 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>10/06/2025</td>
-                    <td>5B02 le dernier pointage du jour doit être une sortie</td>
-                    <td>I</td>
+                  <tr *ngFor="let anomaly of anomalies">
+                    <td>{{ anomaly.dateAnomalie }}</td>
+                    <td>{{ anomaly.details }}</td>
+                    <td>{{ anomaly.poid }}</td>
                     <td>
                       <button class="action-button detail-button" >
-                        <img src="assets/images/searchJ.png" >
+                        <img src="assets/images/searchJ.png">
                       </button>
                     </td>
                   </tr>
@@ -126,26 +126,24 @@
                 <th>Heure de début</th>
                 <th>Heure de fin</th>
                 <th>Durée</th>
-                <th>Saisie</th>
                 <th>Actions</th>
               </tr>
               </thead>
               <tbody>
-              <tr>
-                <td>Absence à tort</td>
-                <td>09:00</td>
-                <td>13:00</td>
-                <td>4h00</td>
-                <td></td>
+              <tr *ngFor="let natureheure of natureHeures">
+                <td>{{ natureheure.nature_heure }}</td>
+                <td>{{ natureheure.heureDebut }}</td>
+                <td>{{ natureheure.heureFin }}</td>
+                <td>{{ natureheure.duree }}</td>
                 <td>
-                  <button class="action-button detail-button" (click)="openDetail(natureHeuresData[0])">
-                    <img src="assets/images/searchJ.png" >
+                  <button class="action-button detail-button" (click)="openDetail(natureheure)">
+                    <img src="assets/images/searchJ.png">
                   </button>
-                  <button class="action-button edit-button" (click)="openEdit(natureHeuresData[0])">
-                    <img src="assets/images/editJ.png" >
+                  <button class="action-button edit-button" (click)="openEdit(natureheure)">
+                    <img src="assets/images/editJ.png">
                   </button>
-                  <button class="action-button delete-button" (click)="deleteItem(natureHeuresData[0])">
-                    <img src="assets/images/deleteJ.png" >
+                  <button class="action-button delete-button" (click)="deleteItem(natureheure)">
+                    <img src="assets/images/deleteJ.png">
                   </button>
                 </td>
               </tr>
@@ -181,14 +179,14 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>10/06/2025</td>
-                    <td>17:58</td>
-                    <td>Entrée</td>
-                    <td>Standard</td>
+                  <tr *ngFor="let pointage of pointages">
+                    <td>{{ pointage.createdAt }}</td>
+                    <td>{{ pointage.heure }}</td>
+                    <td>{{ pointage.sens }}</td>
+                    <td>{{ pointage.naturePointage }}</td>
                     <td>
                       <button class="action-button detail-button" >
-                        <img src="assets/images/searchJ.png" >
+                        <img src="assets/images/searchJ.png">
                       </button>
                     </td>
                   </tr>
@@ -199,7 +197,6 @@
           </div>
         </div>
       </div>
-
       <!-- Form Section 5: Mes Références Horaires -->
       <div class="form-section" sectionId="section5">
         <div class="form-header" (click)="toggleForm('section5')">

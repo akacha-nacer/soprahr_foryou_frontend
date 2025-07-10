@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit, OnDestroy} from '@angular/core';
+import {AfterViewInit, Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
@@ -6,6 +6,11 @@ import {MatDialog} from '@angular/material/dialog';
 import {PopupNatureHeureComponent} from '../popup-nature-heure/popup-nature-heure.component';
 import {DataItem, Timeline, TimelineOptions} from 'vis-timeline';
 import {DataSet} from 'vis-data';
+import {DepartementNaiss} from '../models/DepartementNaiss';
+import {NatureHeure} from '../models/journee/NatureHeureModel';
+import {Anomalies} from '../models/journee/AnomaliesModel';
+import {Pointage} from '../models/journee/PointageModel';
+import {JourneeService} from '../services/journee.service';
 
 @Component({
   selector: 'app-journee',
@@ -33,6 +38,13 @@ import {DataSet} from 'vis-data';
 })
 export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   natureHeuresForm: FormGroup;
+  natureHeures: NatureHeure[] = [];
+  anomalies: Anomalies[] = [];
+  pointages: Pointage[] = [];
+  userId: number | null = null;
+  userFirstname: string | null = null;
+  userIdentifiant: string | null = null;
+  userPoste: string | null = null;
   sectionVisibility: { [key: string]: boolean } = {};
   sectionValidationStates: { [key: string]: boolean } = {};
   activeProgressButton: string = 'Créer';
@@ -44,7 +56,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   private timeline: Timeline | null = null;
   private timelineInitialized = false;
 
-  constructor(private fb: FormBuilder, public dialog: MatDialog) {
+  constructor(private fb: FormBuilder, public dialog: MatDialog, public  journeeService :JourneeService,private cdr: ChangeDetectorRef) {
     this.natureHeuresForm = this.fb.group({
       date: ['', [Validators.required]],
       nature: ['', [Validators.required]],
@@ -57,6 +69,24 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const storedUser = sessionStorage.getItem('user');
+    console.log('Stored user from sessionStorage:', storedUser);
+
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.userId = user.userID !== undefined && user.userID !== null ? parseInt(user.userID, 10) : null;
+        this.userFirstname = user.firstname !== undefined && user.firstname !== null ? user.firstname : null;
+        this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
+        this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
+        console.log(this.userId);
+      } catch (e) {
+        console.error('Error parsing user from sessionStorage:', e);
+      }
+    } else {
+      console.warn('No user found in sessionStorage');
+    }
+
     this.sectionVisibility['section1'] = false;
     this.sectionVisibility['section2'] = false;
     this.sectionVisibility['section3'] = false;
@@ -69,6 +99,32 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sectionValidationStates['section5'] = false;
 
     this.natureHeuresForm.markAllAsTouched();
+  if (this.userId){
+    this.journeeService.getNatureHeures(this.userId).subscribe(value => {
+      this.natureHeures = value ;
+      console.log(this.natureHeures)
+      this.cdr.detectChanges();
+    },
+      (error) => {
+        console.error('Error fetching nature heures :', error);
+      });
+
+    this.journeeService.getPointages(this.userId).subscribe(value => {
+        this.pointages = value ;
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching pointages :', error);
+      });
+
+    this.journeeService.getAnomalies(this.userId).subscribe(value => {
+        this.anomalies = value ;
+        this.cdr.detectChanges();
+      },
+      (error) => {
+        console.error('Error fetching anomalies :', error);
+      });
+  }
   }
 
   ngAfterViewInit(): void {
@@ -120,10 +176,10 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     ];
 
-    // Create DataSet
+
     const items = new DataSet(itemsArray);
 
-    // Configure timeline options
+
     const options: TimelineOptions = {
       width: "100%",
       height: "200px",
@@ -175,13 +231,13 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log('Timeline initialized successfully:', this.timeline);
 
       // Force redraw and fit
-      setTimeout(() => {
+
         if (this.timeline) {
           this.timeline.redraw();
           this.timeline.fit();
           console.log('Timeline redrawn and fitted');
         }
-      }, 100);
+
 
       // Add event listeners
       this.timeline.on('select', (event) => {
@@ -225,32 +281,52 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      if (result && this.userId) {
         console.log('Nature d\'heure ajoutée :', result);
+        this.journeeService.saveNatureHeure(result, this.userId).subscribe({
+          next: (response) => {
+            console.log('NatureHeure saved:', response);
+            this.journeeService.getNatureHeures(this.userId!).subscribe(value => {
+              this.natureHeures = value;
+              this.cdr.detectChanges();
+            });
+          },
+          error: (error) => console.error('Error saving natureHeure:', error)
+        });
       }
     });
   }
 
-  openDetail(item: any): void {
+  openDetail(natureheure: NatureHeure): void {
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
-      data: { type: 'detail', item }
+      data: { type: 'detail', item: natureheure }
     });
+    console.log(natureheure);
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Détail affiché :', result);
-      }
+      if (result) console.log('Détail affiché :', result);
     });
   }
 
-  openEdit(item: any): void {
+  openEdit(natureheure: NatureHeure): void {
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
-      data: { type: 'edit', item }
+      data: { type: 'edit', item: natureheure }
     });
 
+    console.log(natureheure);
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      if (result && this.userId && natureheure.id) {
         console.log('Modification enregistrée :', result);
+        this.journeeService.updateNatureHeure(natureheure.id, result, this.userId).subscribe({
+          next: (response) => {
+            console.log('NatureHeure updated:', response);
+            this.journeeService.getNatureHeures(this.userId!).subscribe(value => {
+              this.natureHeures = value;
+              this.cdr.detectChanges();
+            });
+          },
+          error: (error) => console.error('Error updating natureHeure:', error)
+        });
       }
     });
   }

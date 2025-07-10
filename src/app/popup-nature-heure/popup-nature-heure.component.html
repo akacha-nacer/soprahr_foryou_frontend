@@ -5,51 +5,43 @@
   <h3 class="popup-title">{{ data.type === 'add' ? 'Ajouter une nature d’heure' : data.type === 'edit' ? 'Modifier une nature d’heure' : 'Détail de la nature d’heure' }}</h3>
   <br><br>
   <div class="popup-body">
-    <!-- Condition pour différencier les modes -->
     <div *ngIf="data.type !== 'detail'">
       <div class="form-row">
-      <div class="form-field">
-        <label>Date</label>
-        <input type="date" [disabled]="data.type === 'edit'" placeholder="Sélectionnez une date">
-      </div>
-      <div class="form-field">
-        <label>Nature d’heure</label>
-        <select [disabled]="data.type === 'edit'">
-          <option value="" disabled selected>Sélectionnez une nature</option>
-          <option value="recuperation">Heures de récupération</option>
-          <option value="dejeuner">Déjeuner</option>
-          <option value="AbsenceAtort">Absence à tort</option>
-        </select>
-      </div>
+        <div class="form-field">
+          <label>Nature d’heure</label>
+          <select [(ngModel)]="natureHeure.nature_heure" required>
+            <option value="" disabled>Sélectionnez une nature</option>
+            <option *ngFor="let option of natureOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </div>
       </div>
       <div class="form-row">
         <div class="form-field">
           <label>De</label>
-          <input type="time" [disabled]="data.type === 'edit'">
+          <input type="time" [(ngModel)]="natureHeure.heureDebut" (ngModelChange)="calculateDuree()" required>
         </div>
         <div class="form-field">
           <label>À</label>
-          <input type="time" [disabled]="data.type === 'edit'">
+          <input type="time" [(ngModel)]="natureHeure.heureFin" (ngModelChange)="calculateDuree()" required>
         </div>
         <div class="form-field">
           <label>Durée</label>
-          <input type="text" disabled placeholder="Calculée automatiquement">
+          <input type="text" [(ngModel)]="natureHeure.duree" disabled placeholder="Calculée automatiquement">
         </div>
       </div>
       <div class="form-row">
-      <div class="form-field">
-        <label>Commentaire 1</label>
-        <textarea [disabled]="data.type === 'edit'" placeholder="Entrez un commentaire"></textarea>
-      </div>
-      <div class="form-field">
-        <label>Commentaire 2</label>
-        <textarea [disabled]="data.type === 'edit'" placeholder="Entrez un commentaire"></textarea>
-      </div>
+        <div class="form-field">
+          <label>Commentaire</label>
+          <textarea [(ngModel)]="natureHeure.commentaire" placeholder="Entrez un commentaire"></textarea>
+        </div>
       </div>
     </div>
     <div *ngIf="data.type === 'detail'">
-      <!-- À implémenter : afficher les détails de data.item -->
-      <p>Détails : {{ data.item ? JSON.stringify(data.item) : 'Aucun détail disponible' }}</p>
+      <p><strong>Nature:</strong> {{ natureHeure.nature_heure || 'N/A' }}</p>
+      <p><strong>Début:</strong> {{ natureHeure.heureDebut || 'N/A' }}</p>
+      <p><strong>Fin:</strong> {{ natureHeure.heureFin || 'N/A' }}</p>
+      <p><strong>Durée:</strong> {{ natureHeure.duree || 'N/A' }}</p>
+      <p><strong>Commentaire:</strong> {{ natureHeure.commentaire || 'N/A' }}</p>
     </div>
   </div>
   <br>
