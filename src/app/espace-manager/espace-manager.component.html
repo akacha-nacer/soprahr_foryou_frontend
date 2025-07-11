@@ -5,11 +5,14 @@
     </div>
     <div class="user-info-container">
       <div class="user-info-section">
-        <div class="circular-image-placeholder"><img *ngIf="!profilePicture" class="img1" src="assets/images/blank-avatar-women.jpg"><img *ngIf="profilePicture" class="img1" [src]="profilePicture"></div>
+        <div class="circular-image-placeholder">
+          <img *ngIf="!profilePicture" class="img1" src="assets/images/blank-avatar-women.jpg">
+          <img *ngIf="profilePicture" class="img1" [src]="profilePicture">
+        </div>
         <div class="user-details">
-          <span class="nameId" *ngIf="userFirstname && userIdentifiant">{{userFirstname}}  {{userIdentifiant}} </span>
+          <span class="nameId" *ngIf="userFirstname && userIdentifiant">{{userFirstname}} {{userIdentifiant}}</span>
           <span class="position1" *ngIf="userPoste">{{userPoste}}</span>
-          <span class="folder1">0 <img  src="assets/images/folder.png" alt="Profile Picture" class="folderIcon"></span>
+          <span class="folder1">0 <img src="assets/images/folder.png" alt="Profile Picture" class="folderIcon"></span>
         </div>
       </div>
     </div>
@@ -23,7 +26,7 @@
            (@notificationSlide.done)="animationDone($event)">
         <div class="notification-item">Mes tâches (0) <span>24/05/2025</span></div>
         <div class="notification-item warning" (click)="toggleDemands()">
-          Les notifications de mon équipe ({{ notifications.length }}) <span>29/05/2025</span>
+          Les notifications de mon équipe ({{ notifications.length + natureHeureRequests.length }}) <span>29/05/2025</span>
         </div>
       </div>
       <div class="demands-section"
@@ -37,18 +40,17 @@
             <img src="assets/images/filtre.png" class="search-icon" alt="Search Icon">
           </div>
         </div>
+        <!-- Notifications -->
         <div class="demand-item" *ngFor="let notification of notifications"
              [class.disabled]="notification.cloturee"
              (click)="showDeclaration(notification)">
-          <img [src]="getEmployeePicture(notification.employeeId) || 'assets/images/managerPhoto.jpg'" alt="Manager Photo" class="manager-photo">
-
+          <img [src]="getEmployeePicture(notification.employeeId) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
           <div class="employeeNotif">
-            <span class="employee-name">{{ notification.employeeName }} </span>
-            <span class="employee-name">{{  notification.employeeIdentifiant }}</span>
-
+            <span class="employee-name">{{ notification.employeeName }}</span>
+            <span class="employee-name">{{ notification.employeeIdentifiant }}</span>
           </div>
           <span class="employee-identifiant">- {{ notification.createdAt | date:'dd/MM/yyyy' }} -</span>
-          <span *ngIf="notification.retard">(Retard - Aucune action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
+          <span *ngIf="notification.retard">(Aucune action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
           <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
           <span *ngIf="!notification.retard && !notification.cloturee && notification.absenceDeclarations.length === 0">(Aucune déclaration)</span>
           <button *ngIf="isDeclarationValidatable(notification)"
@@ -60,16 +62,51 @@
                   disabled
                   aria-label="Demande validée">Demande validée</button>
         </div>
-        <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDemands()" alt="Back Button">
+        <!-- NatureHeureRequest Items -->
+        <div class="demand-item" *ngFor="let request of natureHeureRequests"
+             [class.disabled]="request.status !== 'PENDING'"
+             (click)="selectNatureHeureRequest(request)">
+          <img [src]="getEmployeePicture(request.userid) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
+          <div class="employeeNotif">
+            <span class="employee-name">{{ request.nature_heure }}</span>
+            <span class="employee-identifiant">Statut: {{ request.status }}</span>
+          </div>
+          <span> - {{ request.date | date:'dd/MM/yyyy' }} -</span>
+          <div *ngIf="request.status === 'PENDING'" class="action-buttons">
+            <button class="action-btn enabled" (click)="approveAddRequest(request); $event.stopPropagation()" aria-label="Approuver la demande">Valider</button>
+            <button class="action-btn enabled" (click)="rejectAddRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande">Rejeter</button>
+          </div>
+        </div>
+
+        <!-- NatureHeureModifRequest Items -->
+        <div class="demand-item" *ngFor="let request of natureHeureModificationRequests"
+             [class.disabled]="request.rejected || request.approved"
+             (click)="selectNatureModifHeureRequest(request)">
+          <img [src]="getEmployeePicture(request.requestedById) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
+          <div class="employeeNotif">
+            <span class="employee-name">{{ request.newNatureHeure }}</span>
+            <span class="employee-identifiant" *ngIf="request.rejected" >Statut: REJETEE</span>
+            <span class="employee-identifiant" *ngIf="request.approved" >Statut: VALIDEE</span>
+            <span class="employee-identifiant" *ngIf="(!request.rejected && !request.approved)" >Statut: EN COURS</span>
+          </div>
+          <span> - {{ request.newDate | date:'dd/MM/yyyy' }} -</span>
+          <div *ngIf="(!request.rejected && !request.approved)" class="action-buttons">
+            <button class="action-btn enabled" (click)="approveModifRequest(request); $event.stopPropagation()" aria-label="Approuver la demande">Valider</button>
+            <button class="action-btn enabled" (click)="rejectModifRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande">Rejeter</button>
+          </div>
+        </div>
+
+        <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDeclarations()" alt="Back Button">
       </div>
       <div class="declarations-section"
            [@declarationSlide]="declarationState"
            (@declarationSlide.start)="animationStart($event)"
            (@declarationSlide.done)="animationDone($event)">
         <img src="assets/images/arrowLeft.png" class="arrowLeftD" (click)="goBackFromDeclarations()" alt="Back Button">
+        <!-- Notification Details -->
         <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.message?.length ?? 0) > 0">
-          Message :
-          <span class="messageD">{{selectedNotification.message}}</span>
+          Message:
+          <span class="messageD">{{ selectedNotification.message }}</span>
         </div>
         <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.absenceDeclarations?.length ?? 0) > 0">
           {{ selectedNotification.absenceDeclarations[0].isProlongation ? 'Prolongation :' : 'Déclaration :' }}
@@ -80,7 +117,7 @@
         <div class="demand-item" *ngIf="hasJustifications">
           Justification(s):
           <div class="justifications-list">
-            <div class="justification-item" *ngFor="let justification of selectedNotification!.absenceDeclarations![0].justifications;let i = index">
+            <div class="justification-item" *ngFor="let justification of selectedNotification!.absenceDeclarations![0].justifications; let i = index">
               <span class="justification-number">{{ i + 1 }}. </span>
               <span class="justText">{{ justification.originalDepose ? ' (Original déposé)' : ' (Original non déposé)' }}</span>
               <button class="action-btnj enabled" (click)="downloadJustification(justification.id)">
@@ -91,6 +128,19 @@
         </div>
         <div class="demand-item" *ngIf="selectedNotification && (selectedNotification.absenceDeclarations?.length ?? 0) === 0 && !selectedNotification.retard">
           Aucune déclaration associée
+        </div>
+        <!-- NatureHeureRequest Details -->
+        <div *ngIf="selectedNatureHeureRequest">
+        <div class="demand-item" >
+            De:<span> {{ selectedNatureHeureRequest.heureDebut }}</span>
+            A: <span>{{ selectedNatureHeureRequest.heureFin }}</span>
+        </div>
+          <div class="demand-item" >
+            Durée: <span>{{ selectedNatureHeureRequest.duree }}</span>
+          </div>
+            <div class="demand-item" >
+            Commentaire:<span> {{ selectedNatureHeureRequest.commentaire }}</span>
+        </div>
         </div>
         <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDeclarations()" alt="Back Button">
       </div>

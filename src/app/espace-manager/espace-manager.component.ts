@@ -5,6 +5,9 @@ import { animate, AnimationEvent, state, style, transition, trigger } from '@ang
 import { MaladieService } from '../services/maladie.service';
 import { NotificationDTO } from '../models/NotificationDTOModel';
 import { AuthService } from '../services/auth.service';
+import {JourneeService} from '../services/journee.service';
+import {NatureHeureRequest} from '../models/journee/NatureHeureRequestModel';
+import {NatureHeureModificationRequest} from '../models/journee/NatureHeureModificationRequestModel';
 
 @Component({
   selector: 'app-espace-manager',
@@ -39,6 +42,10 @@ export class EspaceManagerComponent implements OnInit {
   currentSection: 'notifications' | 'demands' | 'declarations' = 'notifications';
   selectedNotification: NotificationDTO | null = null;
   notifications: NotificationDTO[] = [];
+  selectedNatureHeureRequest: NatureHeureRequest | null = null;
+  selectedNatureHeureModifReq: NatureHeureModificationRequest | null = null;
+  natureHeureRequests: NatureHeureRequest[] = [];
+  natureHeureModificationRequests: NatureHeureModificationRequest[] = [];
   managerId: number | null = null;
   profilePicture: string | null = null;
   userFirstname: string | null = null;
@@ -65,7 +72,7 @@ export class EspaceManagerComponent implements OnInit {
   ];
   filteredDemarcheItems: string[] = [...this.demarcheItems];
 
-  constructor(private cdr: ChangeDetectorRef, private maladieService: MaladieService, private authService: AuthService) {}
+  constructor(private cdr: ChangeDetectorRef, private maladieService: MaladieService, private authService: AuthService,private  journeeService :JourneeService) {}
 
   ngOnInit() {
     const storedUser = sessionStorage.getItem('user');
@@ -125,9 +132,164 @@ export class EspaceManagerComponent implements OnInit {
           alert('Erreur lors de la récupération des notifications.');
         }
       });
+
+      this.journeeService.getPendingRequests(this.managerId).subscribe({
+        next: (natureHeureRequest) => {
+          this.natureHeureRequests = natureHeureRequest;
+          console.log('natureHeureRequests:', natureHeureRequest);
+          console.log('Number of requests:', natureHeureRequest.length);
+          natureHeureRequest.forEach((request, index) => {
+            console.log(`Request ${index}:`, request);
+            console.log(`Request ${index} userid:`, request.userid);
+            if (request.userid) {
+              console.log("teest:", request.userid);
+              this.authService.getProfilePicture(request.userid).subscribe({
+                next: (picture) => {
+                  console.log(`Profile picture for userid ${request.userid}:`, picture);
+                  this.employeePictures.set(request.userid, picture);
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.employeePictures.set(request.userid, null);
+                  this.cdr.detectChanges();
+                }
+              });
+            } else {
+              console.warn(`No userid for request ${index}`);
+            }
+          });
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error fetching natureHeureRequests:', err);
+          alert('Erreur lors de la récupération des demandes de nature d\'heures.');
+        }
+      });
+
+
+      this.journeeService.getPendingModificationRequests(this.managerId).subscribe({
+        next: (natureHeureModifRequest) => {
+          this.natureHeureModificationRequests = natureHeureModifRequest;
+          console.log(natureHeureModifRequest);
+          natureHeureModifRequest.forEach((request, index) => {
+            if (request.requestedById) {
+              this.authService.getProfilePicture(request.requestedById).subscribe({
+                next: (picture) => {
+                  console.log(`Profile picture for userid ${request.requestedById}:`, picture);
+                  this.employeePictures.set(request.requestedById, picture);
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for userid ${request.requestedById}:`, err);
+                  this.employeePictures.set(request.requestedById, null);
+                  this.cdr.detectChanges();
+                }
+              });
+            } else {
+              console.warn(`No userid for request ${index}`);
+            }
+          });
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error fetching natureHeureRequests:', err);
+          alert('Erreur lors de la récupération des demandes de nature d\'heures.');
+        }
+      });
+
+
     } else {
       console.warn('Cannot fetch notifications: managerId is null');
     }
+
+
+
+  }
+
+
+  selectNatureHeureRequest(request: NatureHeureRequest) {
+    if (this.isAnimating) return;
+    this.selectedNatureHeureRequest = request;
+    this.selectedNotification = null; // Clear notification selection
+    this.showDeclarations = true;
+    this.showDemands = false;
+    this.currentSection = 'declarations';
+    this.cdr.markForCheck();
+  }
+
+  selectNatureModifHeureRequest(request: NatureHeureModificationRequest) {
+    if (this.isAnimating) return;
+    this.selectedNatureHeureModifReq = request;
+    this.selectedNatureHeureRequest = null;
+    this.selectedNotification = null;
+    this.showDeclarations = true;
+    this.showDemands = false;
+    this.currentSection = 'declarations';
+    this.cdr.markForCheck();
+  }
+
+
+  approveAddRequest(request: NatureHeureRequest) {
+    if (this.isAnimating || request.status !== 'PENDING') return;
+    this.journeeService.approveNatureHeureRequest(request.id!, this.managerId).subscribe({
+      next: () => {
+        request.status = 'APPROVED';
+        this.cdr.markForCheck();
+        alert('Demande approuvée avec succès.');
+      },
+      error: (err) => {
+        console.error('Error approving request:', err);
+        alert('Erreur lors de l\'approbation de la demande.');
+      }
+    });
+  }
+
+  approveModifRequest(request: NatureHeureModificationRequest) {
+    if (this.isAnimating || request.rejected || request.approved) return;
+    this.journeeService.approveModificationRequest(request.id!, this.managerId).subscribe({
+      next: () => {
+        request.approved = true ;
+        request.rejected = false ;
+        this.cdr.markForCheck();
+        alert('Demande approuvée avec succès.');
+      },
+      error: (err) => {
+        console.error('Error approving request:', err);
+        alert('Erreur lors de l\'approbation de la demande.');
+      }
+    });
+  }
+
+
+  rejectModifRequest(request: NatureHeureModificationRequest) {
+    if (this.isAnimating || request.rejected || request.approved) return;
+    this.journeeService.rejectModificationRequest(request.id!, this.managerId).subscribe({
+      next: () => {
+        request.approved = false ;
+        request.rejected = true ;
+        this.cdr.markForCheck();
+        alert('Demande rejetée avec succès.');
+      },
+      error: (err) => {
+        console.error('Error rejecting request:', err);
+        alert('Erreur lors du rejet de la demande.');
+      }
+    });
+  }
+  rejectAddRequest(request: NatureHeureRequest) {
+    if (this.isAnimating || request.status !== 'PENDING') return;
+    this.journeeService.rejectNatureHeureRequest(request.id!, this.managerId).subscribe({
+      next: () => {
+        request.status = 'REJECTED';
+        this.cdr.markForCheck();
+        alert('Demande rejetée avec succès.');
+      },
+      error: (err) => {
+        console.error('Error rejecting request:', err);
+        alert('Erreur lors du rejet de la demande.');
+      }
+    });
   }
 
   filterDemarcheItems() {
@@ -189,10 +351,11 @@ export class EspaceManagerComponent implements OnInit {
   showDeclaration(notification: NotificationDTO) {
     if (this.isAnimating) return;
     this.selectedNotification = notification;
+    this.selectedNatureHeureRequest = null; // Clear natureHeureRequest selection
     this.showDeclarations = true;
     this.showDemands = false;
     this.currentSection = 'declarations';
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   goBackFromDemands() {
@@ -208,8 +371,10 @@ export class EspaceManagerComponent implements OnInit {
     if (this.isAnimating || !this.showDeclarations) return;
     this.showDeclarations = false;
     this.showDemands = true;
+    this.selectedNotification = null;
+    this.selectedNatureHeureRequest = null;
     this.currentSection = 'demands';
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
   downloadJustification(justificationId: number) {
@@ -276,4 +441,6 @@ export class EspaceManagerComponent implements OnInit {
   getEmployeePicture(employeeId: number | null): string | null {
     return employeeId ? this.employeePictures.get(employeeId) || null : null;
   }
+
+
 }

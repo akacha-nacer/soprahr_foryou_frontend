@@ -240,7 +240,6 @@
   align-items: center;
   padding: 15px;
   background-color: transparent;
-  margin-bottom: 0;
   border-bottom: 1px solid #ccc;
   cursor: pointer;
 }
@@ -282,13 +281,17 @@
   border-top: 1px solid #ccc;
 }
 
+.declarations-section .demand-item:nth-child(2) {
+  border-top: 0;
+}
+
 .declarations-section .demand-item:hover {
   background-color: #e2edff;
 }
 
 .declarations-section .demand-item span {
   font-family: 'OpenSansItalic', sans-serif;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .cards-section {

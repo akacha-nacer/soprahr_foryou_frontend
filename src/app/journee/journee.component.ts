@@ -11,6 +11,7 @@ import {NatureHeure} from '../models/journee/NatureHeureModel';
 import {Anomalies} from '../models/journee/AnomaliesModel';
 import {Pointage} from '../models/journee/PointageModel';
 import {JourneeService} from '../services/journee.service';
+import {PopupConfMaladieComponent} from '../popup-conf-maladie/popup-conf-maladie.component';
 
 @Component({
   selector: 'app-journee',
@@ -44,6 +45,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   userId: number | null = null;
   userFirstname: string | null = null;
   userIdentifiant: string | null = null;
+  userRole: string | null = null;
   userPoste: string | null = null;
   sectionVisibility: { [key: string]: boolean } = {};
   sectionValidationStates: { [key: string]: boolean } = {};
@@ -55,6 +57,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   hasAnomaly = true;
   private timeline: Timeline | null = null;
   private timelineInitialized = false;
+
+
 
   constructor(private fb: FormBuilder, public dialog: MatDialog, public  journeeService :JourneeService,private cdr: ChangeDetectorRef) {
     this.natureHeuresForm = this.fb.group({
@@ -68,6 +72,10 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+
+
+
+
   ngOnInit(): void {
     const storedUser = sessionStorage.getItem('user');
     console.log('Stored user from sessionStorage:', storedUser);
@@ -78,6 +86,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.userId = user.userID !== undefined && user.userID !== null ? parseInt(user.userID, 10) : null;
         this.userFirstname = user.firstname !== undefined && user.firstname !== null ? user.firstname : null;
         this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
+        this.userRole = user.role !== undefined && user.role !== null ? user.role : null;
         this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
         console.log(this.userId);
       } catch (e) {
@@ -109,7 +118,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error('Error fetching nature heures :', error);
       });
 
-    this.journeeService.getPointages(this.userId).subscribe(value => {
+    this.journeeService.getAllPointages(this.userId).subscribe(value => {
         this.pointages = value ;
         this.cdr.detectChanges();
       },
@@ -117,7 +126,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         console.error('Error fetching pointages :', error);
       });
 
-    this.journeeService.getAnomalies(this.userId).subscribe(value => {
+    this.journeeService.getAllUserAnomalies(this.userId).subscribe(value => {
         this.anomalies = value ;
         this.cdr.detectChanges();
       },
@@ -135,6 +144,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 100);
     }
   }
+
+
 
   ngOnDestroy(): void {
     if (this.timeline) {
@@ -280,18 +291,43 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       data: { type: 'add' }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && this.userId) {
-        console.log('Nature d\'heure ajoutée :', result);
-        this.journeeService.saveNatureHeure(result, this.userId).subscribe({
-          next: (response) => {
-            console.log('NatureHeure saved:', response);
-            this.journeeService.getNatureHeures(this.userId!).subscribe(value => {
-              this.natureHeures = value;
-              this.cdr.detectChanges();
+    dialogRef.afterClosed().subscribe(formResult => {
+      if (formResult && this.userId) {
+        // Validate required fields
+        if (!formResult.nature_heure || !formResult.heureDebut || !formResult.heureFin ) {
+          console.error('Validation failed: Missing required fields');
+          return;
+        }
+
+        // Open confirmation dialog
+        const confirmDialogRef = this.dialog.open(PopupConfMaladieComponent, {
+          data: {
+            message: this.userRole === 'MANAGER'
+              ? `Voulez-vous vraiment ajouter la nature d’heure "${formResult.nature_heure}"  ?`
+              : `Voulez-vous soumettre une demande pour ajouter la nature d’heure "${formResult.nature_heure}"  ?`
+          }
+        });
+
+        confirmDialogRef.afterClosed().subscribe(confirmResult => {
+          if (confirmResult) {
+            this.journeeService.saveNatureHeure(formResult, this.userId!).subscribe({
+              next: (response) => {
+                console.log('NatureHeure saved:', response);
+                this.journeeService.getNatureHeures(this.userId!).subscribe({
+                  next: (value) => {
+                    this.natureHeures = value;
+                    this.cdr.detectChanges();
+                  },
+                  error: (error) => {
+                    console.error('Error fetching natureHeures:', error);
+                  }
+                });
+              },
+              error: (error) => {
+                console.error('Error saving natureHeure:', error);
+              }
             });
-          },
-          error: (error) => console.error('Error saving natureHeure:', error)
+          }
         });
       }
     });
@@ -308,31 +344,96 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  openEdit(natureheure: NatureHeure): void {
+  openEdit(natureHeure: NatureHeure): void {
+    if (!natureHeure.id) {
+      console.error('Invalid natureHeure ID');
+      return;
+    }
+
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
-      data: { type: 'edit', item: natureheure }
+      data: { type: 'edit', item: natureHeure }
     });
 
-    console.log(natureheure);
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && this.userId && natureheure.id) {
-        console.log('Modification enregistrée :', result);
-        this.journeeService.updateNatureHeure(natureheure.id, result, this.userId).subscribe({
-          next: (response) => {
-            console.log('NatureHeure updated:', response);
-            this.journeeService.getNatureHeures(this.userId!).subscribe(value => {
-              this.natureHeures = value;
-              this.cdr.detectChanges();
+    dialogRef.afterClosed().subscribe(formResult => {
+      if (formResult && this.userId) {
+        // Validate required fields
+        if (!formResult.nature_heure || !formResult.heureDebut || !formResult.heureFin || !formResult.date) {
+          console.error('Validation failed: Missing required fields');
+          return;
+        }
+
+        // Open confirmation dialog
+        const confirmDialogRef = this.dialog.open(PopupConfMaladieComponent, {
+          data: {
+            message: this.userRole === 'MANAGER'
+              ? `Voulez-vous vraiment modifier la nature d’heure "${formResult.nature_heure}"  ?`
+              : `Voulez-vous soumettre une demande de modification pour la nature d’heure "${formResult.nature_heure}" ?`
+          }
+        });
+
+        confirmDialogRef.afterClosed().subscribe(confirmResult => {
+          if (confirmResult) {
+            this.journeeService.updateNatureHeure(natureHeure.id!, formResult, this.userId!).subscribe({
+              next: (response) => {
+                console.log('NatureHeure updated:', response);
+                this.journeeService.getNatureHeures(this.userId!).subscribe({
+                  next: (value) => {
+                    this.natureHeures = value;
+                    this.cdr.detectChanges();
+                  },
+                  error: (error) => {
+                    console.error('Error fetching natureHeures:', error);
+                  }
+                });
+              },
+              error: (error) => {
+                console.error('Error updating natureHeure:', error);
+              }
             });
-          },
-          error: (error) => console.error('Error updating natureHeure:', error)
+          }
         });
       }
     });
   }
 
-  deleteItem(item: any): void {
-    console.log('Suppression de :', item);
+  deleteItem(natureHeure: NatureHeure): void {
+    if (!natureHeure.id || !this.userId) {
+      console.error('Invalid natureHeure ID or user ID');
+      return;
+    }
+
+    const message = this.userRole === 'MANAGER'
+      ? `Voulez-vous vraiment supprimer la nature d'heure "${natureHeure.nature_heure}"?`
+      : `Voulez-vous soumettre une demande de suppression pour la nature d'heure "${natureHeure.nature_heure}" ?`;
+
+    const dialogRef = this.dialog.open(PopupConfMaladieComponent, {
+      data: { message }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && this.userId) {
+        if (this.userRole === 'MANAGER') {
+          this.journeeService.deleteNatureHeure(natureHeure.id!, this.userId).subscribe({
+            next: (response) => {
+              console.log('NatureHeure deleted:', response);
+              this.journeeService.getNatureHeures(this.userId!).subscribe(value => {
+                this.natureHeures = value;
+                this.cdr.detectChanges();
+              });
+            },
+            error: (error) => console.error('Error deleting natureHeure:', error)
+          });
+        } else {
+          this.journeeService.requestNatureHeureDeletion(natureHeure.id!, this.userId).subscribe({
+            next: (response) => {
+              console.log('Deletion request submitted:', response);
+              this.cdr.detectChanges();
+            },
+            error: (error) => console.error('Error submitting deletion request:', error)
+          });
+        }
+      }
+    });
   }
 
   toggleAnomalySection(): void {

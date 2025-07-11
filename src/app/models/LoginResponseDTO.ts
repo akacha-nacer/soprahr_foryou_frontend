@@ -5,6 +5,6 @@ export interface LoginResponseDTO {
   identifiant: string;
   email: string;
   poste: string;
-  role: 'MANAGER' | 'EMPLOYEE' | 'GESTIONNAIRE' | 'ADMIN';
+  role: string;
   message: string;
 }
