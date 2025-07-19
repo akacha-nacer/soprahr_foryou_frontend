@@ -8,6 +8,9 @@ import { AuthService } from '../services/auth.service';
 import {JourneeService} from '../services/journee.service';
 import {NatureHeureRequest} from '../models/journee/NatureHeureRequestModel';
 import {NatureHeureModificationRequest} from '../models/journee/NatureHeureModificationRequestModel';
+import {JourneeNotificationDTO} from '../models/journee/JourneeNotificationDTO';
+import {NatureHeureDeletionRequest} from '../models/journee/NatureHeureDeletionRequestModel';
+import {NatureHeureDeleteDTO} from '../models/journee/NatureHeureDeleteDTO';
 
 @Component({
   selector: 'app-espace-manager',
@@ -43,9 +46,11 @@ export class EspaceManagerComponent implements OnInit {
   selectedNotification: NotificationDTO | null = null;
   notifications: NotificationDTO[] = [];
   selectedNatureHeureRequest: NatureHeureRequest | null = null;
-  selectedNatureHeureModifReq: NatureHeureModificationRequest | null = null;
+  selectedNatureHeureModifReq: JourneeNotificationDTO | null = null;
+  selectednatureHeureDeletionReq: NatureHeureDeleteDTO | null = null;
   natureHeureRequests: NatureHeureRequest[] = [];
-  natureHeureModificationRequests: NatureHeureModificationRequest[] = [];
+  natureHeureModificationRequests: JourneeNotificationDTO[] = [];
+  natureHeureDeletionRequests: NatureHeureDeleteDTO[] = [];
   managerId: number | null = null;
   profilePicture: string | null = null;
   userFirstname: string | null = null;
@@ -145,8 +150,21 @@ export class EspaceManagerComponent implements OnInit {
               console.log("teest:", request.userid);
               this.authService.getProfilePicture(request.userid).subscribe({
                 next: (picture) => {
-                  console.log(`Profile picture for userid ${request.userid}:`, picture);
                   this.employeePictures.set(request.userid, picture);
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.employeePictures.set(request.userid, null);
+                  this.cdr.detectChanges();
+                }
+              });
+
+              this.authService.retrieveUser(request.userid).subscribe({
+                next: (user) => {
+                  request.userFirstname = user.firstname ;
+                  request.userlastname = user.lastname ;
+                  request.identifiant = user.identifiant ;
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
@@ -173,11 +191,65 @@ export class EspaceManagerComponent implements OnInit {
           this.natureHeureModificationRequests = natureHeureModifRequest;
           console.log(natureHeureModifRequest);
           natureHeureModifRequest.forEach((request, index) => {
+            if (request.userid) {
+              this.authService.getProfilePicture(request.userid).subscribe({
+                next: (picture) => {
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.employeePictures.set(request.userid, null);
+                  this.cdr.detectChanges();
+                }
+              });
+
+              this.authService.retrieveUser(request.userid).subscribe({
+                next: (user) => {
+                  request.userFirstname = user.firstname ;
+                  request.userlastname = user.lastname ;
+                  request.identifiant = user.identifiant ;
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.employeePictures.set(request.userid, null);
+                  this.cdr.detectChanges();
+                }
+              });
+            } else {
+              console.warn(`No userid for request ${index}`);
+            }
+          });
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Error fetching natureHeureRequests:', err);
+          alert('Erreur lors de la récupération des demandes de nature d\'heures.');
+        }
+      });
+
+      this.journeeService.getPendingDeletionRequests(this.managerId).subscribe({
+        next: (natureHeuredelRequest) => {
+          this.natureHeureDeletionRequests = natureHeuredelRequest;
+          console.log(natureHeuredelRequest);
+          natureHeuredelRequest.forEach((request, index) => {
             if (request.requestedById) {
               this.authService.getProfilePicture(request.requestedById).subscribe({
                 next: (picture) => {
-                  console.log(`Profile picture for userid ${request.requestedById}:`, picture);
-                  this.employeePictures.set(request.requestedById, picture);
+                  this.cdr.detectChanges();
+                },
+                error: (err) => {
+                  console.error(`Error fetching picture for userid ${request.requestedById}:`, err);
+                  this.employeePictures.set(request.requestedById, null);
+                  this.cdr.detectChanges();
+                }
+              });
+
+              this.authService.retrieveUser(request.requestedById).subscribe({
+                next: (user) => {
+                  request.userFirstname = user.firstname ;
+                  request.userlastname = user.lastname ;
+                  request.identifiant = user.identifiant ;
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
@@ -218,9 +290,21 @@ export class EspaceManagerComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  selectNatureModifHeureRequest(request: NatureHeureModificationRequest) {
+  selectNatureModifHeureRequest(request: JourneeNotificationDTO) {
     if (this.isAnimating) return;
     this.selectedNatureHeureModifReq = request;
+    this.selectedNatureHeureRequest = null;
+    this.selectedNotification = null;
+    this.showDeclarations = true;
+    this.showDemands = false;
+    this.currentSection = 'declarations';
+    this.cdr.markForCheck();
+  }
+
+  selectNatureDelHeureRequest(request: NatureHeureDeleteDTO) {
+    if (this.isAnimating) return;
+    this.selectednatureHeureDeletionReq = request;
+    this.selectedNatureHeureModifReq = null;
     this.selectedNatureHeureRequest = null;
     this.selectedNotification = null;
     this.showDeclarations = true;
@@ -245,12 +329,11 @@ export class EspaceManagerComponent implements OnInit {
     });
   }
 
-  approveModifRequest(request: NatureHeureModificationRequest) {
-    if (this.isAnimating || request.rejected || request.approved) return;
+  approveModifRequest(request: JourneeNotificationDTO) {
+    if (this.isAnimating || request.status !== 'PENDING') return;
     this.journeeService.approveModificationRequest(request.id!, this.managerId).subscribe({
       next: () => {
-        request.approved = true ;
-        request.rejected = false ;
+        request.status = 'APPROVED';
         this.cdr.markForCheck();
         alert('Demande approuvée avec succès.');
       },
@@ -261,14 +344,47 @@ export class EspaceManagerComponent implements OnInit {
     });
   }
 
+  approveDelRequest(request: NatureHeureDeleteDTO) {
+    if (this.isAnimating || request.approved || request.rejected) return;
+    this.journeeService.approveDeletionRequest(request.id!, this.managerId).subscribe({
+      next: () => {
+        request.approved = true;
+        request.rejected = false;
+        this.cdr.markForCheck();
+        alert('Demande approuvée avec succès.');
+      },
+      error: (err) => {
+        console.error('Error approving request:', err);
+        alert('Erreur lors de l\'approbation de la demande.');
+      }
+    });
+  }
 
-  rejectModifRequest(request: NatureHeureModificationRequest) {
-    if (this.isAnimating || request.rejected || request.approved) return;
+  rejectDelRequest(request: NatureHeureDeleteDTO) {
+    if (this.isAnimating || request.approved || request.rejected) return;
+    this.journeeService.rejectDeletionRequest(request.id!, this.managerId).subscribe({
+      next: () => {
+        request.approved = false;
+        request.rejected = true;
+        this.cdr.markForCheck();
+        console.log(" id : ",request.id);
+        alert('Demande rejetée avec succès.');
+      },
+      error: (err) => {
+        console.error('Error rejecting request:', err);
+        alert('Erreur lors du rejet de la demande.');
+      }
+    });
+  }
+
+
+  rejectModifRequest(request: JourneeNotificationDTO) {
+    if (this.isAnimating || request.status !== 'PENDING') return;
     this.journeeService.rejectModificationRequest(request.id!, this.managerId).subscribe({
       next: () => {
-        request.approved = false ;
-        request.rejected = true ;
+        request.status = 'REJECTED';
         this.cdr.markForCheck();
+        console.log(" id : ",request.id);
         alert('Demande rejetée avec succès.');
       },
       error: (err) => {

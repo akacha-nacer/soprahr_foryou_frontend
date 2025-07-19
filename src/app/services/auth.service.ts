@@ -44,6 +44,12 @@ export class AuthService {
     );
   }
 
+  retrieveUser(id: number): Observable<LoginResponseDTO> {
+    return this.http.get<LoginResponseDTO>(`${this.apiUrl1}/retrieve-User/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';
     if (error.status === 401) {

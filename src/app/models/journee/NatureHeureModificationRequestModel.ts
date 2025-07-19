@@ -14,4 +14,5 @@ export interface NatureHeureModificationRequest {
   requestedAt?: string;
   originalNatureHeureId?: number;
   requestedById: number;
+
 }

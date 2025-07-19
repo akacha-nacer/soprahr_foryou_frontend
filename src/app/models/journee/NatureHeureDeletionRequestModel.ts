@@ -5,8 +5,11 @@ export interface NatureHeureDeletionRequest {
   id?: number;
   originalNatureHeureId?: number; // Reference to the original NatureHeure
   originalNatureHeure?: NatureHeure;
-  requestedById?: number; // Reference to the employee who made the request
+  requestedById: number; // Reference to the employee who made the request
   approved: boolean;
   rejected: boolean;
   requestedAt?: string;
+  userFirstname : string ;
+  userlastname : string ;
+  identifiant : string ;
 }

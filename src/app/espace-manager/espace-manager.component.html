@@ -26,7 +26,7 @@
            (@notificationSlide.done)="animationDone($event)">
         <div class="notification-item">Mes tâches (0) <span>24/05/2025</span></div>
         <div class="notification-item warning" (click)="toggleDemands()">
-          Les notifications de mon équipe ({{ notifications.length + natureHeureRequests.length }}) <span>29/05/2025</span>
+          Les notifications de mon équipe ({{ notifications.length + natureHeureRequests.length + natureHeureDeletionRequests.length+ natureHeureModificationRequests.length }}) <span>29/05/2025</span>
         </div>
       </div>
       <div class="demands-section"
@@ -47,9 +47,13 @@
           <img [src]="getEmployeePicture(notification.employeeId) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
           <div class="employeeNotif">
             <span class="employee-name">{{ notification.employeeName }}</span>
-            <span class="employee-name">{{ notification.employeeIdentifiant }}</span>
+            <span >{{ notification.employeeIdentifiant }}</span>
           </div>
+          <div class="employeeNotif">
+            <span class="employee-name" *ngIf="notification.retard"> (Retard)</span>
+            <span class="employee-name" *ngIf="!notification.retard"> (Maladie)</span>
           <span class="employee-identifiant">- {{ notification.createdAt | date:'dd/MM/yyyy' }} -</span>
+          </div>
           <span *ngIf="notification.retard">(Aucune action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
           <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
           <span *ngIf="!notification.retard && !notification.cloturee && notification.absenceDeclarations.length === 0">(Aucune déclaration)</span>
@@ -68,35 +72,58 @@
              (click)="selectNatureHeureRequest(request)">
           <img [src]="getEmployeePicture(request.userid) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
           <div class="employeeNotif">
-            <span class="employee-name">{{ request.nature_heure }}</span>
+            <span class="employee-name">{{ request.userFirstname }} {{ request.userlastname }}</span>
+            <span >{{ request.identifiant }}</span>
             <span class="employee-identifiant">Statut: {{ request.status }}</span>
           </div>
-          <span> - {{ request.date | date:'dd/MM/yyyy' }} -</span>
+          <div class="employeeNotif">
+            <span class="employee-name" > (Ajout  nature d'heure)</span>
+            <span> - {{ request.date | date:'dd/MM/yyyy' }} -</span>
+          </div>
+
           <div *ngIf="request.status === 'PENDING'" class="action-buttons">
-            <button class="action-btn enabled" (click)="approveAddRequest(request); $event.stopPropagation()" aria-label="Approuver la demande">Valider</button>
-            <button class="action-btn enabled" (click)="rejectAddRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande">Rejeter</button>
+            <button class="action-btn enabled" (click)="approveAddRequest(request); $event.stopPropagation()" aria-label="Approuver la demande"><img src="assets/images/validate.png"  alt="Search Icon"></button>
+            <button class="action-btn enabled" (click)="rejectAddRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande"><img src="assets/images/reject.png"  alt="Search Icon"></button>
           </div>
         </div>
 
         <!-- NatureHeureModifRequest Items -->
         <div class="demand-item" *ngFor="let request of natureHeureModificationRequests"
-             [class.disabled]="request.rejected || request.approved"
+             [class.disabled]="request.status !== 'PENDING'"
              (click)="selectNatureModifHeureRequest(request)">
-          <img [src]="getEmployeePicture(request.requestedById) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
+          <img [src]="getEmployeePicture(request.userid) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
           <div class="employeeNotif">
-            <span class="employee-name">{{ request.newNatureHeure }}</span>
-            <span class="employee-identifiant" *ngIf="request.rejected" >Statut: REJETEE</span>
-            <span class="employee-identifiant" *ngIf="request.approved" >Statut: VALIDEE</span>
-            <span class="employee-identifiant" *ngIf="(!request.rejected && !request.approved)" >Statut: EN COURS</span>
+            <span class="employee-name">{{ request.userFirstname }} {{ request.userlastname }}</span>
+            <span >{{ request.identifiant }}</span>
+            <span class="employee-identifiant">Statut: {{ request.status }}</span>
           </div>
-          <span> - {{ request.newDate | date:'dd/MM/yyyy' }} -</span>
-          <div *ngIf="(!request.rejected && !request.approved)" class="action-buttons">
-            <button class="action-btn enabled" (click)="approveModifRequest(request); $event.stopPropagation()" aria-label="Approuver la demande">Valider</button>
-            <button class="action-btn enabled" (click)="rejectModifRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande">Rejeter</button>
+          <div class="employeeNotif">
+            <span class="employee-name" > (Modification de Nature d'heure)</span>
+            <span> - {{ request.date | date:'dd/MM/yyyy' }} -</span>
+          </div>
+          <div *ngIf="request.status === 'PENDING'" class="action-buttons">
+            <button class="action-btn enabled" (click)="approveModifRequest(request); $event.stopPropagation()" aria-label="Approuver la demande"><img src="assets/images/validate.png"  alt="Search Icon"></button>
+            <button class="action-btn enabled" (click)="rejectModifRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande"><img src="assets/images/reject.png"  alt="Search Icon"></button>
           </div>
         </div>
 
-        <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDeclarations()" alt="Back Button">
+        <!-- NatureHeureDelRequest Items -->
+        <div class="demand-item" *ngFor="let request of natureHeureDeletionRequests"
+             [class.disabled]="request.approved || request.rejected">
+          <img [src]="getEmployeePicture(request.requestedById) || 'assets/images/managerPhoto.jpg'" alt="Employee Photo" class="manager-photo" >
+          <div class="employeeNotif">
+            <span class="employee-name">{{ request.userFirstname }} {{ request.userlastname }}</span>
+            <span >{{ request.identifiant }}</span>
+          </div>
+          <div class="employeeNotif">
+            <span class="employee-name" > (Suppression d'une Nature d'heure)</span>
+          </div>
+          <div *ngIf="(!request.approved && !request.rejected)" class="action-buttons">
+            <button class="action-btn enabled" (click)="approveDelRequest(request); $event.stopPropagation()" aria-label="Approuver la demande"><img src="assets/images/validate.png"  alt="Search Icon"></button>
+            <button class="action-btn enabled" (click)="rejectDelRequest(request); $event.stopPropagation()" aria-label="Rejeter la demande"><img src="assets/images/reject.png"  alt="Search Icon"></button>
+          </div>
+        </div>
+
       </div>
       <div class="declarations-section"
            [@declarationSlide]="declarationState"
@@ -131,6 +158,9 @@
         </div>
         <!-- NatureHeureRequest Details -->
         <div *ngIf="selectedNatureHeureRequest">
+          <div class="demand-item" >
+            Nature d'heure: <span>{{ selectedNatureHeureRequest.nature_heure }}</span>
+          </div>
         <div class="demand-item" >
             De:<span> {{ selectedNatureHeureRequest.heureDebut }}</span>
             A: <span>{{ selectedNatureHeureRequest.heureFin }}</span>
@@ -141,6 +171,23 @@
             <div class="demand-item" >
             Commentaire:<span> {{ selectedNatureHeureRequest.commentaire }}</span>
         </div>
+        </div>
+
+        <!-- NatureHeureModifRequest Details -->
+        <div *ngIf="selectedNatureHeureModifReq">
+          <div class="demand-item" >
+            Nature d'heure: <span>{{ selectedNatureHeureModifReq.nature_heure }}</span>
+          </div>
+          <div class="demand-item" >
+            De:<span> {{ selectedNatureHeureModifReq.heureDebut }}</span>
+            A: <span>{{ selectedNatureHeureModifReq.heureFin }}</span>
+          </div>
+          <div class="demand-item" >
+            Durée: <span>{{ selectedNatureHeureModifReq.duree }}</span>
+          </div>
+          <div class="demand-item" >
+            Commentaire:<span> {{ selectedNatureHeureModifReq.commentaire }}</span>
+          </div>
         </div>
         <img src="assets/images/arrow.png" class="back-button" (click)="goBackFromDeclarations()" alt="Back Button">
       </div>

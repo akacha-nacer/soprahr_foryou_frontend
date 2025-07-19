@@ -9,6 +9,8 @@ import {Pointage} from '../models/journee/PointageModel';
 import {NatureHeureRequest} from '../models/journee/NatureHeureRequestModel';
 import {NatureHeureDeletionRequest} from '../models/journee/NatureHeureDeletionRequestModel';
 import {NotificationDTO} from '../models/NotificationDTOModel';
+import {JourneeNotificationDTO} from '../models/journee/JourneeNotificationDTO';
+import {NatureHeureDeleteDTO} from '../models/journee/NatureHeureDeleteDTO';
 
 @Injectable({
   providedIn: 'root'
@@ -38,20 +40,20 @@ export class JourneeService {
     return this.http.get<NatureHeureRequest[]>(`${this.apiUrl}/pending_requests`, { params });
   }
 
-  getPendingModificationRequests(managerId: number | null): Observable<NatureHeureModificationRequest[]> {
+  getPendingModificationRequests(managerId: number | null): Observable<JourneeNotificationDTO[]> {
     if (managerId === null) {
       throw new Error('managerId is null');
     }
     const params = new HttpParams().set('managerId', managerId.toString());
-    return this.http.get<NatureHeureModificationRequest[]>(`${this.apiUrl}/pending_modification_requests`, { params });
+    return this.http.get<JourneeNotificationDTO[]>(`${this.apiUrl}/pending_modification_requests`, { params });
   }
 
-  getPendingDeletionRequests(managerId: number | null): Observable<NatureHeureDeletionRequest[]> {
+  getPendingDeletionRequests(managerId: number | null): Observable<NatureHeureDeleteDTO[]> {
     if (managerId === null) {
       throw new Error('managerId is null');
     }
     const params = new HttpParams().set('managerId', managerId.toString());
-    return this.http.get<NatureHeureDeletionRequest[]>(`${this.apiUrl}/pending_deletion_requests`, { params });
+    return this.http.get<NatureHeureDeleteDTO[]>(`${this.apiUrl}/pending_deletion_requests`, { params });
   }
 
   approveNatureHeureRequest(requestId: number, managerId: number | null ): Observable<NatureHeure> {

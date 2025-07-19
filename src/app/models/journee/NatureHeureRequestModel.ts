@@ -11,4 +11,7 @@ export interface NatureHeureRequest {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   userid: number;
   managerId?: number;
+  userFirstname : string ;
+  userlastname : string ;
+  identifiant : string ;
 }

@@ -26,6 +26,8 @@ export class PopupNatureHeureComponent {
 
   natureOptions = [
     { value: 'Absence justifiée', label: 'Absence justifiée' },
+    { value: 'Déjeuner', label: 'Déjeuner' },
+    { value: 'Réunion', label: 'Réunion' },
 
   ];
   constructor(
