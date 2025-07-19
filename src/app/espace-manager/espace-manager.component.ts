@@ -279,6 +279,21 @@ export class EspaceManagerComponent implements OnInit {
 
   }
 
+  refuser_fermer_Notif(notification : NotificationDTO){
+    if (this.isAnimating) return;
+    this.maladieService.refuseNotification(notification.id).subscribe({
+      next: () => {
+        notification.isValidated = true;
+        this.cdr.detectChanges();
+        location.reload();
+      },
+      error: (err) => {
+        console.error('Error declining notification:', err);
+        alert('Erreur lors du refus de la notification.');
+      }
+    });
+  }
+
 
   selectNatureHeureRequest(request: NatureHeureRequest) {
     if (this.isAnimating) return;
@@ -432,6 +447,7 @@ export class EspaceManagerComponent implements OnInit {
     return (
       !notification.retard &&
       !notification.cloturee &&
+        !notification.isValidated &&
       notification.absenceDeclarations?.length > 0 &&
       !notification.absenceDeclarations[0]?.isValidated &&
       !notification.absenceDeclarations[0]?.cloturee

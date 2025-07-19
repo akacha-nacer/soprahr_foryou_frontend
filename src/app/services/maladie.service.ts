@@ -52,9 +52,12 @@ export class MaladieService {
   }
 
   validateDeclaration(declarationId: number): Observable<void> {
-    return this.http.patch<void>(`${this.apiUrl}/declaration/${declarationId}/validate`, { isValidated: true });
+    return this.http.put<void>(`${this.apiUrl}/declaration/${declarationId}/validate`, {});
   }
 
+  refuseNotification(id: number): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/notification/${id}/refuser`, {});
+  }
   downloadJustification(justificationId: number): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/justifications/${justificationId}/download`, { responseType: 'blob' });
   }

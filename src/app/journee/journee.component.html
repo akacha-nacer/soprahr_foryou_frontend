@@ -1,128 +1,321 @@
 <div class="embauche-container">
   <!-- Left Section (Main Container) -->
   <div class="main-section">
-    <!-- Description Section -->
-    <div class="description-section">
-      <p>Depuis cette démarche, vous pouvez consulter les données d’une journée, sur votre temps de travail (vos anomalies, vos absences, vos pointages, etc). Vous pourrez effectuer si nécessaire des mises à jour sur vos pointages et vos congés en utilisant les suggestions qui vous sont proposées.</p>
-      <div class="action-buttons">
-        <button class="action-btn enabled">Quitter</button>
-        <button class="action-btn disabled">Supprimer</button>
-      </div>
-      <hr>
-    </div>
-    <div class="form-placeholder">
-      <!-- Form Section 1: Mes Absences -->
-      <div class="form-section" sectionId="section1">
-        <div class="form-header" (click)="toggleForm('section1')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Mes Absences</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
+    <!-- Current View -->
+    <ng-container *ngIf="viewMode === 'current'">
+      <!-- Description Section -->
+      <div class="description-section">
+        <p>Depuis cette démarche, vous pouvez consulter les données d’une journée, sur votre temps de travail (vos anomalies, vos absences, vos pointages, etc). Vous pourrez effectuer si nécessaire des mises à jour sur vos pointages et vos congés en utilisant les suggestions qui vous sont proposées.</p>
+        <div class="action-buttons">
+          <button class="action-btn enabled">Quitter</button>
+          <button class="action-btn disabled">Supprimer</button>
         </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
-          <div class="create-dossier-form">
-            <div class="form-group">
-              <div class="nature-heures-container">
-                <table class="nature-heures-table">
-                  <thead>
-                  <tr>
-                    <th>Absence</th>
-                    <th>Libellé</th>
-                    <th>Matin</th>
-                    <th>Après midi</th>
-                    <th>de</th>
-                    <th>à</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr>
-                    <td>ABR</td>
-                    <td>absence diverse</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>09:00</td>
-                    <td>17:00</td>
-                    <td>
-                      <button class="action-button detail-button" >
-                        <img src="assets/images/searchJ.png" >
-                      </button>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
+        <hr>
+      </div>
+      <div class="form-placeholder">
+        <!-- Form Section 1: Mes Absences -->
+        <div class="form-section" sectionId="section1">
+          <div class="form-header" (click)="toggleForm('section1')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Mes Absences</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
+            <div class="create-dossier-form">
+              <div class="form-group">
+                <div class="nature-heures-container">
+                  <table class="nature-heures-table">
+                    <thead>
+                    <tr>
+                      <th>Absence</th>
+                      <th>Libellé</th>
+                      <th>Matin</th>
+                      <th>Après midi</th>
+                      <th>de</th>
+                      <th>à</th>
+                      <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                      <td>ABR</td>
+                      <td>absence diverse</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>09:00</td>
+                      <td>17:00</td>
+                      <td>
+                        <button class="action-button detail-button">
+                          <img src="assets/images/searchJ.png">
+                        </button>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Section 2: Mes Anomalies -->
+        <div class="form-section" sectionId="section2">
+          <div class="form-header" (click)="toggleForm('section2')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Mes Anomalies</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
+            <div class="create-dossier-form">
+              <div class="form-group">
+                <div class="nature-heures-container">
+                  <table class="nature-heures-table">
+                    <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Anomalie</th>
+                      <th>Poid/Détails</th>
+                      <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let anomaly of anomalies">
+                      <td>{{ anomaly.dateAnomalie }}</td>
+                      <td>{{ anomaly.details }}</td>
+                      <td>{{ anomaly.poid }}</td>
+                      <td>
+                        <button class="action-button detail-button">
+                          <img src="assets/images/searchJ.png">
+                        </button>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Section 3: Mes Natures d'Heures -->
+        <div class="form-section" sectionId="section3">
+          <div class="form-header" (click)="toggleForm('section3')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Mes Natures d’Heures</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+            <div class="nature-heures-container">
+              <div class="add-button-container">
+                <button class="add-nature-button" (click)="openAddNatureHeure()">Ajouter une nature d’heure</button>
+              </div>
+              <table class="nature-heures-table">
+                <thead>
+                <tr>
+                  <th>Nature d’heures</th>
+                  <th>Heure de début</th>
+                  <th>Heure de fin</th>
+                  <th>Durée</th>
+                  <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let natureheure of natureHeures" [id]="'nature-heure-row-' + natureheure.id">
+                  <td>{{ natureheure.nature_heure }}</td>
+                  <td>{{ natureheure.heureDebut }}</td>
+                  <td>{{ natureheure.heureFin }}</td>
+                  <td>{{ natureheure.duree }}</td>
+                  <td>
+                    <button class="action-button detail-button" (click)="openDetail(natureheure)">
+                      <img src="assets/images/searchJ.png">
+                    </button>
+                    <button class="action-button edit-button" (click)="openEdit(natureheure)">
+                      <img src="assets/images/editJ.png">
+                    </button>
+                    <button class="action-button delete-button" (click)="deleteItem(natureheure)">
+                      <img src="assets/images/deleteJ.png">
+                    </button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Section 4: Mes Pointages -->
+        <div class="form-section" sectionId="section4">
+          <div class="form-header" (click)="toggleForm('section4')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section4'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Mes Pointages</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section4'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
+            <div class="create-dossier-form">
+              <div class="form-group">
+                <div class="nature-heures-container">
+                  <table class="nature-heures-table">
+                    <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Heure</th>
+                      <th>Sens</th>
+                      <th>Nature de pointage</th>
+                      <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let pointage of pointages" [id]="'pointage-row-' + pointage.id">
+                      <td>{{ pointage.createdAt }}</td>
+                      <td>{{ pointage.heure }}</td>
+                      <td>{{ pointage.sens }}</td>
+                      <td>{{ pointage.naturePointage }}</td>
+                      <td>
+                        <button class="action-button detail-button">
+                          <img src="assets/images/searchJ.png">
+                        </button>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Section 5: Mes Références Horaires -->
+        <div class="form-section" sectionId="section5">
+          <div class="form-header" (click)="toggleForm('section5')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section5'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Mes Références Horaires</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section5'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
+            <div class="create-dossier-form">
+              <div class="form-group">
+                <p>La timeline représente les références horaires sur une journée complète.</p>
+                <div class="timeline-legend">
+                  <div class="legend-item">
+                    <span class="legend-color work-range"></span>
+                    <span class="legend-label">Période de travail</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color nature-heure-item"></span>
+                    <span class="legend-label">Natures d'heures</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color pointage-entry"></span>
+                    <span class="legend-label">Entrée</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color pointage-exit"></span>
+                    <span class="legend-label">Sortie</span>
+                  </div>
+                </div>
+                <div class="timeline-wrapper">
+                  <div id="timelineContainer" style="width: 100%; height: 200px; border: 1px solid #ccc;"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </ng-container>
 
-      <!-- Form Section 2: Mes Anomalies -->
-      <div class="form-section" sectionId="section2">
-        <div class="form-header" (click)="toggleForm('section2')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Mes Anomalies</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
-          <div class="create-dossier-form">
-            <div class="form-group">
-              <div class="nature-heures-container">
-                <table class="nature-heures-table">
-                  <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Anomalie</th>
-                    <th>Poid/Détails</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let anomaly of anomalies">
-                    <td>{{ anomaly.dateAnomalie }}</td>
-                    <td>{{ anomaly.details }}</td>
-                    <td>{{ anomaly.poid }}</td>
-                    <td>
-                      <button class="action-button detail-button" >
-                        <img src="assets/images/searchJ.png">
-                      </button>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Form Section 3: Mes Natures d'Heures -->
-      <div class="form-section" sectionId="section3">
-        <div class="form-header" (click)="toggleForm('section3')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Mes Natures d’Heures</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+    <!-- Historique View -->
+    <ng-container *ngIf="viewMode === 'historique'">
+      <div class="historique-section">
+        <div class="table-wrapper">
+          <h2>Mes Absences</h2>
           <div class="nature-heures-container">
-            <div class="add-button-container">
-              <button class="add-nature-button" (click)="openAddNatureHeure()">Ajouter une nature d’heure</button>
-            </div>
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Absence</th>
+                <th>Libellé</th>
+                <th>Matin</th>
+                <th>Après midi</th>
+                <th>de</th>
+                <th>à</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let absence of absences">
+                <td>{{ absence.code }}</td>
+                <td>{{ absence.libelle }}</td>
+                <td>{{ absence.matin }}</td>
+                <td>{{ absence.apresMidi }}</td>
+                <td>{{ absence.debut }}</td>
+                <td>{{ absence.fin }}</td>
+                <td>
+                  <button class="action-button detail-button">
+                    <img src="assets/images/searchJ.png">
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <h2>Mes Anomalies</h2>
+          <div class="nature-heures-container">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Anomalie</th>
+                <th>Poid/Détails</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let anomaly of allAnomalies">
+                <td>{{ anomaly.dateAnomalie }}</td>
+                <td>{{ anomaly.details }}</td>
+                <td>{{ anomaly.poid }}</td>
+                <td>
+                  <button class="action-button detail-button">
+                    <img src="assets/images/searchJ.png">
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <h2>Mes Natures d’Heures</h2>
+          <div class="nature-heures-container">
             <table class="nature-heures-table">
               <thead>
               <tr>
                 <th>Nature d’heures</th>
+                <th>Date</th>
                 <th>Heure de début</th>
                 <th>Heure de fin</th>
                 <th>Durée</th>
@@ -130,17 +323,15 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let natureheure of natureHeures">
+              <tr *ngFor="let natureheure of allNatureHeures">
                 <td>{{ natureheure.nature_heure }}</td>
+                <td>{{ natureheure.date }}</td>
                 <td>{{ natureheure.heureDebut }}</td>
                 <td>{{ natureheure.heureFin }}</td>
                 <td>{{ natureheure.duree }}</td>
                 <td>
                   <button class="action-button detail-button" (click)="openDetail(natureheure)">
                     <img src="assets/images/searchJ.png">
-                  </button>
-                  <button class="action-button edit-button" (click)="openEdit(natureheure)">
-                    <img src="assets/images/editJ.png">
                   </button>
                   <button class="action-button delete-button" (click)="deleteItem(natureheure)">
                     <img src="assets/images/deleteJ.png">
@@ -151,107 +342,149 @@
             </table>
           </div>
         </div>
-      </div>
 
-      <!-- Form Section 4: Mes Pointages -->
-      <div class="form-section" sectionId="section4">
-        <div class="form-header" (click)="toggleForm('section4')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section4'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Mes Pointages</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section4'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
-          <div class="create-dossier-form">
-            <div class="form-group">
-              <div class="nature-heures-container">
-                <table class="nature-heures-table">
-                  <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Heure</th>
-                    <th>Sens</th>
-                    <th>Nature de pointage</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let pointage of pointages">
-                    <td>{{ pointage.createdAt }}</td>
-                    <td>{{ pointage.heure }}</td>
-                    <td>{{ pointage.sens }}</td>
-                    <td>{{ pointage.naturePointage }}</td>
-                    <td>
-                      <button class="action-button detail-button" >
-                        <img src="assets/images/searchJ.png">
-                      </button>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        <div class="table-wrapper">
+          <h2>Mes Pointages</h2>
+          <div class="nature-heures-container">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Heure</th>
+                <th>Sens</th>
+                <th>Nature de pointage</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let pointage of allPointages">
+                <td>{{ pointage.createdAt }}</td>
+                <td>{{ pointage.heure }}</td>
+                <td>{{ pointage.sens }}</td>
+                <td>{{ pointage.naturePointage }}</td>
+                <td>
+                  <button class="action-button detail-button">
+                    <img src="assets/images/searchJ.png">
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      <!-- Form Section 5: Mes Références Horaires -->
-      <div class="form-section" sectionId="section5">
-        <div class="form-header" (click)="toggleForm('section5')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section5'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Mes Références Horaires</span>
+    </ng-container>
+    <ng-container *ngIf="viewMode === 'enCours'">
+      <div class="historique-section">
+        <div class="table-wrapper">
+          <h2>Demandes de Nature d’Heures</h2>
+          <div class="nature-heures-container">
+            <p *ngIf="pendingNatureHeureRequests.length === 0">Aucune demande de nature d’heure en cours.</p>
+            <table class="nature-heures-table" *ngIf="pendingNatureHeureRequests.length > 0">
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Nature d’heures</th>
+                <th>Heure de début</th>
+                <th>Heure de fin</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let request of pendingNatureHeureRequests">
+                <td>{{ request.date }}</td>
+                <td>{{ request.nature_heure }}</td>
+                <td>{{ request.heureDebut }}</td>
+                <td>{{ request.heureFin }}</td>
+                <td>{{ request.status }}</td>
+                <td>
+                  <button class="action-button detail-button" (click)="openDetailRequest(request)">
+                    <img src="assets/images/searchJ.png">
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section5'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
         </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
-          <div class="create-dossier-form">
-            <div class="form-group">
-              <p>La timeline représente les références horaires sur une journée complète.</p>
-              <!-- Legend for the timeline -->
-              <div class="timeline-legend">
-                <div class="legend-item">
-                  <span class="legend-color work-range"></span>
-                  <span class="legend-label">Période de travail</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-color nature-heure-item"></span>
-                  <span class="legend-label">Natures d'heures</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-color pointage-entry"></span>
-                  <span class="legend-label">Entrée</span>
-                </div>
-                <div class="legend-item">
-                  <span class="legend-color pointage-exit"></span>
-                  <span class="legend-label">Sortie</span>
-                </div>
-              </div>
 
-              <div class="timeline-wrapper">
-                <div id="timelineContainer" style="width: 100%; height: 200px; border: 1px solid #ccc;"></div>
-              </div>
-            </div>
+        <div class="table-wrapper">
+          <h2>Demandes de Modification de Nature d’Heures</h2>
+          <div class="nature-heures-container">
+            <p *ngIf="pendingModificationRequests.length === 0">Aucune demande de modification en cours.</p>
+            <table class="nature-heures-table" *ngIf="pendingModificationRequests.length > 0">
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Nature d’heures</th>
+                <th>Heure de début</th>
+                <th>Heure de fin</th>
+                <th>Date de demande</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let request of pendingModificationRequests">
+                <td>{{ request.newDate }}</td>
+                <td>{{ request.newNatureHeure }}</td>
+                <td>{{ request.newHeureDebut }}</td>
+                <td>{{ request.newHeureFin }}</td>
+                <td>{{ request.requestedAt }}</td>
+                <td>
+                  <button class="action-button detail-button" (click)="openDetailModificationRequest(request)">
+                    <img src="assets/images/searchJ.png">
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <h2>Demandes de Suppression de Nature d’Heures</h2>
+          <div class="nature-heures-container">
+            <p *ngIf="pendingDeletionRequests.length === 0">Aucune demande de suppression en cours.</p>
+            <table class="nature-heures-table" *ngIf="pendingDeletionRequests.length > 0">
+              <thead>
+              <tr>
+                <th>Date</th>
+                <th>Nature d’heures</th>
+                <th>Heure de début</th>
+                <th>Heure de fin</th>
+                <th>Durée</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let request of pendingDeletionRequests">
+                <td>{{ request.originalNatureHeure?.date }}</td>
+                <td>{{ request.originalNatureHeure?.nature_heure || 'N/A' }}</td>
+                <td>{{ request.originalNatureHeure?.heureDebut || 'N/A' }}</td>
+                <td>{{ request.originalNatureHeure?.heureFin || 'N/A' }}</td>
+                <td>{{ request.originalNatureHeure?.duree || 'N/A' }}</td>
+                <td>
+                  <button class="action-button detail-button" (click)="openDetailDeletionRequest(request)">
+                    <img src="assets/images/searchJ.png">
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-    </div>
+    </ng-container>
   </div>
 
   <!-- Right Section -->
   <div class="right-section">
-    <!-- Top Sub-Section (Progress Indicators/Buttons) -->
     <div class="progress-section">
-      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}">Créer</button>
-      <button class="progress-button" [disabled]="true">En Cours</button>
-      <button class="progress-button" [disabled]="true">Historique</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}" (click)="toggleViewMode('current')">Créer</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'En Cours'}" (click)="toggleViewMode('enCours')">En Cours</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Historique'}" (click)="toggleViewMode('historique')">Historique</button>
     </div>
-
-    <!-- Bottom Sub-Section (Suggestions) -->
     <div class="suggestions-section">
       <p><a href="#">Poser un congé</a></p>
     </div>

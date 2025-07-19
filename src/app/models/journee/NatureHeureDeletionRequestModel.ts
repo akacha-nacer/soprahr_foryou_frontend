@@ -3,9 +3,9 @@ import {LoginResponseDTO} from '../LoginResponseDTO';
 
 export interface NatureHeureDeletionRequest {
   id?: number;
-  originalNatureHeureId?: number; // Reference to the original NatureHeure
+  originalNatureHeureId?: number;
   originalNatureHeure?: NatureHeure;
-  requestedById: number; // Reference to the employee who made the request
+  requestedById: number;
   approved: boolean;
   rejected: boolean;
   requestedAt?: string;

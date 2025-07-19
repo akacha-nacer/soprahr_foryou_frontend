@@ -54,17 +54,16 @@
             <span class="employee-name" *ngIf="!notification.retard"> (Maladie)</span>
           <span class="employee-identifiant">- {{ notification.createdAt | date:'dd/MM/yyyy' }} -</span>
           </div>
-          <span *ngIf="notification.retard">(Aucune action requise, {{ notification.cloturee ? 'Clôturée' : 'Active' }})</span>
           <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
           <span *ngIf="!notification.retard && !notification.cloturee && notification.absenceDeclarations.length === 0">(Aucune déclaration)</span>
+          <span *ngIf="!notification.retard">({{ notification.isValidated ? 'Validée' : 'Non Validée' }})</span>
           <button *ngIf="isDeclarationValidatable(notification)"
                   class="action-btn enabled"
                   (click)="validateNotification(notification); $event.stopPropagation()"
-                  aria-label="Valider la déclaration">Valider</button>
-          <button *ngIf="!notification.retard && !notification.cloturee && isDeclarationValidatedOrClosed(notification)"
-                  class="action-btn disabled"
-                  disabled
-                  aria-label="Demande validée">Demande validée</button>
+                  aria-label="Valider la déclaration"><img src="assets/images/validate.png" alt="Search Icon"></button>
+          <button *ngIf="(isDeclarationValidatable(notification) || notification.retard)"
+                  class="action-btn enabled"
+                  (click)="refuser_fermer_Notif(notification); $event.stopPropagation()"><img src="assets/images/reject.png" alt="Search Icon"></button>
         </div>
         <!-- NatureHeureRequest Items -->
         <div class="demand-item" *ngFor="let request of natureHeureRequests"
@@ -139,7 +138,6 @@
           {{ selectedNotification.absenceDeclarations[0].isProlongation ? 'Prolongation :' : 'Déclaration :' }}
           <span>du {{ selectedNotification.absenceDeclarations[0].dateDebut | date:'dd/MM/yyyy' }}</span>
           <span>au {{ selectedNotification.absenceDeclarations[0].dateFin | date:'dd/MM/yyyy' }}</span>
-          <span>({{ selectedNotification.absenceDeclarations[0].cloturee ? 'Clôturée' : selectedNotification.absenceDeclarations[0].isValidated ? 'Validée' : 'Non Validée' }})</span>
         </div>
         <div class="demand-item" *ngIf="hasJustifications">
           Justification(s):

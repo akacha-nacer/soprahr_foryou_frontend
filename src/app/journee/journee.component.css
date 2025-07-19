@@ -465,7 +465,7 @@
 
 /* Timeline wrapper */
 .timeline-wrapper {
-  padding: 20px;
+  padding: 40px;
   background-color: transparent;
   border-radius: 8px;
   min-height: 240px;
@@ -783,4 +783,39 @@
 
 .form-group p {
   margin-top: 20px;
+}
+
+.highlight {
+  background-color: #e0f7fa !important;
+  transition: background-color 0.3s ease;
+}
+
+
+.historique-section {
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.historique-section h2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.historique-section .nature-heures-container {
+  padding: 0 30px; /* Match .form-content padding */
+  background-color: transparent;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+/* Add fine line separator between tables */
+.historique-section .table-wrapper:not(:last-child) {
+  border-bottom: 1px solid #ddd; /* Fine line separator */
+  padding-bottom: 20px; /* Space below the line */
+  margin-bottom: 30px; /* Space above the next table */
 }

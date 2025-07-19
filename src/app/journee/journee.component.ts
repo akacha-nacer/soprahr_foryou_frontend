@@ -12,6 +12,10 @@ import { Anomalies } from '../models/journee/AnomaliesModel';
 import { Pointage } from '../models/journee/PointageModel';
 import { JourneeService } from '../services/journee.service';
 import { PopupConfMaladieComponent } from '../popup-conf-maladie/popup-conf-maladie.component';
+import {Subject, takeUntil} from 'rxjs';
+import {NatureHeureRequest} from '../models/journee/NatureHeureRequestModel';
+import {NatureHeureModificationRequest} from '../models/journee/NatureHeureModificationRequestModel';
+import {NatureHeureDeletionRequest} from '../models/journee/NatureHeureDeletionRequestModel';
 
 @Component({
   selector: 'app-journee',
@@ -42,6 +46,12 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   natureHeures: NatureHeure[] = [];
   anomalies: Anomalies[] = [];
   pointages: Pointage[] = [];
+  allNatureHeures: NatureHeure[] = [];
+  allAnomalies: Anomalies[] = [];
+  allPointages: Pointage[] = [];
+  pendingNatureHeureRequests: NatureHeureRequest[] = [];
+  pendingModificationRequests: NatureHeureModificationRequest[] = [];
+  pendingDeletionRequests: NatureHeureDeletionRequest[] = [];
   userId: number | null = null;
   userFirstname: string | null = null;
   userIdentifiant: string | null = null;
@@ -49,15 +59,17 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   userPoste: string | null = null;
   sectionVisibility: { [key: string]: boolean } = {};
   sectionValidationStates: { [key: string]: boolean } = {};
-  activeProgressButton: string = 'Créer';
-  natureHeuresData = [
-    { nature: 'Absence à tort', debut: '09:00', fin: '13:00', duree: '4h00', saisie: '' }
+  viewMode: 'current' | 'historique' | 'enCours' = 'current';
+  absences = [
+    { code: 'ABR', libelle: 'absence diverse', matin: '-', apresMidi: '-', debut: '09:00', fin: '17:00' }
   ];
+  activeProgressButton: string = 'Créer';
   timelineHours = Array.from({ length: 25 }, (_, i) => (i === 0 ? '00:00' : `${i}:00`));
   hasAnomaly = true;
   private timeline: Timeline | null = null;
   private timelineInitialized = false;
-  private selectedDate: Date = new Date(); // Added to define the day for the timeline
+  private selectedDate: Date = new Date();
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -108,43 +120,49 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sectionValidationStates['section5'] = false;
 
     this.natureHeuresForm.markAllAsTouched();
+    this.fetchCurrentViewData();
+
     if (this.userId) {
-      this.journeeService.getNatureHeures(this.userId).subscribe(
-        value => {
-          this.natureHeures = value;
-          console.log(this.natureHeures);
-          this.cdr.detectChanges();
-          // Update timeline if section5 is visible
-          if (this.sectionVisibility['section5'] && this.timeline) {
-            this.updateTimeline();
-          }
-        },
-        error => {
-          console.error('Error fetching nature heures :', error);
-        }
-      );
+      const today = new Date().toISOString().split('T')[0];
 
-      this.journeeService.getAllPointages(this.userId).subscribe(
-        value => {
-          this.pointages = value;
-          this.cdr.detectChanges();
-        },
-        error => {
-          console.error('Error fetching pointages :', error);
-        }
-      );
+      // Generate anomalies for today
 
-      this.journeeService.getAllUserAnomalies(this.userId).subscribe(
-        value => {
-          this.anomalies = value;
-          this.cdr.detectChanges();
+      this.journeeService.generateAnomaliesForUser(this.userId, today).subscribe({
+        next: (anomalies) => {
+          console.log('Anomalies generated for today:', anomalies);
+          // Fetch today's anomalies
+          this.journeeService.getUserAnomaliesForToday(this.userId!).subscribe({
+            next: (value) => {
+              this.anomalies = value;
+              this.hasAnomaly = value.length > 0;
+              console.log('Today\'s anomalies:', this.anomalies);
+              this.cdr.detectChanges();
+            },
+            error: (error) => {
+              console.error('Error fetching today\'s anomalies:', error);
+            }
+          });
         },
-        error => {
-          console.error('Error fetching anomalies :', error);
+        error: (error) => {
+          console.error('Error generating anomalies:', error);
+          // Still fetch existing anomalies even if generation fails
+          this.journeeService.getUserAnomaliesForToday(this.userId!).subscribe({
+            next: (value) => {
+              this.anomalies = value;
+              this.hasAnomaly = value.length > 0;
+              console.log('Today\'s anomalies:', this.anomalies);
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              console.error('Error fetching today\'s anomalies after generation failure:', err);
+            }
+          });
         }
-      );
+      });
+
     }
   }
+
 
   ngAfterViewInit(): void {
     if (this.sectionVisibility['section5']) {
@@ -159,6 +177,194 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       this.timeline.destroy();
       this.timeline = null;
     }
+  }
+
+  private fetchCurrentViewData(): void {
+    if (!this.userId) return;
+    const today = this.selectedDate.toISOString().split('T')[0];
+
+    this.journeeService.getNatureHeures(this.userId)
+      .subscribe({
+        next: (value) => {
+          this.natureHeures = this.filterByDate(value, this.selectedDate, nh => nh.nature_heure?.toLowerCase() === 'déjeuner');
+          this.cdr.detectChanges();
+          if (this.sectionVisibility['section5'] && this.timeline) {
+            this.updateTimeline();
+          }
+        },
+        error: (error) => {
+          console.error('Error fetching nature heures:', error);
+        }
+      });
+
+    this.journeeService.getAllPointages(this.userId)
+      .subscribe({
+        next: (value) => {
+          this.pointages = this.filterByDate(value, this.selectedDate);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching pointages:', error);
+        }
+      });
+
+    this.journeeService.generateAnomaliesForUser(this.userId, today)
+      .subscribe({
+        next: (anomalies) => {
+          this.journeeService.getUserAnomaliesForToday(this.userId!)
+            .subscribe({
+              next: (value) => {
+                this.anomalies = value;
+                this.hasAnomaly = value.length > 0;
+                this.cdr.detectChanges();
+              },
+              error: (error) => {
+                console.error('Error fetching today\'s anomalies:', error);
+              }
+            });
+        },
+        error: (error) => {
+          console.error('Error generating anomalies:', error);
+          this.journeeService.getUserAnomaliesForToday(this.userId!)
+            .subscribe({
+              next: (value) => {
+                this.anomalies = value;
+                this.hasAnomaly = value.length > 0;
+                this.cdr.detectChanges();
+              },
+              error: (err) => {
+                console.error('Error fetching today\'s anomalies:', err);
+              }
+            });
+        }
+      });
+  }
+
+  private fetchHistoriqueData(): void {
+    if (!this.userId) return;
+
+    this.journeeService.getNatureHeures(this.userId)
+      .subscribe({
+        next: (value) => {
+          this.allNatureHeures = value;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching all nature heures:', error);
+        }
+      });
+
+    this.journeeService.getAllPointages(this.userId)
+      .subscribe({
+        next: (value) => {
+          this.allPointages = value;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching all pointages:', error);
+        }
+      });
+
+    this.journeeService.getAllUserAnomalies(this.userId)
+      .subscribe({
+        next: (value) => {
+          this.allAnomalies = value;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching all anomalies:', error);
+        }
+      });
+  }
+
+
+  private fetchEnCoursData(): void {
+    if (!this.userId) return;
+
+    this.journeeService.getNatureHeureRequests(this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (value) => {
+          this.pendingNatureHeureRequests = value.filter(request => request.status === 'PENDING');
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching nature heure requests:', error);
+        }
+      });
+
+    this.journeeService.getNatureHeureModifRequests(this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (value) => {
+          this.pendingModificationRequests = value.filter(request => !request.approved && !request.rejected);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching modification requests:', error);
+        }
+      });
+
+    this.journeeService.getNatureHeureDelRequests(this.userId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (value) => {
+          this.pendingDeletionRequests = value.filter(request => !request.approved && !request.rejected);
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('Error fetching deletion requests:', error);
+        }
+      });
+  }
+  toggleViewMode(mode: 'current' | 'historique' | 'enCours'): void {
+    this.activeProgressButton = mode === 'current' ? 'Créer' : mode === 'historique' ? 'Historique' : 'En Cours';
+    this.viewMode = mode;
+    if (mode === 'historique') {
+      this.fetchHistoriqueData();
+      if (this.timeline) {
+        this.timeline.destroy();
+        this.timeline = null;
+        this.timelineInitialized = false;
+      }
+    } else if (mode === 'enCours') {
+      this.fetchEnCoursData();
+      if (this.timeline) {
+        this.timeline.destroy();
+        this.timeline = null;
+        this.timelineInitialized = false;
+      }
+    } else {
+      this.fetchCurrentViewData();
+      if (this.sectionVisibility['section5']) {
+        setTimeout(() => this.initializeTimeline(), 350);
+      }
+    }
+    this.cdr.detectChanges();
+  }
+
+  private filterByDate<T extends { date?: string | Date; createdAt?: string | Date; nature_heure?: string }>(
+    items: T[],
+    selectedDate: Date,
+    includeSpecialCases: (item: T) => boolean = () => false
+  ): T[] {
+    const selectedDateStr = selectedDate.toISOString().split('T')[0];
+    return items.filter(item => {
+      if (includeSpecialCases(item)) return true;
+      let itemDate: Date;
+      const dateField = (item.date || item.createdAt) as string | Date;
+      if (typeof dateField === 'string') {
+        const cleanedDate = dateField.replace(' ', 'T').replace(/(\d{4}-\d{2}-\d{2}).*/, '$1');
+        itemDate = new Date(cleanedDate);
+      } else {
+        itemDate = new Date(dateField);
+      }
+      if (isNaN(itemDate.getTime())) {
+        console.warn(`Skipping item with invalid date:`, item);
+        return false;
+      }
+      return itemDate.toISOString().split('T')[0] === selectedDateStr;
+    });
   }
 
 
@@ -198,7 +404,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
           border-right: 6px solid transparent !important;
           border-bottom: 10px solid ${color} !important;
           z-index: 999 !important;
-          pointer-events: none !important;
         `;
 
           htmlPoint.appendChild(triangleElement);
@@ -251,17 +456,93 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.fixPointageStyles();
 
+      this.timeline.on('click', (event) => {
+        console.log('Timeline clicked:', event);
+        const { item } = event;
+        if (item) {
+          if (typeof item === 'string' && item.startsWith('pointage-')) {
+            // Handle pointage click
+            const pointageId = parseInt(item.replace('pointage-', ''), 10);
+            this.navigateToPointage(pointageId);
+          } else if (typeof item === 'string' && item.startsWith('work-')) {
+            // Ignore work-range items
+            console.log('Clicked work-range item, ignoring:', item);
+          } else if (typeof item === 'number' || (typeof item === 'string' && !isNaN(parseInt(item, 10)))) {
+            // Handle nature-heure-item click
+            const natureHeureId = typeof item === 'number' ? item : parseInt(item, 10);
+            this.navigateToNatureHeure(natureHeureId);
+          } else {
+            console.warn('Unknown item clicked:', item);
+          }
+        }
+      });
 
       this.timeline.on('select', (event) => {
         console.log('Item selected:', event);
       });
 
-      this.timeline.on('click', (event) => {
-        console.log('Timeline clicked:', event);
-      });
-
     } catch (error) {
       console.error('Timeline initialization failed:', error);
+    }
+
+
+  }
+
+
+  private navigateToPointage(pointageId: number): void {
+    // Ensure section4 (Pointages) is expanded
+    if (!this.sectionVisibility['section4']) {
+      this.sectionVisibility['section4'] = true;
+      this.cdr.detectChanges();
+      // Delay to allow section to expand
+      setTimeout(() => {
+        const row = document.getElementById(`pointage-row-${pointageId}`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight row
+          row.classList.add('highlight');
+          setTimeout(() => row.classList.remove('highlight'), 2000);
+        } else {
+          console.warn(`Pointage row with ID pointage-row-${pointageId} not found`);
+        }
+      }, 350); // Match animation duration
+    } else {
+      const row = document.getElementById(`pointage-row-${pointageId}`);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.add('highlight');
+        setTimeout(() => row.classList.remove('highlight'), 2000);
+      } else {
+        console.warn(`Pointage row with ID pointage-row-${pointageId} not found`);
+      }
+    }
+  }
+
+  private navigateToNatureHeure(natureHeureId: number): void {
+    // Ensure section3 (Mes Natures d'Heures) is expanded
+    if (!this.sectionVisibility['section3']) {
+      this.sectionVisibility['section3'] = true;
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        const row = document.getElementById(`nature-heure-row-${natureHeureId}`);
+        if (row) {
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Highlight row
+          row.classList.add('highlight');
+          setTimeout(() => row.classList.remove('highlight'), 2000);
+        } else {
+          console.warn(`NatureHeure row with ID nature-heure-row-${natureHeureId} not found`);
+        }
+      }, 350); // Match animation duration
+    } else {
+      const row = document.getElementById(`nature-heure-row-${natureHeureId}`);
+      if (row) {
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        row.classList.add('highlight');
+        setTimeout(() => row.classList.remove('highlight'), 2000);
+      } else {
+        console.warn(`NatureHeure row with ID nature-heure-row-${natureHeureId} not found`);
+      }
     }
   }
 
@@ -346,41 +627,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         type: 'point',
         className: p.sens === "ENTREE" ? 'pointage-entry' : 'pointage-exit',
         style: `
-      /* Masquer complètement le point par défaut */
-      background: none !important;
-      border: none !important;
       top:37px;
-      border-radius: 0 !important;
-      width: 0 !important;
-      height: 0 !important;
-      padding: 0 !important;
-      margin: 0 !important;
-
-      /* Créer le triangle avec des pseudo-éléments via CSS-in-JS */
-      position: relative !important;
-
-      /* Utiliser box-shadow pour créer le triangle car on ne peut pas utiliser ::before/::after en inline */
-      box-shadow:
-        -6px 10px 0 -6px transparent,
-        0px 10px 0 -6px ${p.sens === "ENTREE" ? '#4caf50' : '#d32f2f'},
-        6px 10px 0 -6px transparent !important;
-
-      /* Alternative avec border pour créer le triangle */
-      border-left: 6px solid transparent !important;
-      border-right: 6px solid transparent !important;
-      border-bottom: 10px solid ${p.sens === "ENTREE" ? '#4caf50' : '#d32f2f'} !important;
-      border-top: none !important;
-
-      /* S'assurer que l'élément est visible */
-      opacity: 1 !important;
-      visibility: visible !important;
-      z-index: 999 !important;
-
-      /* Réinitialiser les dimensions pour le triangle */
-      min-width: 12px !important;
-      min-height: 10px !important;
-      max-width: 12px !important;
-      max-height: 10px !important;
     `,
         title: `${p.sens === "ENTREE" ? 'Entrée' : 'Sortie'} à ${p.heure} (${p.naturePointage})`
       };
@@ -507,25 +754,25 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.journeeService.saveNatureHeure(formResult, this.userId!).subscribe({
               next: (response) => {
                 console.log('NatureHeure saved:', response);
-                this.journeeService.getNatureHeures(this.userId!).subscribe({
-                  next: (value) => {
-                    this.natureHeures = value;
-                    console.log('Updated natureHeures:', value);
-                    this.cdr.detectChanges();
-                    // Force section5 visibility and timeline update
-                    this.sectionVisibility['section5'] = true;
-                    setTimeout(() => {
-                      if (this.timeline) {
-                        this.updateTimeline();
-                      } else {
-                        this.initializeTimeline();
+                this.journeeService.getNatureHeures(this.userId!)
+                  .subscribe({
+                    next: (value) => {
+                      this.natureHeures = this.filterByDate(value, this.selectedDate, nh => nh.nature_heure?.toLowerCase() === 'déjeuner');
+                      this.cdr.detectChanges();
+                      if (this.sectionVisibility['section5'] && this.timeline) {
+                        setTimeout(() => {
+                          if (this.timeline) {
+                            this.updateTimeline();
+                          } else {
+                            this.initializeTimeline();
+                          }
+                        }, 350);
                       }
-                    }, 350);
-                  },
-                  error: (error) => {
-                    console.error('Error fetching natureHeures:', error);
-                  }
-                });
+                    },
+                    error: (error) => {
+                      console.error('Error fetching nature heures:', error);
+                    }
+                  });
               },
               error: (error) => {
                 console.error('Error saving natureHeure:', error);
@@ -578,18 +825,25 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.journeeService.updateNatureHeure(natureHeure.id!, formResult, this.userId!).subscribe({
               next: (response) => {
                 console.log('NatureHeure updated:', response);
-                this.journeeService.getNatureHeures(this.userId!).subscribe({
-                  next: (value) => {
-                    this.natureHeures = value;
-                    this.cdr.detectChanges();
-                    if (this.sectionVisibility['section5'] && this.timeline) {
-                      this.updateTimeline();
+                this.journeeService.getNatureHeures(this.userId!)
+                  .subscribe({
+                    next: (value) => {
+                      this.natureHeures = this.filterByDate(value, this.selectedDate, nh => nh.nature_heure?.toLowerCase() === 'déjeuner');
+                      this.cdr.detectChanges();
+                      if (this.sectionVisibility['section5'] && this.timeline) {
+                        setTimeout(() => {
+                          if (this.timeline) {
+                            this.updateTimeline();
+                          } else {
+                            this.initializeTimeline();
+                          }
+                        }, 350);
+                      }
+                    },
+                    error: (error) => {
+                      console.error('Error fetching nature heures:', error);
                     }
-                  },
-                  error: (error) => {
-                    console.error('Error fetching natureHeures:', error);
-                  }
-                });
+                  });
               },
               error: (error) => {
                 console.error('Error updating natureHeure:', error);
@@ -621,13 +875,25 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
           this.journeeService.deleteNatureHeure(natureHeure.id!, this.userId).subscribe({
             next: (response) => {
               console.log('NatureHeure deleted:', response);
-              this.journeeService.getNatureHeures(this.userId!).subscribe(value => {
-                this.natureHeures = value;
-                this.cdr.detectChanges();
-                if (this.sectionVisibility['section5'] && this.timeline) {
-                  this.updateTimeline();
-                }
-              });
+              this.journeeService.getNatureHeures(this.userId!)
+                .subscribe({
+                  next: (value) => {
+                    this.natureHeures = this.filterByDate(value, this.selectedDate, nh => nh.nature_heure?.toLowerCase() === 'déjeuner');
+                    this.cdr.detectChanges();
+                    if (this.sectionVisibility['section5'] && this.timeline) {
+                      setTimeout(() => {
+                        if (this.timeline) {
+                          this.updateTimeline();
+                        } else {
+                          this.initializeTimeline();
+                        }
+                      }, 350);
+                    }
+                  },
+                  error: (error) => {
+                    console.error('Error fetching nature heures:', error);
+                  }
+                });
             },
             error: (error) => console.error('Error deleting natureHeure:', error)
           });
@@ -644,9 +910,44 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+
+
   toggleAnomalySection(): void {
     if (this.hasAnomaly) {
       this.sectionVisibility['section2'] = true;
     }
+  }
+
+  openDetailRequest(request: NatureHeureRequest): void {
+    this.dialog.open(PopupNatureHeureComponent, {
+      data: { type: 'detail', item: request }
+    });
+  }
+
+  openDetailModificationRequest(request: NatureHeureModificationRequest): void {
+    this.dialog.open(PopupNatureHeureComponent, {
+      data: { type: 'detail', item: {
+          nature_heure: request.newNatureHeure,
+          date: request.newDate,
+          heureDebut: request.newHeureDebut,
+          heureFin: request.newHeureFin,
+          duree: request.newDuree,
+          commentaire: request.newCommentaire,
+          requestedAt: request.requestedAt
+        }}
+    });
+  }
+
+  openDetailDeletionRequest(request: NatureHeureDeletionRequest): void {
+    this.dialog.open(PopupNatureHeureComponent, {
+      data: { type: 'detail', item: {
+          nature_heure: request.originalNatureHeure?.nature_heure || 'N/A',
+          date: request.originalNatureHeure?.date,
+          heureDebut: request.originalNatureHeure?.heureDebut,
+          heureFin: request.originalNatureHeure?.heureFin,
+          duree: request.originalNatureHeure?.duree,
+          requestedAt: request.requestedAt
+        }}
+    });
   }
 }

@@ -9,6 +9,7 @@ export interface NotificationDTO {
   cloturee: boolean;
   createdAt: string;
   employeeId: number;
+  isValidated?: boolean;
   employeeIdentifiant: string;
   employeeName: string;
   absenceDeclarations: AbsenceDeclarationDTO[] ;

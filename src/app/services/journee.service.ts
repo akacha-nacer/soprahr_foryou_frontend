@@ -88,9 +88,6 @@ export class JourneeService {
     return this.http.get<Pointage[]>(`${this.apiUrl}/retrieve-all-Pointages?userId=${userId}`);
   }
 
-  getAllUserAnomalies(userId: number): Observable<Anomalies[]> {
-    return this.http.get<Anomalies[]>(`${this.apiUrl}/retrieve-all-Anomalies?userId=${userId}`);
-  }
 
   updateNatureHeure(id: number, natureHeure: NatureHeure, userId: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/update_nature_heure/${id}?userId=${userId}`, natureHeure);
@@ -130,5 +127,35 @@ export class JourneeService {
 
   getNatureHeureById(natureHeureId: number): Observable<NatureHeure> {
     return this.http.get<NatureHeure>(`${this.apiUrl}/nature_heure/${natureHeureId}`).pipe(catchError(this.handleError));
+  }
+
+  getUserAnomaliesForToday(userId: number): Observable<Anomalies[]> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.get<Anomalies[]>(`${this.apiUrl}/anomalies/today`, { params });
+  }
+
+  getAllUserAnomalies(userId: number): Observable<Anomalies[]> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.get<Anomalies[]>(`${this.apiUrl}/retrieve-all-Anomalies`, { params });
+  }
+
+  generateAnomaliesForUser(userId: number, date: string): Observable<Anomalies[]> {
+    const params = new HttpParams().set('date', date);
+    return this.http.post<Anomalies[]>(`${this.apiUrl}/anomalies/generate/${userId}`, null, { params });
+  }
+
+  getNatureHeureRequests(userId: number): Observable<NatureHeureRequest[]> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.get<NatureHeureRequest[]>(`${this.apiUrl}/retrieve-all-NatureHrsRequests`, { params });
+  }
+
+  getNatureHeureModifRequests(userId: number): Observable<NatureHeureModificationRequest[]> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.get<NatureHeureModificationRequest[]>(`${this.apiUrl}/retrieve-all-NatureHrsModifRequests`, { params });
+  }
+
+  getNatureHeureDelRequests(userId: number): Observable<NatureHeureDeletionRequest[]> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.get<NatureHeureDeletionRequest[]>(`${this.apiUrl}/retrieve-all-NatureHrsDelfRequests`, { params });
   }
 }

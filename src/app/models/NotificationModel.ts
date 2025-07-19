@@ -3,6 +3,7 @@ export interface Notification {
   message: string;
   cloturee?: boolean;
   createdAt?: string;
+  isValidated?: boolean;
   employeeId?: number;
   recipientId?: number;
   retard?:boolean;
