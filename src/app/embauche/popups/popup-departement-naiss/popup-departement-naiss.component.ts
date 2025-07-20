@@ -27,29 +27,29 @@ export class PopupDepartementNaissComponent implements OnInit {
   filteredDepartments: DepartementNaiss[] = [];
   selectedRow: DepartementNaiss | null = null;
   currentPage: number = 1;
-  itemsPerPage: number = 10; // Number of items per page
+  itemsPerPage: number = 10;
   totalPages: number = 1;
-
 
   constructor(
     public dialogRef: MatDialogRef<PopupDepartementNaissComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { message: string },
     private cdr: ChangeDetectorRef,
     public embaucheService: EmbaucheService
-  ) {
-
-  }
+  ) {}
 
   ngOnInit(): void {
     this.embaucheService.RetrieveDepartementNaiss().subscribe(
       (value: DepartementNaiss[]) => {
-        this.departements = value;
+        this.departements = value || []; // Default to empty array if null
         console.log('Fetched departements:', this.departements);
-        this.filterItems();
-        this.cdr.detectChanges();
+        this.filterItems(); // Initialize filtered list
+        this.cdr.markForCheck();
       },
       (error) => {
         console.error('Error fetching departements:', error);
+        this.departements = []; // Set to empty array on error
+        this.filterItems();
+        this.cdr.markForCheck();
       }
     );
   }
@@ -59,25 +59,28 @@ export class PopupDepartementNaissComponent implements OnInit {
       this.filteredDepartments = [...this.departements];
     } else {
       const searchLower = this.searchTerm.toLowerCase();
-      this.filteredDepartments = this.departements.filter(dept =>
-        dept.code.toLowerCase().includes(searchLower) ||
-        dept.libelle.toLowerCase().includes(searchLower) ||
-        dept.status.toLowerCase().includes(searchLower)
-      );
+      this.filteredDepartments = this.departements.filter(dept => {
+        const code = dept.code || '';
+        const libelle = dept.libelle || '';
+        const status = dept.status || '';
+        return (
+          code.toLowerCase().includes(searchLower) ||
+          libelle.toLowerCase().includes(searchLower) ||
+          status.toLowerCase().includes(searchLower)
+        );
+      });
     }
     this.currentPage = 1;
     this.updatePagination();
-    this.cdr.detectChanges();
+    this.cdr.markForCheck();
   }
 
-  // Get paginated slice of filteredDepartments
   get paginatedDepartments(): DepartementNaiss[] {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     return this.filteredDepartments.slice(startIndex, endIndex);
   }
 
-  // Update total pages and generate page numbers
   updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredDepartments.length / this.itemsPerPage);
     if (this.currentPage > this.totalPages) {
@@ -85,22 +88,21 @@ export class PopupDepartementNaissComponent implements OnInit {
     }
   }
 
-  // Generate array of page numbers for display
   get pageNumbers(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 
-  // Navigate to a specific page
   goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.cdr.detectChanges();
+      this.cdr.markForCheck();
     }
   }
 
   selectRow(row: DepartementNaiss): void {
     this.selectedRow = row;
   }
+
   onClose(): void {
     this.dialogRef.close(false);
   }
@@ -109,7 +111,7 @@ export class PopupDepartementNaissComponent implements OnInit {
     if (this.selectedRow) {
       this.dialogRef.close(this.selectedRow.id);
     } else {
-      alert('Veuillez sélectionner un établissement');
+      alert('Veuillez sélectionner un département');
     }
   }
 

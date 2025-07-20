@@ -316,6 +316,7 @@
 .card1 {
   padding: 10px;
   width: 280px;
+  max-height: 180px;
   text-align: center;
   color: #fff;
   background-color: #42a1a7;

@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import {Component, HostListener, OnInit} from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
@@ -67,7 +67,7 @@ import {AuthService} from '../services/auth.service';
     ])
   ]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit{
   isDropdownOpen = false;
   isSearchOpen = false;
   isToggleOn = false;
@@ -75,8 +75,35 @@ export class NavbarComponent {
   isSubDropdownOpen1 = false;
   isSubDropdownOpen2 = false;
   isAnimatingSubDropdown = false;
+  managerId: number | null = null;
+  profilePicture: string | null = null;
+  userFirstname: string | null = null;
+  userIdentifiant: string | null = null;
+  userPoste: string | null = null;
+  userRole: string | null = null;
 
   constructor(private dialog: MatDialog,private router:Router, private authServcie:AuthService) {}
+
+  ngOnInit() {
+    const storedUser = sessionStorage.getItem('user');
+    console.log('Stored user from sessionStorage:', storedUser);
+
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        this.managerId = user.userID !== undefined && user.userID !== null ? parseInt(user.userID, 10) : null;
+        this.userFirstname = user.firstname !== undefined && user.firstname !== null ? user.firstname : null;
+        this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
+        this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
+        this.userRole = user.role !== undefined && user.role !== null ? user.role : null;
+        console.log(this.managerId);
+      } catch (e) {
+        console.error('Error parsing user from sessionStorage:', e);
+      }
+    } else {
+      console.warn('No user found in sessionStorage');
+    }
+  }
 
   toggleDropdown() {
     this.isDropdownOpen = !this.isDropdownOpen;
@@ -185,6 +212,7 @@ export class NavbarComponent {
       if (result) {
         this.authServcie.logout();
         this.router.navigate(['/auth']);
+        sessionStorage.clear();
       }
     });
   }

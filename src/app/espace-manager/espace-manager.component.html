@@ -25,7 +25,7 @@
            (@notificationSlide.start)="animationStart($event)"
            (@notificationSlide.done)="animationDone($event)">
         <div class="notification-item">Mes tâches (0) <span>24/05/2025</span></div>
-        <div class="notification-item warning" (click)="toggleDemands()">
+        <div class="notification-item warning" (click)="toggleDemands()" *ngIf="userRole == 'MANAGER' ">
           Les notifications de mon équipe ({{ notifications.length + natureHeureRequests.length + natureHeureDeletionRequests.length+ natureHeureModificationRequests.length }}) <span>29/05/2025</span>
         </div>
       </div>
@@ -54,9 +54,11 @@
             <span class="employee-name" *ngIf="!notification.retard"> (Maladie)</span>
           <span class="employee-identifiant">- {{ notification.createdAt | date:'dd/MM/yyyy' }} -</span>
           </div>
-          <span *ngIf="!notification.retard && notification.cloturee">(Clôturée)</span>
+          <div class="employeeNotif">
           <span *ngIf="!notification.retard && !notification.cloturee && notification.absenceDeclarations.length === 0">(Aucune déclaration)</span>
-          <span *ngIf="!notification.retard">({{ notification.isValidated ? 'Validée' : 'Non Validée' }})</span>
+          <span *ngIf="!notification.retard">({{ notification.absenceDeclarations[0].isValidated ? 'Validée' : 'Non Validée' }})</span>
+          <span *ngIf="!notification.retard && !notification.cloturee">(Non clôturée)</span>
+          </div>
           <button *ngIf="isDeclarationValidatable(notification)"
                   class="action-btn enabled"
                   (click)="validateNotification(notification); $event.stopPropagation()"
@@ -191,7 +193,7 @@
       </div>
     </div>
     <div class="cards-section">
-      <div class="card">
+      <div class="card" *ngIf="userRole == 'MANAGER' ">
         <div class="card-title">Absentéisme de mon équipe Responsable opérationnel (HIE) / Société FDP</div>
         <div class="card-fraction">
           <span class="numerator">0 <span class="text1"> j </span></span>
@@ -199,7 +201,7 @@
           <span class="denominator">46 <span class="text1"> pers.</span></span>
         </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="userRole == 'MANAGER' ">
         <div class="card-title">Absentéisme de mon équipe Responsable (HIE) / DEP QAI</div>
         <div class="card-fraction">
           <span class="numerator">0 <span class="text1"> j </span></span>
@@ -207,7 +209,7 @@
           <span class="denominator">0 <span class="text1"> pers.</span></span>
         </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="userRole == 'MANAGER' ">
         <div class="card-title">Absentéisme de mon équipe Responsable (HIE) / Infirmier</div>
         <div class="card-fraction">
           <span class="numerator">0 <span class="text1"> j </span></span>
@@ -215,7 +217,7 @@
           <span class="denominator">21 <span class="text1"> pers.</span></span>
         </div>
       </div>
-      <div class="card">
+      <div class="card" *ngIf="userRole == 'MANAGER' ">
         <div class="card-title">Micro-absentéisme de mon équipe Responsable (HIE) / DEP...</div>
         <div class="card-fraction">
           <span class="numerator">0 <span class="text1"> j </span></span>

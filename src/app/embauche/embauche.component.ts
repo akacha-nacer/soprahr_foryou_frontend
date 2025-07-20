@@ -11,6 +11,12 @@ import {MatDialog, MatDialogModule} from '@angular/material/dialog';
 import {PopupNatureHeureComponent} from '../popup-nature-heure/popup-nature-heure.component';
 import {PopupEtablissementComponent} from './popups/popup-etablissement/popup-etablissement.component';
 import {PopupDepartementNaissComponent} from './popups/popup-departement-naiss/popup-departement-naiss.component';
+import {PopupTypeTelephoneComponent} from './popups/popup-type-telephone/popup-type-telephone.component';
+import {PopupTypeAdresseComponent} from './popups/popup-type-adresse/popup-type-adresse.component';
+import {PopupMotifEntreeComponent} from './popups/popup-motif-entree/popup-motif-entree.component';
+import {PopupConventionComponent} from './popups/popup-convention/popup-convention.component';
+import {PopupQualifComponent} from './popups/popup-qualif/popup-qualif.component';
+import {PopupNatureContratComponent} from './popups/popup-nature-contrat/popup-nature-contrat.component';
 
 @Component({
   selector: 'app-embauche',
@@ -412,6 +418,139 @@ export class EmbaucheComponent implements OnInit {
         });
       } else {
         console.log('Aucun département sélectionné');
+      }
+    });
+  }
+
+  openTelephonepopup(): void {
+    const dialogRef = this.dialog.open(PopupTypeTelephoneComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez un type de voie"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.addressForm.patchValue({
+          natureVoie: result.libelle
+        });
+      }
+    });
+  }
+
+  openTypeAdressepopup(): void {
+    const dialogRef = this.dialog.open(PopupTypeAdresseComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez un type d'adresses"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.addressForm.patchValue({
+          typeAdresse: result.code
+        });
+      }
+    });
+  }
+
+  openMotifpopup(): void {
+    const dialogRef = this.dialog.open(PopupMotifEntreeComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez un Motif d'entrée"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.assignmentForm.patchValue({
+          motifEntree: result
+        });
+      }
+    });
+  }
+
+
+  openConventionpopup(): void {
+    const dialogRef = this.dialog.open(PopupConventionComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez une convention"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.careerForm.patchValue({
+          conventionCollective: result.code
+        });
+      }
+    });
+  }
+
+  openQualifpopup(): void {
+    const dialogRef = this.dialog.open(PopupQualifComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez une qualification"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.careerForm.patchValue({
+          qualification: result
+        });
+      }
+    });
+  }
+
+  openNatureContratpopup(): void {
+    const dialogRef = this.dialog.open(PopupNatureContratComponent, {
+      width: '700px',
+      maxWidth: '900px',
+      minWidth: '600px',
+      panelClass: 'custom-dialog-container',
+      disableClose: false,
+      autoFocus: true,
+      data: {
+        message: "Sélectionnez une nature de contrat"
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.careerForm.patchValue({
+          natureContrat: result
+        });
       }
     });
   }

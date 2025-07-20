@@ -2,27 +2,28 @@
   <button mat-icon-button class="close-button" (click)="onClose()">
     <img src="assets/images/close.png" class="close-icon">
   </button>
-  <h3 class="popup-title">Etablissement</h3>
+  <h3 class="popup-title">Conventions collectives</h3>
   <br><br>
   <div class="popup-body">
     <div class="search-bar-container">
-    <input type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterItems()" >
+      <input type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterItems()" >
     </div>
     <table class="nature-heures-table">
       <thead>
       <tr>
-        <th>Modèle</th>
-        <th>Etablissement</th>
+        <th>Code</th>
         <th>Libellé</th>
+        <th>Status</th>
       </tr>
       </thead>
       <tbody>
       <tr *ngFor="let row of filteredRows; let i = index"
           [class.selected-row]="selectedRow === row"
           (click)="selectRow(row)">
-        <td>{{ row.modele }}</td>
-        <td>{{ row.etablissement || 'N/A' }}</td>
+        <td>{{ row.code }}</td>
         <td>{{ row.libelle }}</td>
+        <td>Actif</td>
+
       </tr>
       </tbody>
     </table>

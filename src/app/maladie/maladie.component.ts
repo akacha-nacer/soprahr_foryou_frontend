@@ -10,6 +10,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { PopupConfMaladieComponent } from '../popup-conf-maladie/popup-conf-maladie.component';
 import {AuthService} from '../services/auth.service';
 import {LoginResponseDTO} from '../models/LoginResponseDTO';
+import {NotificationDTO} from '../models/NotificationDTOModel';
+import {AbsenceDeclarationDTO} from '../models/AbsenceDeclarationDTOModel';
+import {JustificationDTO} from '../models/JustificationDTO';
 
 @Component({
   selector: 'app-maladie',
@@ -55,6 +58,16 @@ export class MaladieComponent implements OnInit {
   absenceDeclarationId?: number | null = null;
   managerInfo: LoginResponseDTO | null = null;
   ManagerPicture: string | null = null;
+
+  viewMode: 'current' | 'historique' | 'enCours' = 'current';
+  allNotifications: NotificationDTO[] = [];
+  allDeclarations: { declaration: AbsenceDeclarationDTO, notificationId: number }[] = [];
+  allJustifications: { justification: JustificationDTO, declarationId: number }[] = [];
+  selectedNotificationId: number | null = null;
+  selectedDeclarationId: number | null = null;
+  selectedJustificationId: number | null = null;
+  activeNotification: Notification | null = null;
+  activeDeclaration: AbsenceDeclaration | null = null;
 
   maladieData = {
     notification: { message: '', retard: false } as Notification,
@@ -136,7 +149,6 @@ export class MaladieComponent implements OnInit {
       this.justifyForm.get('dateAccident')?.updateValueAndValidity();
     });
 
-    // Check for active notification
     this.maladieService.getActiveNotification(this.employeeId).subscribe({
       next: (notification) => {
         if (notification) {
@@ -145,7 +157,7 @@ export class MaladieComponent implements OnInit {
           this.isNotificationFormDisabled = true;
           this.notifyForm.disable();
         }
-        if (notification?.retard){
+        if (notification?.retard) {
           this.sectionVisibility['section1'] = false;
           this.sectionVisibility['section2'] = false;
           this.sectionVisibility['section3'] = false;
@@ -164,7 +176,7 @@ export class MaladieComponent implements OnInit {
 
     this.authService.getManagerInfo(this.employeeId).subscribe({
       next: value => {
-        this.managerInfo = value; // Assign the entire object
+        this.managerInfo = value;
         this.authService.getProfilePicture(value.userID).subscribe({
           next: (picture) => {
             this.ManagerPicture = picture;
@@ -177,13 +189,12 @@ export class MaladieComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching manager info:', err);
-        this.managerInfo = null; // Reset on error
+        this.managerInfo = null;
         this.ManagerPicture = null;
         alert('Erreur lors de la récupération des informations du manager.');
       }
     });
 
-    // Check for active absence declaration
     this.maladieService.getActiveAbsenceDeclaration(this.employeeId).subscribe({
       next: (declaration) => {
         if (declaration && declaration.id) {
@@ -200,8 +211,98 @@ export class MaladieComponent implements OnInit {
     });
   }
 
+  toggleViewMode(mode: 'current' | 'historique' | 'enCours'): void {
+    this.viewMode = mode;
+    this.activeProgressButton = mode === 'current' ? 'Créer' : mode === 'historique' ? 'Historique' : 'En Cours';
+    if (mode === 'historique') {
+      this.fetchHistoriqueData();
+    }
+    if (mode === 'enCours') {
+      this.fetchEnCoursData();
+    }
+  }
+
+  private fetchHistoriqueData(): void {
+    if (!this.employeeId) return;
+    this.maladieService.getAllNotifications(this.employeeId).subscribe({
+      next: (notifications) => {
+        this.allNotifications = notifications;
+        this.processNotifications();
+      },
+      error: (error) => {
+        console.error('Error fetching notifications:', error);
+      }
+    });
+  }
+
+  private fetchEnCoursData(): void {
+    if (!this.employeeId) return;
+
+    this.maladieService.getActiveNotification(this.employeeId).subscribe({
+      next: (notification) => {
+        this.activeNotification = notification;
+      },
+      error: (error) => {
+        console.error('Error fetching active notification:', error);
+        this.activeNotification = null;
+      }
+    });
+
+    this.maladieService.getActiveAbsenceDeclaration(this.employeeId).subscribe({
+      next: (declaration) => {
+        this.activeDeclaration = declaration;
+        console.log(this.activeDeclaration?.validated);
+      },
+      error: (error) => {
+        console.error('Error fetching active declaration:', error);
+        this.activeDeclaration = null;
+      }
+    });
+  }
+
+
+
+  private processNotifications(): void {
+    this.allDeclarations = [];
+    this.allJustifications = [];
+    this.allNotifications.forEach(notification => {
+      notification.absenceDeclarations.forEach(declaration => {
+        this.allDeclarations.push({ declaration, notificationId: notification.id });
+        declaration.justifications.forEach(justification => {
+          this.allJustifications.push({ justification, declarationId: declaration.id });
+        });
+      });
+    });
+  }
+
+  selectNotification(id: number): void {
+    this.selectedNotificationId = id;
+    this.selectedDeclarationId = null;
+    this.selectedJustificationId = null;
+  }
+
+  selectDeclaration(id: number): void {
+    this.selectedDeclarationId = id;
+    this.selectedJustificationId = null;
+    const decl = this.allDeclarations.find(d => d.declaration.id === id);
+    if (decl) {
+      this.selectedNotificationId = decl.notificationId;
+    }
+  }
+
+  selectJustification(id: number): void {
+    this.selectedJustificationId = id;
+    const just = this.allJustifications.find(j => j.justification.id === id);
+    if (just) {
+      this.selectedDeclarationId = just.declarationId;
+      const decl = this.allDeclarations.find(d => d.declaration.id === just.declarationId);
+      if (decl) {
+        this.selectedNotificationId = decl.notificationId;
+      }
+    }
+  }
+
   toggleForm(sectionId: string): void {
-    // Only toggle if the section is not disabled
     if (sectionId === 'section1' && this.isNotificationFormDisabled) return;
     if (sectionId === 'section2' && this.isDeclarationFormDisabled) return;
     this.sectionVisibility[sectionId] = !this.sectionVisibility[sectionId];
@@ -257,9 +358,9 @@ export class MaladieComponent implements OnInit {
           this.sectionVisibility[sectionId] = false;
           this.isNotificationFormDisabled = true;
           this.notifyForm.disable();
-          if (response.retard){
+          if (response.retard) {
             this.isJustifyFormDisabled = true;
-            this.isDeclarationFormDisabled = true ;
+            this.isDeclarationFormDisabled = true;
           }
         },
         error: (error: any) => {
@@ -367,10 +468,9 @@ export class MaladieComponent implements OnInit {
         next: () => {
           alert('Succès de la clôturation');
           this.resetForms();
-          // Re-enable forms after closing
           this.isNotificationFormDisabled = false;
           this.isDeclarationFormDisabled = false;
-          this.isJustifyFormDisabled = false ;
+          this.isJustifyFormDisabled = false;
           this.notifyForm.enable();
           this.declareForm.enable();
         },

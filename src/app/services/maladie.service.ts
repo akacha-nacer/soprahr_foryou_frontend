@@ -51,6 +51,10 @@ export class MaladieService {
     return this.http.get<NotificationDTO[]>(`${this.apiUrl}/manager/${managerId}/getnotif`);
   }
 
+  getAllNotifications(employeeId: number| null): Observable<NotificationDTO[]> {
+    return this.http.get<NotificationDTO[]>(`${this.apiUrl}/employee/${employeeId}/getAllnotif`);
+  }
+
   validateDeclaration(declarationId: number): Observable<void> {
     return this.http.put<void>(`${this.apiUrl}/declaration/${declarationId}/validate`, {});
   }

@@ -56,6 +56,7 @@ export class EspaceManagerComponent implements OnInit {
   userFirstname: string | null = null;
   userIdentifiant: string | null = null;
   userPoste: string | null = null;
+  userRole: string | null = null;
   searchTerm: string = '';
   employeePictures: Map<number, string | null> = new Map();
   demarcheItems: string[] = [
@@ -90,6 +91,7 @@ export class EspaceManagerComponent implements OnInit {
         this.userFirstname = user.firstname !== undefined && user.firstname !== null ? user.firstname : null;
         this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
         this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
+        this.userRole = user.role !== undefined && user.role !== null ? user.role : null;
         console.log(this.managerId);
       } catch (e) {
         console.error('Error parsing user from sessionStorage:', e);
@@ -194,6 +196,7 @@ export class EspaceManagerComponent implements OnInit {
             if (request.userid) {
               this.authService.getProfilePicture(request.userid).subscribe({
                 next: (picture) => {
+                  this.employeePictures.set(request.userid, picture);
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
@@ -236,6 +239,7 @@ export class EspaceManagerComponent implements OnInit {
             if (request.requestedById) {
               this.authService.getProfilePicture(request.requestedById).subscribe({
                 next: (picture) => {
+                  this.employeePictures.set(request.requestedById, picture);
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
@@ -539,6 +543,7 @@ export class EspaceManagerComponent implements OnInit {
     this.maladieService.validateDeclaration(declarationId).subscribe({
       next: () => {
         notification.absenceDeclarations[0].isValidated = true;
+        notification.isValidated = true;
         this.cdr.detectChanges();
       },
       error: (err) => {

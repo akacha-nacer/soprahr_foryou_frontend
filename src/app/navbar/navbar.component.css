@@ -71,8 +71,8 @@
 }
 
 .dropdown-icon {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   pointer-events: none;
 }
 
@@ -90,24 +90,26 @@
 }
 
 .home-icon {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   pointer-events: none;
 }
 
 .navbar-left {
   display: flex;
   align-items: stretch;
+  gap: 10px;
 }
 
 .navbar-right {
   display: flex;
   align-items: stretch;
+  gap: 10px;
 }
 
 .search-button {
-  width: 33px;
-  height: 33px;
+  width: 35px;
+  height: 35px;
   pointer-events: none;
 }
 

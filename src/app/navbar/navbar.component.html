@@ -7,11 +7,11 @@
       <div class="dropdown-content" [ngClass]="{'active': isDropdownOpen}" [@slideInOut]="isDropdownOpen ? 'in' : 'out'"
            [style.overflow]="isSubDropdownOpen || isSubDropdownOpen1 || isAnimatingSubDropdown ? 'visible' : 'hidden'">
         <a href="#" routerLink="/link1"><img src="assets/images/home.png" class="dropdown-option-icon"> Accueil</a>
-        <a href="#" (click)="toggleSubDropdown($event)">
-          <img src="assets/images/compass.png" class="dropdown-option-icon"> Gestion administrative/Paie <i class="fa fa-caret-right"></i>
+        <a href="#" (click)="toggleSubDropdown($event)" *ngIf="userRole == 'GESTIONNAIRE' ">
+          <img src="assets/images/compass.png" class="dropdown-option-icon" > Gestion administrative/Paie <i class="fa fa-caret-right"></i>
         </a>
         <div class="sub-dropdown-content" [ngClass]="{'active': isSubDropdownOpen}" [@slideInOut]="isSubDropdownOpen ? 'in' : 'out'">
-          <a href="#" (click)="toggleSubDropdown1($event)">Dossier individuel <i class="fa fa-caret-right"></i></a>
+          <a href="#" (click)="toggleSubDropdown1($event)"  >Dossier individuel <i class="fa fa-caret-right"></i></a>
           <a href="#">RGPD</a>
           <a href="#">Rémunération</a>
           <a href="#">reporting</a>
@@ -47,13 +47,13 @@
         <a href="#" routerLink="/link5"><img src="assets/images/preferences.png" class="dropdown-option-icon">Mes préférences <i class="fa fa-caret-right"></i></a>
         <a href="#" routerLink="/link6"><img src="assets/images/accessibility.png" class="dropdown-option-icon"> Accessibilité </a>
         <a href="#" routerLink="/link7"><img src="assets/images/steria.png" class="dropdown-option-icon"> À propos</a>
-        <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png" class="dropdown-option-icon"> Déconnexion</a>
+        <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png" class="dropdown-option-icon" (click)="logout()"> Déconnexion</a>
       </div>
     </div>
-    <a href="#home" routerLink="/home">
+    <a href="#home" routerLink="/espace_manager">
       <img src="assets/images/4you_naceur_black.png" alt="Home Icon" class="home-icon">
     </a>
-    <div class="toggle-container" (click)="toggleSwitch()">
+    <div class="toggle-container" (click)="toggleSwitch()" *ngIf="userRole == 'GESTIONNAIRE' ">
       <div class="toggle-switch" [ngClass]="{'toggle-on': isToggleOn}">
         <div class="toggle-circle" [@slideToggle]="isToggleOn ? 'on' : 'off'">
           <img [src]="isToggleOn ? 'assets/images/manager.png' : 'assets/images/employe.png'" class="toggle-icon">

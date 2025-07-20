@@ -2,7 +2,7 @@
   <button mat-icon-button class="close-button" (click)="onClose()">
     <img src="assets/images/close.png" class="close-icon">
   </button>
-  <h3 class="popup-title">Sélectionner un département</h3>
+  <h3 class="popup-title">Natures de contrat</h3>
   <br><br>
   <div class="popup-body">
     <div class="search-bar-container">
@@ -11,7 +11,7 @@
         placeholder="Rechercher"
         class="search-bar"
         [(ngModel)]="searchTerm"
-        (input)="filterItems()"
+        (ngModelChange)="filterItems()"
       />
     </div>
     <table class="nature-heures-table">
@@ -30,11 +30,11 @@
       >
         <td>{{ row.code || 'N/A' }}</td>
         <td>{{ row.libelle || 'N/A' }}</td>
-        <td>{{ row.status || 'N/A' }}</td>
+        <td>Actif</td>
       </tr>
       </tbody>
     </table>
-    <div class="pagination-controls" *ngIf="filteredDepartments.length > itemsPerPage">
+    <div class="pagination-controls" *ngIf="filteredMotifs.length > itemsPerPage">
       <div class="pagination">
         <a (click)="goToPage(1); $event.preventDefault()" [class.active]="currentPage === 1">«</a>
         <a
@@ -47,8 +47,8 @@
         <a (click)="goToPage(totalPages); $event.preventDefault()" [class.active]="currentPage === totalPages">»</a>
       </div>
     </div>
-    <div *ngIf="filteredDepartments.length === 0" class="no-results">
-      Aucun département trouvé.
+    <div *ngIf="filteredMotifs.length === 0" class="no-results">
+      Aucun Motif trouvé.
     </div>
   </div>
   <br>

@@ -6,16 +6,15 @@ import { MatDialog } from '@angular/material/dialog';
 import { PopupNatureHeureComponent } from '../popup-nature-heure/popup-nature-heure.component';
 import { DataItem, Timeline, TimelineOptions } from 'vis-timeline';
 import { DataSet } from 'vis-data';
-import { DepartementNaiss } from '../models/DepartementNaiss';
 import { NatureHeure } from '../models/journee/NatureHeureModel';
 import { Anomalies } from '../models/journee/AnomaliesModel';
 import { Pointage } from '../models/journee/PointageModel';
 import { JourneeService } from '../services/journee.service';
 import { PopupConfMaladieComponent } from '../popup-conf-maladie/popup-conf-maladie.component';
-import {Subject, takeUntil} from 'rxjs';
-import {NatureHeureRequest} from '../models/journee/NatureHeureRequestModel';
-import {NatureHeureModificationRequest} from '../models/journee/NatureHeureModificationRequestModel';
-import {NatureHeureDeletionRequest} from '../models/journee/NatureHeureDeletionRequestModel';
+import { Subject, takeUntil } from 'rxjs';
+import { NatureHeureRequest } from '../models/journee/NatureHeureRequestModel';
+import { NatureHeureModificationRequest } from '../models/journee/NatureHeureModificationRequestModel';
+import { NatureHeureDeletionRequest } from '../models/journee/NatureHeureDeletionRequestModel';
 
 @Component({
   selector: 'app-journee',
@@ -65,11 +64,12 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
   activeProgressButton: string = 'Créer';
   timelineHours = Array.from({ length: 25 }, (_, i) => (i === 0 ? '00:00' : `${i}:00`));
-  hasAnomaly = true;
+  hasAnomaly = false;
   private timeline: Timeline | null = null;
   private timelineInitialized = false;
   private selectedDate: Date = new Date();
   private destroy$ = new Subject<void>();
+  private anomaliesGenerated = false; // Flag to prevent duplicate anomaly generation
 
   constructor(
     private fb: FormBuilder,
@@ -100,7 +100,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
         this.userRole = user.role !== undefined && user.role !== null ? user.role : null;
         this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
-        console.log(this.userId);
+        console.log('Parsed userId:', this.userId);
       } catch (e) {
         console.error('Error parsing user from sessionStorage:', e);
       }
@@ -120,63 +120,40 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sectionValidationStates['section5'] = false;
 
     this.natureHeuresForm.markAllAsTouched();
-    this.fetchCurrentViewData();
 
     if (this.userId) {
-      const today = new Date().toISOString().split('T')[0];
-
-      // Generate anomalies for today
-
-      this.journeeService.generateAnomaliesForUser(this.userId, today).subscribe({
-        next: (anomalies) => {
-          console.log('Anomalies generated for today:', anomalies);
-          // Fetch today's anomalies
-          this.journeeService.getUserAnomaliesForToday(this.userId!).subscribe({
-            next: (value) => {
-              this.anomalies = value;
-              this.hasAnomaly = value.length > 0;
-              console.log('Today\'s anomalies:', this.anomalies);
-              this.cdr.detectChanges();
-            },
-            error: (error) => {
-              console.error('Error fetching today\'s anomalies:', error);
-            }
-          });
-        },
-        error: (error) => {
-          console.error('Error generating anomalies:', error);
-          // Still fetch existing anomalies even if generation fails
-          this.journeeService.getUserAnomaliesForToday(this.userId!).subscribe({
-            next: (value) => {
-              this.anomalies = value;
-              this.hasAnomaly = value.length > 0;
-              console.log('Today\'s anomalies:', this.anomalies);
-              this.cdr.detectChanges();
-            },
-            error: (err) => {
-              console.error('Error fetching today\'s anomalies after generation failure:', err);
-            }
-          });
-        }
-      });
-
+      this.fetchCurrentViewData();
+      // Generate anomalies only once
+      if (!this.anomaliesGenerated) {
+        const today = new Date().toISOString().split('T')[0];
+        this.anomaliesGenerated = true;
+        this.journeeService.generateAnomaliesForUser(this.userId, today).subscribe({
+          next: (anomalies) => {
+            console.log('Anomalies generated for today:', anomalies);
+            this.fetchAnomalies();
+          },
+          error: (error) => {
+            console.error('Error generating anomalies:', error);
+            this.fetchAnomalies();
+          }
+        });
+      }
     }
   }
 
-
-  ngAfterViewInit(): void {
-    if (this.sectionVisibility['section5']) {
-      setTimeout(() => {
-        this.initializeTimeline();
-      }, 100);
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.timeline) {
-      this.timeline.destroy();
-      this.timeline = null;
-    }
+  private fetchAnomalies(): void {
+    if (!this.userId) return;
+    this.journeeService.getUserAnomaliesForToday(this.userId).subscribe({
+      next: (value) => {
+        this.anomalies = value;
+        this.hasAnomaly = value.length > 0;
+        console.log('Today\'s anomalies:', this.anomalies);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching today\'s anomalies:', error);
+      }
+    });
   }
 
   private fetchCurrentViewData(): void {
@@ -208,36 +185,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
-    this.journeeService.generateAnomaliesForUser(this.userId, today)
-      .subscribe({
-        next: (anomalies) => {
-          this.journeeService.getUserAnomaliesForToday(this.userId!)
-            .subscribe({
-              next: (value) => {
-                this.anomalies = value;
-                this.hasAnomaly = value.length > 0;
-                this.cdr.detectChanges();
-              },
-              error: (error) => {
-                console.error('Error fetching today\'s anomalies:', error);
-              }
-            });
-        },
-        error: (error) => {
-          console.error('Error generating anomalies:', error);
-          this.journeeService.getUserAnomaliesForToday(this.userId!)
-            .subscribe({
-              next: (value) => {
-                this.anomalies = value;
-                this.hasAnomaly = value.length > 0;
-                this.cdr.detectChanges();
-              },
-              error: (err) => {
-                console.error('Error fetching today\'s anomalies:', err);
-              }
-            });
-        }
-      });
+    // Remove duplicate generateAnomaliesForUser call
+    this.fetchAnomalies();
   }
 
   private fetchHistoriqueData(): void {
@@ -276,7 +225,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
   }
-
 
   private fetchEnCoursData(): void {
     if (!this.userId) return;
@@ -317,6 +265,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
   }
+
   toggleViewMode(mode: 'current' | 'historique' | 'enCours'): void {
     this.activeProgressButton = mode === 'current' ? 'Créer' : mode === 'historique' ? 'Historique' : 'En Cours';
     this.viewMode = mode;
@@ -343,6 +292,25 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  // ... rest of the methods remain unchanged ...
+
+  ngAfterViewInit(): void {
+    if (this.sectionVisibility['section5']) {
+      setTimeout(() => {
+        this.initializeTimeline();
+      }, 100);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.timeline) {
+      this.timeline.destroy();
+      this.timeline = null;
+    }
+  }
+
   private filterByDate<T extends { date?: string | Date; createdAt?: string | Date; nature_heure?: string }>(
     items: T[],
     selectedDate: Date,
@@ -367,108 +335,85 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-
   private fixPointageStyles(): void {
     setTimeout(() => {
-      // Sélectionner tous les points de pointage après que la timeline soit rendue
       const pointagePoints = document.querySelectorAll('.vis-item.vis-point.pointage-entry, .vis-item.vis-point.pointage-exit');
-
       pointagePoints.forEach((point: Element) => {
         const htmlPoint = point as HTMLElement;
-
-        // Masquer complètement le point par défaut
         const dotElement = htmlPoint.querySelector('.vis-dot') as HTMLElement;
         if (dotElement) {
           dotElement.style.display = 'none';
           dotElement.style.visibility = 'hidden';
           dotElement.style.opacity = '0';
         }
-
-        // Créer un élément triangle personnalisé
         let triangleElement = htmlPoint.querySelector('.custom-triangle') as HTMLElement;
         if (!triangleElement) {
           triangleElement = document.createElement('div');
           triangleElement.className = 'custom-triangle';
-
           const isEntry = htmlPoint.classList.contains('pointage-entry');
           const color = isEntry ? '#4caf50' : '#d32f2f';
-
           triangleElement.style.cssText = `
-          position: absolute !important;
-          top: 50% !important;
-          left: 50% !important;
-          transform: translate(-50%, -50%) !important;
-          width: 0 !important;
-          height: 0 !important;
-          border-left: 6px solid transparent !important;
-          border-right: 6px solid transparent !important;
-          border-bottom: 10px solid ${color} !important;
-          z-index: 999 !important;
-        `;
-
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 0 !important;
+            height: 0 !important;
+            border-left: 6px solid transparent !important;
+            border-right: 6px solid transparent !important;
+            border-bottom: 10px solid ${color} !important;
+            z-index: 999 !important;
+          `;
           htmlPoint.appendChild(triangleElement);
         }
-
-        // S'assurer que le conteneur principal a les bonnes dimensions
         htmlPoint.style.cssText += `
-        width: 12px !important;
-        height: 10px !important;
-        background: transparent !important;
-        border: none !important;
-        position: relative !important;
-      `;
+          width: 12px !important;
+          height: 10px !important;
+          background: transparent !important;
+          border: none !important;
+          position: relative !important;
+        `;
       });
-    }, 500); // Délai pour s'assurer que la timeline est complètement rendue
+    }, 500);
   }
+
   private initializeTimeline(): void {
     if (this.timelineInitialized) {
       return;
     }
-
     const container = document.getElementById('timelineContainer');
     if (!container) {
       console.error('Timeline container not found.');
       return;
     }
-
     console.log('Container found:', container);
     console.log('Container dimensions:', container.offsetWidth, 'x', container.offsetHeight);
-
     const items = new DataSet(this.getTimelineItems());
     console.log('All items in DataSet:', items.get());
     const options: TimelineOptions = this.getTimelineOptions();
-
     try {
       if (this.timeline) {
         this.timeline.destroy();
       }
-
       this.timeline = new Timeline(container, items, options);
       this.timelineInitialized = true;
-
       console.log('Timeline initialized successfully:', this.timeline);
-
       if (this.timeline) {
         this.timeline.redraw();
         this.timeline.fit();
         console.log('Timeline redrawn and fitted');
       }
-
-        this.fixPointageStyles();
-
+      this.fixPointageStyles();
       this.timeline.on('click', (event) => {
         console.log('Timeline clicked:', event);
         const { item } = event;
         if (item) {
           if (typeof item === 'string' && item.startsWith('pointage-')) {
-            // Handle pointage click
             const pointageId = parseInt(item.replace('pointage-', ''), 10);
             this.navigateToPointage(pointageId);
           } else if (typeof item === 'string' && item.startsWith('work-')) {
-            // Ignore work-range items
             console.log('Clicked work-range item, ignoring:', item);
           } else if (typeof item === 'number' || (typeof item === 'string' && !isNaN(parseInt(item, 10)))) {
-            // Handle nature-heure-item click
             const natureHeureId = typeof item === 'number' ? item : parseInt(item, 10);
             this.navigateToNatureHeure(natureHeureId);
           } else {
@@ -476,36 +421,28 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
       });
-
       this.timeline.on('select', (event) => {
         console.log('Item selected:', event);
       });
-
     } catch (error) {
       console.error('Timeline initialization failed:', error);
     }
-
-
   }
 
-
   private navigateToPointage(pointageId: number): void {
-    // Ensure section4 (Pointages) is expanded
     if (!this.sectionVisibility['section4']) {
       this.sectionVisibility['section4'] = true;
       this.cdr.detectChanges();
-      // Delay to allow section to expand
       setTimeout(() => {
         const row = document.getElementById(`pointage-row-${pointageId}`);
         if (row) {
           row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Highlight row
           row.classList.add('highlight');
           setTimeout(() => row.classList.remove('highlight'), 2000);
         } else {
           console.warn(`Pointage row with ID pointage-row-${pointageId} not found`);
         }
-      }, 350); // Match animation duration
+      }, 350);
     } else {
       const row = document.getElementById(`pointage-row-${pointageId}`);
       if (row) {
@@ -519,7 +456,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private navigateToNatureHeure(natureHeureId: number): void {
-    // Ensure section3 (Mes Natures d'Heures) is expanded
     if (!this.sectionVisibility['section3']) {
       this.sectionVisibility['section3'] = true;
       this.cdr.detectChanges();
@@ -527,13 +463,12 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         const row = document.getElementById(`nature-heure-row-${natureHeureId}`);
         if (row) {
           row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          // Highlight row
           row.classList.add('highlight');
           setTimeout(() => row.classList.remove('highlight'), 2000);
         } else {
           console.warn(`NatureHeure row with ID nature-heure-row-${natureHeureId} not found`);
         }
-      }, 350); // Match animation duration
+      }, 350);
     } else {
       const row = document.getElementById(`nature-heure-row-${natureHeureId}`);
       if (row) {
@@ -549,16 +484,14 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   private getTimelineItems(): DataItem[] {
     const selectedDate = this.selectedDate;
     const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth(); // 0-based
+    const month = selectedDate.getMonth();
     const day = selectedDate.getDate();
 
-    // Define static periods
     const workPeriods = [
       { start: new Date(year, month, day, 9, 0), end: new Date(year, month, day, 13, 0) },
       { start: new Date(year, month, day, 14, 0), end: new Date(year, month, day, 17, 0) }
     ];
 
-    // Static items as range items
     const backgroundItems: DataItem[] = [
       ...workPeriods.map((period, index) => ({
         id: `work-${index}`,
@@ -571,18 +504,15 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       }))
     ];
 
-    // Filter dynamic items by today's date or nature_heure: "Déjeuner"
     const selectedNatureHeures = this.natureHeures.filter(nh => {
       if (!nh.date) {
         console.warn(`Skipping natureHeure with undefined date:`, nh);
         return false;
       }
-      // Always include "Déjeuner" regardless of date
       if (nh.nature_heure.toLowerCase() === 'déjeuner') {
         console.log(`Including Déjeuner regardless of date: ${nh.date} for ${nh.nature_heure}`);
         return true;
       }
-      // Normalize date in local timezone
       let nhDate: Date;
       if (typeof nh.date === 'string') {
         const cleanedDate = nh.date.replace(' ', 'T').replace(/(\d{4}-\d{2}-\d{2}).*/, '$1');
@@ -594,7 +524,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         console.warn(`Skipping natureHeure with invalid date: ${nh.date}`, nh);
         return false;
       }
-      // Compare dates in local timezone
       const nhYear = nhDate.getFullYear();
       const nhMonth = nhDate.getMonth();
       const nhDay = nhDate.getDate();
@@ -602,7 +531,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       return nhYear === year && nhMonth === month && nhDay === day;
     });
 
-    // Dynamic items
     const dynamicItems: DataItem[] = selectedNatureHeures.map(nh => {
       const startTime = this.parseTime(nh.heureDebut);
       const endTime = this.parseTime(nh.heureFin);
@@ -617,7 +545,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     });
 
-    // Filter pointages by today's date
     const pointageItems: DataItem[] = this.pointages.map(p => {
       const time = this.parseTime(p.heure);
       return {
@@ -626,9 +553,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         start: new Date(year, month, day, time.hours, time.minutes),
         type: 'point',
         className: p.sens === "ENTREE" ? 'pointage-entry' : 'pointage-exit',
-        style: `
-      top:37px;
-    `,
+        style: 'top:37px;',
         title: `${p.sens === "ENTREE" ? 'Entrée' : 'Sortie'} à ${p.heure} (${p.naturePointage})`
       };
     });
@@ -642,7 +567,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     return [...backgroundItems, ...dynamicItems, ...pointageItems];
   }
 
-  /** Helper method to define timeline options */
   private getTimelineOptions(): TimelineOptions {
     const selectedDate = this.selectedDate;
     const year = selectedDate.getFullYear();
@@ -656,8 +580,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       end: new Date(year, month, day + 1, 0, 0),
       min: new Date(year, month, day, 0, 0),
       max: new Date(year, month, day + 1, 0, 0),
-      zoomMin: 1000 * 60 * 60, // 1 hour
-      zoomMax: 1000 * 60 * 60 * 24, // 1 day
+      zoomMin: 1000 * 60 * 60,
+      zoomMax: 1000 * 60 * 60 * 24,
       orientation: 'top',
       showCurrentTime: true,
       format: {
@@ -688,13 +612,11 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  /** Parse time string into hours and minutes */
   private parseTime(timeStr: string): { hours: number, minutes: number } {
     const [hours, minutes] = timeStr.split(':').map(Number);
     return { hours, minutes };
   }
 
-  /** Update the timeline when data changes */
   private updateTimeline(): void {
     if (this.timeline) {
       const newItems = new DataSet(this.getTimelineItems());
@@ -736,11 +658,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
           console.error('Validation failed: Missing required fields');
           return;
         }
-
-        // Normalize date to match selectedDate
-        formResult.date = this.selectedDate.toISOString().split('T')[0]; // e.g., "2025-07-19"
+        formResult.date = this.selectedDate.toISOString().split('T')[0];
         console.log('Form result before saving:', formResult);
-
         const confirmDialogRef = this.dialog.open(PopupConfMaladieComponent, {
           data: {
             message: this.userRole === 'MANAGER'
@@ -748,7 +667,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
               : `Voulez-vous soumettre une demande pour ajouter la nature d’heure "${formResult.nature_heure}" ?`
           }
         });
-
         confirmDialogRef.afterClosed().subscribe(confirmResult => {
           if (confirmResult) {
             this.journeeService.saveNatureHeure(formResult, this.userId!).subscribe({
@@ -789,7 +707,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       data: { type: 'detail', item: natureheure }
     });
     console.log(natureheure);
-
     dialogRef.afterClosed().subscribe(result => {
       if (result) console.log('Détail affiché :', result);
     });
@@ -800,18 +717,15 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('Invalid natureHeure ID');
       return;
     }
-
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
       data: { type: 'edit', item: natureHeure }
     });
-
     dialogRef.afterClosed().subscribe(formResult => {
       if (formResult && this.userId) {
         if (!formResult.nature_heure || !formResult.heureDebut || !formResult.heureFin || !formResult.date) {
           console.error('Validation failed: Missing required fields');
           return;
         }
-
         const confirmDialogRef = this.dialog.open(PopupConfMaladieComponent, {
           data: {
             message: this.userRole === 'MANAGER'
@@ -819,7 +733,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
               : `Voulez-vous soumettre une demande de modification pour la nature d’heure "${formResult.nature_heure}" ?`
           }
         });
-
         confirmDialogRef.afterClosed().subscribe(confirmResult => {
           if (confirmResult) {
             this.journeeService.updateNatureHeure(natureHeure.id!, formResult, this.userId!).subscribe({
@@ -860,15 +773,12 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('Invalid natureHeure ID or user ID');
       return;
     }
-
     const message = this.userRole === 'MANAGER'
       ? `Voulez-vous vraiment supprimer la nature d'heure "${natureHeure.nature_heure}"?`
       : `Voulez-vous soumettre une demande de suppression pour la nature d'heure "${natureHeure.nature_heure}" ?`;
-
     const dialogRef = this.dialog.open(PopupConfMaladieComponent, {
       data: { message }
     });
-
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.userId) {
         if (this.userRole === 'MANAGER') {
@@ -909,8 +819,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-
-
 
   toggleAnomalySection(): void {
     if (this.hasAnomaly) {

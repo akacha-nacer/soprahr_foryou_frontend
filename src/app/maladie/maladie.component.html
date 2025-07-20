@@ -1,168 +1,295 @@
 <div class="embauche-container">
   <!-- Left Section (Main Container) -->
   <div class="main-section">
-    <!-- Description Section -->
-    <div class="description-section">
-      <p>Vous êtes malade, vous ne serez pas présent à votre poste. La démarche "Je suis malade" permet de prévenir par défaut votre manager, de gérer éventuellement vos réponses automatiques en cas d'absence du bureau. Vous pouvez envoyer le message par défaut ou le modifier afin de prévenir pour une absence ou un retard. Dans le cas d'une absence, vous complèterez les volets pour déclarer un arrêt de travail, et déposer votre justificatif. Dans le cas d'un retard, vous clôturerez la démarche à votre retour. Vous pouvez poser un congé par le lien suggéré dans la partie suggestions.</p>
-      <div class="action-buttons">
-        <button class="action-btn enabled" (click)="cloturerMaladie()">Clôturer</button>
-        <button class="action-btn enabled">Quitter</button>
+    <ng-container *ngIf="viewMode === 'current'">
+      <!-- Description Section -->
+      <div class="description-section">
+        <p>Vous êtes malade, vous ne serez pas présent à votre poste. La démarche "Je suis malade" permet de prévenir par défaut votre manager, de gérer éventuellement vos réponses automatiques en cas d'absence du bureau. Vous pouvez envoyer le message par défaut ou le modifier afin de prévenir pour une absence ou un retard. Dans le cas d'une absence, vous complèterez les volets pour déclarer un arrêt de travail, et déposer votre justificatif. Dans le cas d'un retard, vous clôturerez la démarche à votre retour. Vous pouvez poser un congé par le lien suggéré dans la partie suggestions.</p>
+        <div class="action-buttons">
+          <button class="action-btn enabled" (click)="cloturerMaladie()">Clôturer</button>
+          <button class="action-btn enabled">Quitter</button>
+        </div>
+        <hr>
       </div>
-      <hr>
-    </div>
-    <div class="form-placeholder">
-      <!-- Form Section 1: Je préviens -->
-      <div class="form-section" sectionId="section1">
-        <div class="form-header" [class.disabled]="isNotificationFormDisabled" (click)="toggleForm('section1')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Je préviens</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
-          <form [formGroup]="notifyForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
-            <div class="form-group">
-              <div class="form-field">
-                <br>
-                <label>Manager</label>
-                <div class="manager-info">
-                  <img *ngIf="!ManagerPicture" src="assets/images/managerPhoto.jpg" alt="Manager Photo" class="manager-photo">
-                  <img *ngIf="ManagerPicture" [src]="ManagerPicture" alt="Manager Photo" class="manager-photo">
-
-                  <span class="manager-name" *ngIf="managerInfo">{{this.managerInfo.firstname}} {{this.managerInfo.lastname}}</span>
-                  <span class="manager-poste"*ngIf="managerInfo">{{this.managerInfo.poste}}</span>
-                </div>
-              </div>
-              <div class="form-field">
-                <label>Message</label>
-                <textarea formControlName="message" rows="5" required [disabled]="isNotificationFormDisabled"></textarea>
-              </div>
+      <div class="form-placeholder">
+        <!-- Form Section 1: Je préviens -->
+        <div class="form-section" sectionId="section1">
+          <div class="form-header" [class.disabled]="isNotificationFormDisabled" (click)="toggleForm('section1')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Je préviens</span>
             </div>
-            <div class="form-field">
-              <div class="checkbox-container">
-                <input type="checkbox" formControlName="retard" id="retard" [disabled]="isNotificationFormDisabled">
-                <label for="retard">Je signale un retard.</label>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn" [ngClass]="{'enabled': !isNotificationFormDisabled, 'disabled': isNotificationFormDisabled}" [disabled]="!notifyForm.valid || isNotificationFormDisabled">Envoyer</button>
-            </div>
-          </form>
-          <div class="disable-message" *ngIf="isNotificationFormDisabled">
-            Une notification a déjà été envoyée. Veuillez clôturer pour en envoyer une autre.
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
           </div>
-        </div>
-      </div>
-
-
-      <!-- Form Section 2: Je déclare un arrêt -->
-      <div class="form-section" sectionId="section2">
-        <div class="form-header" [class.disabled]="isDeclarationFormDisabled" (click)="toggleForm('section2')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Je déclare un arrêt</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
-          <form [formGroup]="declareForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
-            <div class="form-group">
-              <br>
-              <div class="form-field">
-                <div class="checkbox-container">
-                  <input type="checkbox" formControlName="isProlongation" id="isProlongation" [disabled]="isDeclarationFormDisabled">
-                  <label for="isProlongation">Votre arrêt maladie est une prolongation de l'arrêt précédent</label>
-                </div>
-              </div>
-              <div class="form-row">
+          <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
+            <form [formGroup]="notifyForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
+              <div class="form-group">
                 <div class="form-field">
-                  <label>Depuis</label>
-                  <input type="date" formControlName="dateDebut" required [disabled]="isDeclarationFormDisabled">
+                  <br>
+                  <label>Manager</label>
+                  <div class="manager-info">
+                    <img *ngIf="!ManagerPicture" src="assets/images/managerPhoto.jpg" alt="Manager Photo" class="manager-photo">
+                    <img *ngIf="ManagerPicture" [src]="ManagerPicture" alt="Manager Photo" class="manager-photo">
+                    <span class="manager-name" *ngIf="managerInfo">{{this.managerInfo.firstname}} {{this.managerInfo.lastname}}</span>
+                    <span class="manager-poste" *ngIf="managerInfo">{{this.managerInfo.poste}}</span>
+                  </div>
                 </div>
                 <div class="form-field">
-                  <label>Jusqu'à</label>
-                  <input type="date" formControlName="dateFin" required [disabled]="isDeclarationFormDisabled">
+                  <label>Message</label>
+                  <textarea formControlName="message" rows="5" required [disabled]="isNotificationFormDisabled"></textarea>
                 </div>
               </div>
+              <div class="form-field">
+                <div class="checkbox-container">
+                  <input type="checkbox" formControlName="retard" id="retard" [disabled]="isNotificationFormDisabled">
+                  <label for="retard">Je signale un retard.</label>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn" [ngClass]="{'enabled': !isNotificationFormDisabled, 'disabled': isNotificationFormDisabled}" [disabled]="!notifyForm.valid || isNotificationFormDisabled">Envoyer</button>
+              </div>
+            </form>
+            <div class="disable-message" *ngIf="isNotificationFormDisabled">
+              Une notification a déjà été envoyée. Veuillez clôturer pour en envoyer une autre.
             </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn" [ngClass]="{'enabled': !isDeclarationFormDisabled, 'disabled': isDeclarationFormDisabled}" [disabled]="!declareForm.valid || isDeclarationFormDisabled">Envoyer</button>
-            </div>
-          </form>
-          <div class="disable-message" *ngIf="isDeclarationFormDisabled">
-            Une déclaration d'arrêt a déjà été envoyée. Veuillez clôturer pour en envoyer une autre.
           </div>
         </div>
-      </div>
 
-      <!-- Form Section 3: Je justifie -->
-      <div class="form-section" sectionId="section3">
-        <div class="form-header" [class.disabled]="isJustifyFormDisabled" (click)="toggleForm('section3')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Je justifie</span>
+        <!-- Form Section 2: Je déclare un arrêt -->
+        <div class="form-section" sectionId="section2">
+          <div class="form-header" [class.disabled]="isDeclarationFormDisabled" (click)="toggleForm('section2')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Je déclare un arrêt</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
           </div>
-          <span class="header-symbol">
-            <img src="assets/images/paperclip.png" alt="Validation Status" class="validation-icon">
-            <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
-          <form [formGroup]="justifyForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
-            <div class="form-group">
-              <div class="form-field">
+          <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
+            <form [formGroup]="declareForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
+              <div class="form-group">
                 <br>
-                <label>Justificatif :</label>
-                <div class="file-upload-container">
-                  <label #fileUploadBtn for="justificatif" class="file-upload-btn">
-                    <img #uploadIcon [src]="selectedFile ? 'assets/images/check.png' : 'assets/images/upload1.png'" class="upload-icon">
-                    <span #fileNameText>{{ selectedFile ? selectedFile.name.substring(0, 20) + (selectedFile.name.length > 20 ? '...' : '') : ' Choisir un fichier' }}</span>
-                  </label>
-                  <input id="justificatif" type="file" (change)="onFileChange($event)" accept=".pdf,.jpg,.jpeg,.png" required>
-                  <span class="file-upload-text">Formats acceptés : PDF, JPG, PNG</span>
+                <div class="form-field">
+                  <div class="checkbox-container">
+                    <input type="checkbox" formControlName="isProlongation" id="isProlongation" [disabled]="isDeclarationFormDisabled">
+                    <label for="isProlongation">Votre arrêt maladie est une prolongation de l'arrêt précédent</label>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Depuis</label>
+                    <input type="date" formControlName="dateDebut" required [disabled]="isDeclarationFormDisabled">
+                  </div>
+                  <div class="form-field">
+                    <label>Jusqu'à</label>
+                    <input type="date" formControlName="dateFin" required [disabled]="isDeclarationFormDisabled">
+                  </div>
                 </div>
               </div>
-              <div class="form-field">
-                <div class="checkbox-container">
-                  <input type="checkbox" formControlName="originalDepose" id="originalDepose" required>
-                  <label for="originalDepose">J'ai déposé l'original de l'arrêt maladie à l'entreprise.</label>
-                </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn" [ngClass]="{'enabled': !isDeclarationFormDisabled, 'disabled': isDeclarationFormDisabled}" [disabled]="!declareForm.valid || isDeclarationFormDisabled">Envoyer</button>
               </div>
-              <div class="form-field">
-                <div class="checkbox-container">
-                  <input type="checkbox" formControlName="accidentTravail" id="accidentTravail">
-                  <label for="accidentTravail">Arrêt suite à un accident de travail.</label>
-                </div>
-              </div>
-              <div class="form-field" *ngIf="showAccidentDate">
-                <label>Date de l'accident</label>
-                <input type="date" formControlName="dateAccident" required>
-              </div>
+            </form>
+            <div class="disable-message" *ngIf="isDeclarationFormDisabled">
+              Une déclaration d'arrêt a déjà été envoyée. Veuillez clôturer pour en envoyer une autre.
             </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!justifyForm.valid">Envoyer</button>
+          </div>
+        </div>
+
+        <!-- Form Section 3: Je justifie -->
+        <div class="form-section" sectionId="section3">
+          <div class="form-header" [class.disabled]="isJustifyFormDisabled" (click)="toggleForm('section3')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Je justifie</span>
             </div>
-          </form>
+            <span class="header-symbol">
+              <img src="assets/images/paperclip.png" alt="Validation Status" class="validation-icon">
+              <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+            <form [formGroup]="justifyForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
+              <div class="form-group">
+                <div class="form-field">
+                  <br>
+                  <label>Justificatif :</label>
+                  <div class="file-upload-container">
+                    <label #fileUploadBtn for="justificatif" class="file-upload-btn">
+                      <img #uploadIcon [src]="selectedFile ? 'assets/images/check.png' : 'assets/images/upload1.png'" class="upload-icon">
+                      <span #fileNameText>{{ selectedFile ? selectedFile.name.substring(0, 20) + (selectedFile.name.length > 20 ? '...' : '') : ' Choisir un fichier' }}</span>
+                    </label>
+                    <input id="justificatif" type="file" (change)="onFileChange($event)" accept=".pdf,.jpg,.jpeg,.png" required>
+                    <span class="file-upload-text">Formats acceptés : PDF, JPG, PNG</span>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <div class="checkbox-container">
+                    <input type="checkbox" formControlName="originalDepose" id="originalDepose" required>
+                    <label for="originalDepose">J'ai déposé l'original de l'arrêt maladie à l'entreprise.</label>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <div class="checkbox-container">
+                    <input type="checkbox" formControlName="accidentTravail" id="accidentTravail">
+                    <label for="accidentTravail">Arrêt suite à un accident de travail.</label>
+                  </div>
+                </div>
+                <div class="form-field" *ngIf="showAccidentDate">
+                  <label>Date de l'accident</label>
+                  <input type="date" formControlName="dateAccident" required>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn enabled" [disabled]="!justifyForm.valid">Envoyer</button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </ng-container>
+
+    <!-- Historique View -->
+    <ng-container *ngIf="viewMode === 'historique'">
+      <div class="historique-section">
+        <div class="table-wrapper">
+          <h2>Notifications</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Message</th>
+              <th>Retard</th>
+              <th>Clôturée</th>
+              <th>Créé le</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let notification of allNotifications" (click)="selectNotification(notification.id)" [class.selected]="selectedNotificationId === notification.id">
+              <td>{{ notification.message }}</td>
+              <td>{{ notification.retard ? 'Oui' : 'Non' }}</td>
+              <td>{{ notification.cloturee ? 'Oui' : 'Non' }}</td>
+              <td>{{ notification.createdAt | date:'medium' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrapper">
+          <h2>Déclarations d'Absence</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Prolongation</th>
+              <th>Date Début</th>
+              <th>Date Fin</th>
+              <th>Clôturée</th>
+              <th>Validée</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let decl of allDeclarations" (click)="selectDeclaration(decl.declaration.id)" [class.highlighted]="selectedNotificationId === decl.notificationId" [class.selected]="selectedDeclarationId === decl.declaration.id">
+              <td>{{ decl.declaration.isProlongation ? 'Oui' : 'Non' }}</td>
+              <td>{{ decl.declaration.dateDebut | date:'mediumDate' }}</td>
+              <td>{{ decl.declaration.dateFin | date:'mediumDate' }}</td>
+              <td>{{ decl.declaration.cloturee ? 'Oui' : 'Non' }}</td>
+              <td>{{ decl.declaration.isValidated ? 'Oui' : 'Non' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrapper">
+          <h2>Justifications</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Original Déposé</th>
+              <th>Accident de Travail</th>
+              <th>Date Accident</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let just of allJustifications" (click)="selectJustification(just.justification.id)" [class.highlighted]="selectedDeclarationId === just.declarationId" [class.selected]="selectedJustificationId === just.justification.id">
+              <td>{{ just.justification.originalDepose ? 'Oui' : 'Non' }}</td>
+              <td>{{ just.justification.accidentTravail ? 'Oui' : 'Non' }}</td>
+              <td>{{ just.justification.dateAccident | date:'mediumDate' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- En Cours View (Placeholder) -->
+    <ng-container *ngIf="viewMode === 'enCours'">
+      <div class="historique-section">
+        <div class="table-wrapper">
+          <h2>Notification Active</h2>
+          <ng-container *ngIf="activeNotification; else noNotification">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Message</th>
+                <th>Retard</th>
+                <th>Créé le</th>
+                <th>Cloturée</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>{{ activeNotification.message }}</td>
+                <td>{{ activeNotification.retard ? 'Oui' : 'Non' }}</td>
+                <td>{{ activeNotification.createdAt | date:'medium' }}</td>
+                <td>{{ activeNotification.cloturee ? 'Oui' : 'Non' }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </ng-container>
+          <ng-template #noNotification>
+            <p>Il n'y a pas de notification active pour le moment.</p>
+          </ng-template>
+        </div>
+
+        <div class="table-wrapper">
+          <h2>Déclaration d'Absence Active</h2>
+          <ng-container *ngIf="activeDeclaration; else noDeclaration">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Prolongation</th>
+                <th>Date Début</th>
+                <th>Date Fin</th>
+                <th>Validée</th>
+                <th>Cloturée</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>{{ activeDeclaration.isProlongation ? 'Oui' : 'Non' }}</td>
+                <td>{{ activeDeclaration.dateDebut | date:'mediumDate' }}</td>
+                <td>{{ activeDeclaration.dateFin | date:'mediumDate' }}</td>
+                <td>{{ activeDeclaration.validated ? 'Oui' : 'Non' }}</td>
+                <td>{{ activeDeclaration.cloturee ? 'Oui' : 'Non' }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </ng-container>
+          <ng-template #noDeclaration>
+            <p>Il n'y a pas de déclaration d'absence active pour le moment.</p>
+          </ng-template>
+        </div>
+      </div>
+    </ng-container>
   </div>
 
   <!-- Right Section -->
   <div class="right-section">
-    <!-- Top Sub-Section (Progress Indicators/Buttons) -->
     <div class="progress-section">
-      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}">Créer</button>
-      <button class="progress-button" [disabled]="true">En Cours</button>
-      <button class="progress-button" [disabled]="true">Historique</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}" (click)="toggleViewMode('current')">Créer</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'En Cours'}" (click)="toggleViewMode('enCours')">En Cours</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Historique'}" (click)="toggleViewMode('historique')">Historique</button>
     </div>
-
-    <!-- Bottom Sub-Section (Suggestions) -->
     <div class="suggestions-section">
       <p><a href="#">Poser un congé</a></p>
     </div>

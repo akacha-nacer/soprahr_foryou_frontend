@@ -205,14 +205,18 @@
           <form [formGroup]="addressForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
             <div class="form-group">
               <br>
+              <h3>Adresse</h3>
               <div class="form-row">
                 <div class="form-field">
                   <label>Pays</label>
-                  <input type="text" formControlName="pays" required>
+                  <select formControlName="pays" required>
+                    <option value="" disabled selected>Sélectionnez un pays</option>
+                    <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                  </select>
                 </div>
                 <div class="form-field">
                   <label>Type d'adresse</label>
-                  <input type="text" formControlName="typeAdresse" required>
+                  <input type="text" formControlName="typeAdresse" required readonly (click)="openTypeAdressepopup()">
                 </div>
               </div>
               <div class="form-row">
@@ -237,16 +241,7 @@
                   </div>
                 </div>
               </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Voie (numéro)</label>
-                  <input type="text" formControlName="numeroVoie" required>
-                </div>
-                <div class="form-field">
-                  <label>Nature et nom de la voie</label>
-                  <input type="text" formControlName="natureVoie" required>
-                </div>
-              </div>
+
               <div class="form-row">
                 <div class="form-field">
                   <label>Complément d'adresse 1</label>
@@ -277,6 +272,18 @@
                   <input type="text" formControlName="codeInseeCommune" required>
                 </div>
               </div>
+              <br>
+              <h3>Téléphone/Fixe</h3>
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Nature et nom de la voie</label>
+                  <input type="text" formControlName="natureVoie" required readonly (click)="openTelephonepopup()">
+                </div>
+                <div class="form-field">
+                  <label>Voie (numéro)</label>
+                  <input type="text" formControlName="numeroVoie" required>
+                </div>
+              </div>
             </div>
             <div class="form-actions">
               <button type="submit" class="action-btn enabled" [disabled]="!addressForm.valid">Enregistrer</button>
@@ -304,11 +311,16 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Catégorie d'entrée</label>
-                  <input type="text" formControlName="categorieEntree" required>
+                  <select formControlName="categorieEntree" required>
+                    <option value="" disabled selected>Sélectionnez une categorie</option>
+                    <option value="STANDA"  selected>Standard</option>
+                    <option value="ACTIVE"  selected>En activité</option>
+                    <option value="TECNIC"  selected>Catégorie technique</option>
+                  </select>
                 </div>
                 <div class="form-field">
                   <label>Motif d'entrée</label>
-                  <input type="text" formControlName="motifEntree" required>
+                  <input type="text" formControlName="motifEntree" required readonly (click)="openMotifpopup()">
                 </div>
               </div>
               <br>
@@ -334,7 +346,11 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Calendrier de paie</label>
-                  <input type="text" formControlName="calendrierPaie" required>
+                  <select formControlName="calendrierPaie" required>
+                    <option value="" disabled selected>Sélectionnez un calendrier</option>
+                    <option value="CSN"  selected>Calendrier standard national</option>
+                    <option value="CAM"  selected>Calendrier Alsace-Moselle</option>
+                  </select>
                 </div>
               </div>
               <br>
@@ -356,7 +372,12 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Modalité de gestion de temps</label>
-                  <input type="text" formControlName="modaliteGestion" required>
+                  <select formControlName="modaliteGestion" required>
+                    <option value="" disabled selected>Sélectionnez une modalité</option>
+                    <option value="cycle"  selected>Cycle</option>
+                    <option value="horaire"  selected>Horaire individualisé par tâche</option>
+                    <option value="cycleHoraire"  selected>Cycle+Horaire individualisé par tâche</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -386,7 +407,7 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Convention collective</label>
-                  <input type="text" formControlName="conventionCollective" required>
+                  <input type="text" formControlName="conventionCollective" required readonly (click)="openConventionpopup()">
                 </div>
                 <div class="form-field">
                   <label>Accord entreprise</label>
@@ -396,11 +417,23 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Qualification (classification)</label>
-                  <input type="text" formControlName="qualification" required>
+                  <input type="text" formControlName="qualification" required readonly (click)="openQualifpopup()">
                 </div>
                 <div class="form-field">
                   <label>Type de paie</label>
-                  <input type="text" formControlName="typePaie" required>
+                  <select formControlName="typePaie" required>
+                    <option value="" disabled selected>Sélectionnez un type de paie</option>
+                    <option value="3"  selected>Mensuel</option>
+                    <option value="4"  selected>Horaire</option>
+                    <option value="C"  selected>Cachet isolé</option>
+                    <option value="D"  selected>Cachet groupés</option>
+                    <option value="F"  selected>Forfait jour cadres</option>
+                    <option value="G"  selected>Forfait heure</option>
+                    <option value="I"  selected>Paie à la journée</option>
+                    <option value="P"  selected>Paie à la pige</option>
+                    <option value="T"  selected>Paie à la tache</option>
+                    <option value="V"  selected>Paie à la vacation</option>
+                  </select>
                 </div>
               </div>
               <br>
@@ -408,7 +441,21 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Régime spécial</label>
-                  <input type="text" formControlName="regimeSpecial" required>
+                  <select formControlName="regimeSpecial" required>
+                    <option value="" disabled selected>Sélectionnez un régime</option>
+                    <option value="01"  selected>Régime SPE CADRE</option>
+                    <option value="AA"  selected>Régime Alpha</option>
+                    <option value="BB"  selected>Régime Beta</option>
+                    <option value="DD"  selected>Régime Delta</option>
+                    <option value="EE"  selected>Régime Epsilon</option>
+                    <option value="GG"  selected>Régime Gamma</option>
+                    <option value="HH"  selected>Régime Eta</option>
+                    <option value="KK"  selected>Régime Kappa</option>
+                    <option value="LL"  selected>Régime Lota</option>
+                    <option value="OO"  selected>Régime Omega</option>
+                    <option value="TT"  selected>Régime Theta</option>
+                    <option value="ZZ"  selected>Régime Zeta</option>
+                  </select>
                 </div>
               </div>
               <br>
@@ -416,11 +463,22 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Nature</label>
-                  <input type="text" formControlName="natureContrat" required>
+                  <input type="text" formControlName="natureContrat" required readonly (click)="openNatureContratpopup()">
                 </div>
                 <div class="form-field">
                   <label>Type</label>
-                  <input type="text" formControlName="typeContrat" required>
+                  <select formControlName="typeContrat" required>
+                    <option value="" disabled selected>Sélectionnez un type</option>
+                    <option value="AP">Apprenti</option>
+                    <option value="DD">Durée dététerminée</option>
+                    <option value="DI">Durée indététerminée</option>
+                    <option value="FO">Formateur occasionnel</option>
+                    <option value="HO">Honoraires seuls</option>
+                    <option value="IS">Contrat intermittent</option>
+                    <option value="ST">Stagiaire</option>
+                    <option value="TT">Travail temporaire</option>
+                    <option value="VA">Vacataire</option>
+                  </select>
                 </div>
               </div>
               <div class="form-row">
@@ -448,7 +506,17 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Type</label>
-                  <input type="text" formControlName="typeTemps" required>
+                  <select formControlName="typeTemps" required>
+                    <option value="" disabled selected>Sélectionnez un type</option>
+                    <option value="00">Temps plein</option>
+                    <option value="01">Temps partiel</option>
+                    <option value="CP">convenance personnelle</option>
+                    <option value="EM">Temps partiel employeur multiple</option>
+                    <option value="MI">Mi-temps thérapeutique</option>
+                    <option value="PL">Préretraite progressive AVEC levée d'option</option>
+                    <option value="PR">Préretraite progressive SANS levée d'option</option>
+                    <option value="TP">Temps partiel suivi d'embauche</option>
+                  </select>
                 </div>
                 <div class="form-field">
                   <label>Modalité horaire</label>
@@ -458,28 +526,22 @@
               <div class="form-row">
                 <div class="form-field">
                   <label>Cadre au forfait jours</label>
-                  <select formControlName="forfaitJours" required>
-                    <option value="" disabled selected>Sélectionnez</option>
-                    <option value="true">Oui</option>
-                    <option value="false">Non</option>
-                  </select>
+                  <input type="number" formControlName="forfaitJours" required>
                 </div>
                 <div class="form-field">
                   <label>Forfait annuel heures</label>
                   <input type="number" formControlName="forfaitHeures" required>
                 </div>
-              </div>
-              <div class="form-row">
                 <div class="form-field">
                   <label>Surcotisation</label>
                   <input type="text" formControlName="surcotisation" required>
                 </div>
+              </div>
+              <div class="form-row">
                 <div class="form-field">
                   <label>Heures travaillées</label>
                   <input type="text" formControlName="heuresTravaillees" required>
                 </div>
-              </div>
-              <div class="form-row">
                 <div class="form-field">
                   <label>Heures payées</label>
                   <input type="text" formControlName="heuresPayees" required>
