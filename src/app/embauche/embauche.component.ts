@@ -56,15 +56,31 @@ export class EmbaucheComponent implements OnInit {
   section4AnimationState: string = 'hidden';
   section5AnimationState: string = 'hidden';
   activeProgressButton: string = 'Créer';
-  departId : string ='';
+  departId: string = '';
+  viewMode: 'form' | 'historique' = 'form'; // Added for view switching
+  allDossiers: DossierModel[] = []; // Added for historical data
+  allRenseignements: any[] = []; // Added for processed individual info
+  allAdresses: any[] = []; // Added for processed addresses
+  allAffectations: any[] = []; // Added for processed assignments
+  allCarrieres: any[] = []; // Added for processed careers
+  selectedMatricule: string | null = null;
 
+  tableVisibility: { [key: string]: boolean } = {
+    'historique-dossiers': true,
+    'historique-renseignements': false,
+    'historique-adresses': false,
+    'historique-affectations': false,
+    'historique-carrieres': false,
+  };
 
   dossierData: DossierModel = {
     dateRecrutement: '',
     codeSociete: '',
     etablissement: '',
     matriculeSalarie: '',
-    departementId : '',
+    dateCreation: '',
+    departementId: '',
+    departementLibelle: '',
     renseignementsIndividuels: {
       qualite: '',
       nomUsuel: '',
@@ -85,7 +101,6 @@ export class EmbaucheComponent implements OnInit {
     carriere: []
   };
 
-  // List of countries for the dropdown
   countries: string[] = [
     'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria',
     'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan', 'Bolivia',
@@ -109,7 +124,7 @@ export class EmbaucheComponent implements OnInit {
     'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
   ];
 
-  constructor(private fb: FormBuilder, private dossierService: EmbaucheService,private dialog: MatDialog) {
+  constructor(private fb: FormBuilder, private dossierService: EmbaucheService, private dialog: MatDialog) {
     this.dossierForm = this.fb.group({
       dateRecrutement: ['', [Validators.required]],
       codeSociete: ['', [Validators.required]],
@@ -222,7 +237,6 @@ export class EmbaucheComponent implements OnInit {
   onPrincipalChange(index: number, event: Event): void {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
-      // Uncheck all other nationalities
       this.nationalites.controls.forEach((control, i) => {
         if (i !== index) {
           control.get('natPrincipale')?.setValue(false);
@@ -293,7 +307,6 @@ export class EmbaucheComponent implements OnInit {
   }
 
   onFinalSubmit(): void {
-
     const dialogRef = this.dialog.open(PopupConfMaladieComponent, {
       width: '700px',
       data: { message: "Voulez-vous valider définitivement toutes les informations du dossier d'embauche ?" }
@@ -343,7 +356,9 @@ export class EmbaucheComponent implements OnInit {
       codeSociete: '',
       etablissement: '',
       matriculeSalarie: '',
+      dateCreation: '',
       departementId: '',
+      departementLibelle: '',
       renseignementsIndividuels: {
         qualite: '',
         nomUsuel: '',
@@ -354,7 +369,6 @@ export class EmbaucheComponent implements OnInit {
         numeroInsee: '',
         dateNaissance: '',
         villeNaissance: '',
-
         paysNaissance: '',
         nationalites: [this.createNationality().value as Nationalite],
         etatFamilial: '',
@@ -366,7 +380,6 @@ export class EmbaucheComponent implements OnInit {
     };
     this.activeProgressButton = 'Créer';
   }
-
 
   openetablissementpopup(): void {
     const dialogRef = this.dialog.open(PopupEtablissementComponent, {
@@ -488,7 +501,6 @@ export class EmbaucheComponent implements OnInit {
     });
   }
 
-
   openConventionpopup(): void {
     const dialogRef = this.dialog.open(PopupConventionComponent, {
       width: '700px',
@@ -553,5 +565,73 @@ export class EmbaucheComponent implements OnInit {
         });
       }
     });
+  }
+
+  // Added method to toggle view mode
+  toggleViewMode(mode: 'form' | 'historique'): void {
+    this.viewMode = mode;
+    this.activeProgressButton = mode === 'form' ? 'Créer' : 'Historique';
+    if (mode === 'historique') {
+      this.fetchHistoriqueData();
+    }
+  }
+
+  // Added method to fetch historical data
+  private fetchHistoriqueData(): void {
+    this.dossierService.getAllDossiers().subscribe({
+      next: (dossiers) => {
+        console.log('Dossiers received:', dossiers);
+        this.allDossiers = dossiers;
+        this.processDossiers();
+      },
+      error: (error) => {
+        console.error('Error fetching dossiers:', error);
+      },
+    });
+  }
+
+  selectDossier(matricule: string): void {
+    this.selectedMatricule = matricule;
+  }
+
+  clearSelection(): void {
+    this.selectedMatricule = null;
+  }
+
+  private processDossiers(): void {
+    this.allRenseignements = this.allDossiers.map(dossier => {
+      const rens = dossier.renseignementsIndividuels;
+      return {
+        matriculeSalarie: dossier.matriculeSalarie,
+        ...(rens || {}),
+        departementNaissance: dossier.departementLibelle,
+        nationalites: rens && rens.nationalites ? rens.nationalites.map(n => n.pays).join(', ') : '',
+      };
+    });
+
+    this.allAdresses = this.allDossiers.flatMap(dossier =>
+      (dossier.adresses || []).map(adresse => ({
+        matriculeSalarie: dossier.matriculeSalarie,
+        ...adresse,
+      }))
+    );
+
+    this.allAffectations = this.allDossiers.flatMap(dossier =>
+      (dossier.affectations || []).map(affectation => ({
+        matriculeSalarie: dossier.matriculeSalarie,
+        ...affectation,
+      }))
+    );
+
+    this.allCarrieres = this.allDossiers.flatMap(dossier =>
+      (dossier.carriere || []).map(carriere => ({
+        matriculeSalarie: dossier.matriculeSalarie,
+        ...carriere,
+      }))
+    );
+  }
+
+  toggleTable(section: string): void {
+    this.tableVisibility[section] = !this.tableVisibility[section];
   }
 }

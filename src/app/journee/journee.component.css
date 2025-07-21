@@ -819,3 +819,34 @@
   padding-bottom: 20px; /* Space below the line */
   margin-bottom: 30px; /* Space above the next table */
 }
+
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+
+  margin-top: 10px;
+}
+
+.pagination {
+  display: inline-block;
+}
+
+.pagination a {
+  color: black;
+  float: left;
+  padding: 8px 16px;
+  margin: 1px;
+  text-decoration: none;
+}
+
+.pagination a.active {
+  background-color: #546170;
+  color: white;
+  border-radius: 5px;
+}
+
+.pagination a:hover:not(.active) {
+  background-color: #ddd;
+  border-radius: 5px;
+}

@@ -5,141 +5,209 @@
     <div class="description-section">
       <p>Cette page vous permet de créer un dossier d’embauche pour un nouvel employé. Commencez par remplir le formulaire initial ci-dessous pour enregistrer les informations de base. Une fois soumis, vous pourrez compléter les sections supplémentaires pour finaliser le dossier. Vous pouvez également recommencer ou quitter à tout moment.</p>
       <div class="action-buttons">
-        <button class="action-btn enabled" (click)="onFinalSubmit()" [disabled]="!areAllSectionsValid()">Valider le  dossier</button>
+        <button class="action-btn enabled" (click)="onFinalSubmit()" [disabled]="!areAllSectionsValid()">Valider le dossier</button>
         <button class="action-btn enabled">Recommencer</button>
         <button class="action-btn enabled" (click)="resetForms()">Quitter</button>
       </div>
       <hr>
     </div>
     <div class="form-placeholder">
-      <!-- Form Section 1: Créer le dossier d'une personne -->
-      <div class="form-section" sectionId="section1">
-        <div class="form-header" (click)="toggleForm('section1')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Créer le dossier d'une personne</span>
+      <ng-container *ngIf="viewMode === 'form'">
+        <!-- Form Section 1: Créer le dossier d'une personne -->
+        <div class="form-section" sectionId="section1">
+          <div class="form-header" (click)="toggleForm('section1')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section1'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Créer le dossier d'une personne</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
           </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section1'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
-          <form [formGroup]="dossierForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
-            <div class="form-group">
-              <div class="form-row">
-              <div class="form-field">
-                <label class="label1">Date de Recrutement</label>
-                <input type="date" formControlName="dateRecrutement" required>
-              </div>
-              <div class="form-field">
-                <label class="label1">Code Société</label>
-                <input type="text" formControlName="codeSociete" placeholder="Code société" required>
-              </div>
-              </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section1'] ? 'visible' : 'hidden'">
+            <form [formGroup]="dossierForm" (ngSubmit)="onSubmit('section1')" class="create-dossier-form">
+              <div class="form-group">
                 <div class="form-row">
-              <div class="form-field">
-                <label >Établissement</label>
-                <input type="text" formControlName="etablissement" placeholder="Établissement" required (click)="openetablissementpopup()" readonly>
+                  <div class="form-field">
+                    <label class="label1">Date de Recrutement</label>
+                    <input type="date" formControlName="dateRecrutement" required>
+                  </div>
+                  <div class="form-field">
+                    <label class="label1">Code Société</label>
+                    <input type="text" formControlName="codeSociete" placeholder="Code société" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Établissement</label>
+                    <input type="text" formControlName="etablissement" placeholder="Établissement" required (click)="openetablissementpopup()" readonly>
+                  </div>
+                  <div class="form-field">
+                    <label>Matricule Salarié</label>
+                    <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required>
+                  </div>
+                </div>
               </div>
-              <div class="form-field">
-                <label>Matricule Salarié</label>
-                <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required>
+              <div class="form-actions">
+                <button type="submit" class="action-btn enabled" [disabled]="!dossierForm.valid">Enregistrer</button>
               </div>
-            </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!dossierForm.valid">Enregistrer</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Form Section 2: Renseignements individuels -->
-      <div class="form-section" sectionId="section2" *ngIf="showAdditionalSections" [@slideHeader]="section2AnimationState">
-        <div class="form-header" (click)="toggleForm('section2')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Renseignements individuels</span>
+            </form>
           </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
         </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
-          <form [formGroup]="individualInfoForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form"  >
-            <div class="form-group">
-              <br>
-              <h3>Identité</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Qualité</label>
-                  <select formControlName="qualite" required>
-                    <option value="" disabled selected>Sélectionnez</option>
-                    <option value="M.">M.</option>
-                    <option value="Mme">Mme</option>
-                  </select>
+
+        <!-- Form Section 2: Renseignements individuels -->
+        <div class="form-section" sectionId="section2" *ngIf="showAdditionalSections" [@slideHeader]="section2AnimationState">
+          <div class="form-header" (click)="toggleForm('section2')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section2'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Renseignements individuels</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section2'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section2'] ? 'visible' : 'hidden'">
+            <form [formGroup]="individualInfoForm" (ngSubmit)="onSubmit('section2')" class="create-dossier-form">
+              <div class="form-group">
+                <br>
+                <h3>Identité</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Qualité</label>
+                    <select formControlName="qualite" required>
+                      <option value="" disabled selected>Sélectionnez</option>
+                      <option value="M.">M.</option>
+                      <option value="Mme">Mme</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label>Nom usuel</label>
+                    <input type="text" formControlName="nomUsuel" required>
+                  </div>
                 </div>
-                <div class="form-field">
-                  <label>Nom usuel</label>
-                  <input type="text" formControlName="nomUsuel" required>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Nom patronymique</label>
+                    <input type="text" formControlName="nomPatronymique" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Prénom</label>
+                    <input type="text" formControlName="prenom" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>2ème prénom</label>
+                    <input type="text" formControlName="deuxiemePrenom" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Sexe</label>
+                    <select formControlName="sexe" required>
+                      <option value="" disabled selected>Sélectionnez</option>
+                      <option value="M">Masculin</option>
+                      <option value="F">Féminin</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Numéro INSEE</label>
+                    <input type="text" formControlName="numeroInsee" required>
+                  </div>
+                </div>
+                <br>
+                <h3>Naissance</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Date de naissance</label>
+                    <input type="date" formControlName="dateNaissance" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Ville de naissance</label>
+                    <input type="text" formControlName="villeNaissance" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Département de naissance</label>
+                    <input type="text" formControlName="departementNaissance" required (click)="opendepartementpopup()" readonly>
+                  </div>
+                  <div class="form-field">
+                    <label>Pays de naissance</label>
+                    <input type="text" formControlName="paysNaissance" required>
+                  </div>
+                </div>
+                <br>
+                <h3>Nationalité</h3>
+                <div formArrayName="nationalites" class="form-group">
+                  <div *ngFor="let nat of nationalites.controls; let i=index" class="form-row" [formGroupName]="i">
+                    <div class="form-field">
+                      <label>Pays</label>
+                      <select formControlName="pays" required>
+                        <option value="" disabled selected>Sélectionnez un pays</option>
+                        <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <div class="checkbox-container">
+                        <input type="checkbox" formControlName="natPrincipale" (change)="onPrincipalChange(i, $event)">
+                        <label>Nationalité principale</label>
+                      </div>
+                    </div>
+                    <div class="form-field">
+                      <div class="button-group">
+                        <button type="button" class="action-button" (click)="removeNationality(i)" *ngIf="i > 0">
+                          <img src="assets/images/deleteJ.png">
+                        </button>
+                        <button type="button" class="action-button" (click)="addNationality()" *ngIf="i === nationalites.length - 1">
+                          <img src="assets/images/addE.png">
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <h3>Situation familiale</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>État (célibataire, marié, divorcé)</label>
+                    <select formControlName="etatFamilial" required>
+                      <option value="" disabled selected>Sélectionnez</option>
+                      <option value="celibataire">Célibataire</option>
+                      <option value="marie">Marié</option>
+                      <option value="divorce">Divorcé</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label>Date d'effet</label>
+                    <input type="date" formControlName="dateEffet" required>
+                  </div>
                 </div>
               </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Nom patronymique</label>
-                  <input type="text" formControlName="nomPatronymique" required>
-                </div>
-                <div class="form-field">
-                  <label>Prénom</label>
-                  <input type="text" formControlName="prenom" required>
-                </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn enabled" [disabled]="!individualInfoForm.valid">Enregistrer</button>
               </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>2ème prénom</label>
-                  <input type="text" formControlName="deuxiemePrenom" required>
-                </div>
-                <div class="form-field">
-                  <label>Sexe</label>
-                  <select formControlName="sexe" required>
-                    <option value="" disabled selected>Sélectionnez</option>
-                    <option value="M">Masculin</option>
-                    <option value="F">Féminin</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Numéro INSEE</label>
-                  <input type="text" formControlName="numeroInsee" required>
-                </div>
-              </div>
-              <br>
-              <h3>Naissance</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Date de naissance</label>
-                  <input type="date" formControlName="dateNaissance" required>
-                </div>
-                <div class="form-field">
-                  <label>Ville de naissance</label>
-                  <input type="text" formControlName="villeNaissance" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Département de naissance</label>
-                  <input type="text" formControlName="departementNaissance" required (click)="opendepartementpopup()" readonly>
-                </div>
-                <div class="form-field">
-                  <label>Pays de naissance</label>
-                  <input type="text" formControlName="paysNaissance" required>
-                </div>
-              </div>
-              <br>
-              <h3>Nationalité</h3>
-              <div formArrayName="nationalites" class="form-group">
-                <div *ngFor="let nat of nationalites.controls; let i=index" class="form-row" [formGroupName]="i">
+            </form>
+          </div>
+        </div>
+
+        <!-- Form Section 3: Adresses -->
+        <div class="form-section" sectionId="section3" *ngIf="showAdditionalSections" [@slideHeader]="section3AnimationState">
+          <div class="form-header" (click)="toggleForm('section3')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Adresses</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
+            <form [formGroup]="addressForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
+              <div class="form-group">
+                <br>
+                <h3>Adresse</h3>
+                <div class="form-row">
                   <div class="form-field">
                     <label>Pays</label>
                     <select formControlName="pays" required>
@@ -148,420 +216,674 @@
                     </select>
                   </div>
                   <div class="form-field">
-                    <div class="checkbox-container">
-                      <input type="checkbox" formControlName="natPrincipale" (change)="onPrincipalChange(i, $event)">
-                      <label>Nationalité principale</label>
-                    </div>
+                    <label>Type d'adresse</label>
+                    <input type="text" formControlName="typeAdresse" required readonly (click)="openTypeAdressepopup()">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Adresse principale (Oui/Non)</label>
+                    <select formControlName="adressePrincipale" required>
+                      <option value="" disabled selected>Sélectionnez</option>
+                      <option value="true">Oui</option>
+                      <option value="false">Non</option>
+                    </select>
                   </div>
                   <div class="form-field">
-                    <div class="button-group">
-                      <button type="button" class="action-button" (click)="removeNationality(i)" *ngIf="i > 0">
-                        <img src="assets/images/deleteJ.png">
-                      </button>
-                      <button type="button" class="action-button" (click)="addNationality()" *ngIf="i === nationalites.length - 1">
-                        <img src="assets/images/addE.png">
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <br>
-              <h3>Situation familiale</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>État (célibataire, marié, divorcé)</label>
-                  <select formControlName="etatFamilial" required>
-                    <option value="" disabled selected>Sélectionnez</option>
-                    <option value="celibataire">Célibataire</option>
-                    <option value="marie">Marié</option>
-                    <option value="divorce">Divorcé</option>
-                  </select>
-                </div>
-                <div class="form-field">
-                  <label>Date d'effet</label>
-                  <input type="date" formControlName="dateEffet" required>
-                </div>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!individualInfoForm.valid">Enregistrer</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Form Section 3: Adresses -->
-      <div class="form-section" sectionId="section3" *ngIf="showAdditionalSections" [@slideHeader]="section3AnimationState">
-        <div class="form-header" (click)="toggleForm('section3')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section3'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Adresses</span>
-          </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section3'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
-        </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section3'] ? 'visible' : 'hidden'">
-          <form [formGroup]="addressForm" (ngSubmit)="onSubmit('section3')" class="create-dossier-form">
-            <div class="form-group">
-              <br>
-              <h3>Adresse</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Pays</label>
-                  <select formControlName="pays" required>
-                    <option value="" disabled selected>Sélectionnez un pays</option>
-                    <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
-                  </select>
-                </div>
-                <div class="form-field">
-                  <label>Type d'adresse</label>
-                  <input type="text" formControlName="typeAdresse" required readonly (click)="openTypeAdressepopup()">
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Adresse principale (Oui/Non)</label>
-                  <select formControlName="adressePrincipale" required>
-                    <option value="" disabled selected>Sélectionnez</option>
-                    <option value="true">Oui</option>
-                    <option value="false">Non</option>
-                  </select>
-                </div>
-                <div class="form-field">
-                  <div class="form-row">
-                    <div class="form-field">
-                  <label>Valable du .. </label>
-                  <input type="date" formControlName="valableDu" required>
-                    </div>
+                    <div class="form-row">
+                      <div class="form-field">
+                        <label>Valable du .. </label>
+                        <input type="date" formControlName="valableDu" required>
+                      </div>
                       <div class="form-field">
                         <label>au ..</label>
-                  <input type="date" formControlName="valableAu" required>
+                        <input type="date" formControlName="valableAu" required>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Complément d'adresse 1</label>
+                    <input type="text" formControlName="complement1" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Complément d'adresse 2</label>
+                    <input type="text" formControlName="complement2" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Lieu-dit</label>
+                    <input type="text" formControlName="lieuDit" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Code postal</label>
+                    <input type="text" formControlName="codePostal" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Commune</label>
+                    <input type="text" formControlName="commune" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Code INSEE commune</label>
+                    <input type="text" formControlName="codeInseeCommune" required>
+                  </div>
+                </div>
+                <br>
+                <h3>Téléphone/Fixe</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Nature et nom de la voie</label>
+                    <input type="text" formControlName="natureVoie" required readonly (click)="openTelephonepopup()">
+                  </div>
+                  <div class="form-field">
+                    <label>Voie (numéro)</label>
+                    <input type="text" formControlName="numeroVoie" required>
                   </div>
                 </div>
               </div>
-
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Complément d'adresse 1</label>
-                  <input type="text" formControlName="complement1" required>
-                </div>
-                <div class="form-field">
-                  <label>Complément d'adresse 2</label>
-                  <input type="text" formControlName="complement2" required>
-                </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn enabled" [disabled]="!addressForm.valid">Enregistrer</button>
               </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Lieu-dit</label>
-                  <input type="text" formControlName="lieuDit" required>
-                </div>
-                <div class="form-field">
-                  <label>Code postal</label>
-                  <input type="text" formControlName="codePostal" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Commune</label>
-                  <input type="text" formControlName="commune" required>
-                </div>
-                <div class="form-field">
-                  <label>Code INSEE commune</label>
-                  <input type="text" formControlName="codeInseeCommune" required>
-                </div>
-              </div>
-              <br>
-              <h3>Téléphone/Fixe</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Nature et nom de la voie</label>
-                  <input type="text" formControlName="natureVoie" required readonly (click)="openTelephonepopup()">
-                </div>
-                <div class="form-field">
-                  <label>Voie (numéro)</label>
-                  <input type="text" formControlName="numeroVoie" required>
-                </div>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!addressForm.valid">Enregistrer</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- Form Section 4: Affectations -->
-      <div class="form-section" sectionId="section4" *ngIf="showAdditionalSections" [@slideHeader]="section4AnimationState">
-        <div class="form-header" (click)="toggleForm('section4')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section4'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Affectations</span>
+            </form>
           </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section4'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
         </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
-          <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit('section4')" class="create-dossier-form">
-            <div class="form-group">
-              <br>
-              <h3>Entrée</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Catégorie d'entrée</label>
-                  <select formControlName="categorieEntree" required>
-                    <option value="" disabled selected>Sélectionnez une categorie</option>
-                    <option value="STANDA"  selected>Standard</option>
-                    <option value="ACTIVE"  selected>En activité</option>
-                    <option value="TECNIC"  selected>Catégorie technique</option>
-                  </select>
-                </div>
-                <div class="form-field">
-                  <label>Motif d'entrée</label>
-                  <input type="text" formControlName="motifEntree" required readonly (click)="openMotifpopup()">
-                </div>
-              </div>
-              <br>
-              <h3>Affectation</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Poste</label>
-                  <input type="text" formControlName="poste" required>
-                </div>
-                <div class="form-field">
-                  <label>Emploi</label>
-                  <input type="text" formControlName="emploi" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Unité organisationnelle</label>
-                  <input type="text" formControlName="uniteOrganisationnelle" required>
-                </div>
-              </div>
-              <br>
-              <h3>Calendrier</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Calendrier de paie</label>
-                  <select formControlName="calendrierPaie" required>
-                    <option value="" disabled selected>Sélectionnez un calendrier</option>
-                    <option value="CSN"  selected>Calendrier standard national</option>
-                    <option value="CAM"  selected>Calendrier Alsace-Moselle</option>
-                  </select>
-                </div>
-              </div>
-              <br>
-              <h3>Cycles de travail</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Code</label>
-                  <input type="text" formControlName="codeCycle" required>
-                </div>
-                <div class="form-field">
-                  <label>Indexé</label>
-                  <select formControlName="indexe" required>
-                    <option value="" disabled selected>Sélectionnez</option>
-                    <option value="true">Oui</option>
-                    <option value="false">Non</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Modalité de gestion de temps</label>
-                  <select formControlName="modaliteGestion" required>
-                    <option value="" disabled selected>Sélectionnez une modalité</option>
-                    <option value="cycle"  selected>Cycle</option>
-                    <option value="horaire"  selected>Horaire individualisé par tâche</option>
-                    <option value="cycleHoraire"  selected>Cycle+Horaire individualisé par tâche</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!assignmentForm.valid">Enregistrer</button>
-            </div>
-          </form>
-        </div>
-      </div>
 
-      <!-- Form Section 5: Carrière -->
-      <div class="form-section" sectionId="section5" *ngIf="showAdditionalSections" [@slideHeader]="section5AnimationState">
-        <div class="form-header" (click)="toggleForm('section5')">
-          <div class="header-left">
-            <span class="arrow">{{ sectionVisibility['section5'] ? '⮟' : '⮞' }}</span>
-            <span class="header-title">Carrière</span>
+        <!-- Form Section 4: Affectations -->
+        <div class="form-section" sectionId="section4" *ngIf="showAdditionalSections" [@slideHeader]="section4AnimationState">
+          <div class="form-header" (click)="toggleForm('section4')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section4'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Affectations</span>
+            </div>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section4'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
           </div>
-          <span class="header-symbol">
-            <img [src]="sectionValidationStates['section5'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
-          </span>
+          <div class="form-content" [@slideDown]="sectionVisibility['section4'] ? 'visible' : 'hidden'">
+            <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit('section4')" class="create-dossier-form">
+              <div class="form-group">
+                <br>
+                <h3>Entrée</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Catégorie d'entrée</label>
+                    <select formControlName="categorieEntree" required>
+                      <option value="" disabled selected>Sélectionnez une categorie</option>
+                      <option value="STANDA" selected>Standard</option>
+                      <option value="ACTIVE" selected>En activité</option>
+                      <option value="TECNIC" selected>Catégorie technique</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label>Motif d'entrée</label>
+                    <input type="text" formControlName="motifEntree" required readonly (click)="openMotifpopup()">
+                  </div>
+                </div>
+                <br>
+                <h3>Affectation</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Poste</label>
+                    <input type="text" formControlName="poste" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Emploi</label>
+                    <input type="text" formControlName="emploi" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Unité organisationnelle</label>
+                    <input type="text" formControlName="uniteOrganisationnelle" required>
+                  </div>
+                </div>
+                <br>
+                <h3>Calendrier</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Calendrier de paie</label>
+                    <select formControlName="calendrierPaie" required>
+                      <option value="" disabled selected>Sélectionnez un calendrier</option>
+                      <option value="CSN" selected>Calendrier standard national</option>
+                      <option value="CAM" selected>Calendrier Alsace-Moselle</option>
+                    </select>
+                  </div>
+                </div>
+                <br>
+                <h3>Cycles de travail</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Code</label>
+                    <input type="text" formControlName="codeCycle" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Indexé</label>
+                    <select formControlName="indexe" required>
+                      <option value="" disabled selected>Sélectionnez</option>
+                      <option value="true">Oui</option>
+                      <option value="false">Non</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Modalité de gestion de temps</label>
+                    <select formControlName="modaliteGestion" required>
+                      <option value="" disabled selected>Sélectionnez une modalité</option>
+                      <option value="cycle" selected>Cycle</option>
+                      <option value="horaire" selected>Horaire individualisé par tâche</option>
+                      <option value="cycleHoraire" selected>Cycle+Horaire individualisé par tâche</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn enabled" [disabled]="!assignmentForm.valid">Enregistrer</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
-          <form [formGroup]="careerForm" (ngSubmit)="onSubmit('section5')" class="create-dossier-form">
-            <div class="form-group">
-              <br>
-              <h3>Suivi conventionnel</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Convention collective</label>
-                  <input type="text" formControlName="conventionCollective" required readonly (click)="openConventionpopup()">
-                </div>
-                <div class="form-field">
-                  <label>Accord entreprise</label>
-                  <input type="text" formControlName="accordEntreprise" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Qualification (classification)</label>
-                  <input type="text" formControlName="qualification" required readonly (click)="openQualifpopup()">
-                </div>
-                <div class="form-field">
-                  <label>Type de paie</label>
-                  <select formControlName="typePaie" required>
-                    <option value="" disabled selected>Sélectionnez un type de paie</option>
-                    <option value="3"  selected>Mensuel</option>
-                    <option value="4"  selected>Horaire</option>
-                    <option value="C"  selected>Cachet isolé</option>
-                    <option value="D"  selected>Cachet groupés</option>
-                    <option value="F"  selected>Forfait jour cadres</option>
-                    <option value="G"  selected>Forfait heure</option>
-                    <option value="I"  selected>Paie à la journée</option>
-                    <option value="P"  selected>Paie à la pige</option>
-                    <option value="T"  selected>Paie à la tache</option>
-                    <option value="V"  selected>Paie à la vacation</option>
-                  </select>
-                </div>
-              </div>
-              <br>
-              <h3>Régime spécial de cotisation</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Régime spécial</label>
-                  <select formControlName="regimeSpecial" required>
-                    <option value="" disabled selected>Sélectionnez un régime</option>
-                    <option value="01"  selected>Régime SPE CADRE</option>
-                    <option value="AA"  selected>Régime Alpha</option>
-                    <option value="BB"  selected>Régime Beta</option>
-                    <option value="DD"  selected>Régime Delta</option>
-                    <option value="EE"  selected>Régime Epsilon</option>
-                    <option value="GG"  selected>Régime Gamma</option>
-                    <option value="HH"  selected>Régime Eta</option>
-                    <option value="KK"  selected>Régime Kappa</option>
-                    <option value="LL"  selected>Régime Lota</option>
-                    <option value="OO"  selected>Régime Omega</option>
-                    <option value="TT"  selected>Régime Theta</option>
-                    <option value="ZZ"  selected>Régime Zeta</option>
-                  </select>
-                </div>
-              </div>
-              <br>
-              <h3>Contrat</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Nature</label>
-                  <input type="text" formControlName="natureContrat" required readonly (click)="openNatureContratpopup()">
-                </div>
-                <div class="form-field">
-                  <label>Type</label>
-                  <select formControlName="typeContrat" required>
-                    <option value="" disabled selected>Sélectionnez un type</option>
-                    <option value="AP">Apprenti</option>
-                    <option value="DD">Durée dététerminée</option>
-                    <option value="DI">Durée indététerminée</option>
-                    <option value="FO">Formateur occasionnel</option>
-                    <option value="HO">Honoraires seuls</option>
-                    <option value="IS">Contrat intermittent</option>
-                    <option value="ST">Stagiaire</option>
-                    <option value="TT">Travail temporaire</option>
-                    <option value="VA">Vacataire</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Durée</label>
-                  <input type="text" formControlName="duree" required>
-                </div>
-                <div class="form-field">
-                  <label>Date de fin prévue</label>
-                  <input type="date" formControlName="dateFinPrevue" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Date de début d'essai</label>
-                  <input type="date" formControlName="dateDebutEssai" required>
-                </div>
-                <div class="form-field">
-                  <label>Date de fin d'essai</label>
-                  <input type="date" formControlName="dateFinEssai" required>
-                </div>
-              </div>
-              <br>
-              <h3>Temps contractuel</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Type</label>
-                  <select formControlName="typeTemps" required>
-                    <option value="" disabled selected>Sélectionnez un type</option>
-                    <option value="00">Temps plein</option>
-                    <option value="01">Temps partiel</option>
-                    <option value="CP">convenance personnelle</option>
-                    <option value="EM">Temps partiel employeur multiple</option>
-                    <option value="MI">Mi-temps thérapeutique</option>
-                    <option value="PL">Préretraite progressive AVEC levée d'option</option>
-                    <option value="PR">Préretraite progressive SANS levée d'option</option>
-                    <option value="TP">Temps partiel suivi d'embauche</option>
-                  </select>
-                </div>
-                <div class="form-field">
-                  <label>Modalité horaire</label>
-                  <input type="text" formControlName="modaliteHoraire" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Cadre au forfait jours</label>
-                  <input type="number" formControlName="forfaitJours" required>
-                </div>
-                <div class="form-field">
-                  <label>Forfait annuel heures</label>
-                  <input type="number" formControlName="forfaitHeures" required>
-                </div>
-                <div class="form-field">
-                  <label>Surcotisation</label>
-                  <input type="text" formControlName="surcotisation" required>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Heures travaillées</label>
-                  <input type="text" formControlName="heuresTravaillees" required>
-                </div>
-                <div class="form-field">
-                  <label>Heures payées</label>
-                  <input type="text" formControlName="heuresPayees" required>
-                </div>
-              </div>
-              <br>
-              <h3>Contrat d'apprentissage</h3>
-              <div class="form-row">
-                <div class="form-field">
-                  <label>Date de début d'apprentissage</label>
-                  <input type="date" formControlName="dateDebutApprentissage" required>
-                </div>
-              </div>
+
+        <!-- Form Section 5: Carrière -->
+        <div class="form-section" sectionId="section5" *ngIf="showAdditionalSections" [@slideHeader]="section5AnimationState">
+          <div class="form-header" (click)="toggleForm('section5')">
+            <div class="header-left">
+              <span class="arrow">{{ sectionVisibility['section5'] ? '⮟' : '⮞' }}</span>
+              <span class="header-title">Carrière</span>
             </div>
-            <div class="form-actions">
-              <button type="submit" class="action-btn enabled" [disabled]="!careerForm.valid">Enregistrer</button>
-            </div>
-          </form>
+            <span class="header-symbol">
+              <img [src]="sectionValidationStates['section5'] ? 'assets/images/form_valid.png' : 'assets/images/form_invalid.png'" alt="Validation Status" class="validation-icon">
+            </span>
+          </div>
+          <div class="form-content" [@slideDown]="sectionVisibility['section5'] ? 'visible' : 'hidden'">
+            <form [formGroup]="careerForm" (ngSubmit)="onSubmit('section5')" class="create-dossier-form">
+              <div class="form-group">
+                <br>
+                <h3>Suivi conventionnel</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Convention collective</label>
+                    <input type="text" formControlName="conventionCollective" required readonly (click)="openConventionpopup()">
+                  </div>
+                  <div class="form-field">
+                    <label>Accord entreprise</label>
+                    <input type="text" formControlName="accordEntreprise" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Qualification (classification)</label>
+                    <input type="text" formControlName="qualification" required readonly (click)="openQualifpopup()">
+                  </div>
+                  <div class="form-field">
+                    <label>Type de paie</label>
+                    <select formControlName="typePaie" required>
+                      <option value="" disabled selected>Sélectionnez un type de paie</option>
+                      <option value="3" selected>Mensuel</option>
+                      <option value="4" selected>Horaire</option>
+                      <option value="C" selected>Cachet isolé</option>
+                      <option value="D" selected>Cachet groupés</option>
+                      <option value="F" selected>Forfait jour cadres</option>
+                      <option value="G" selected>Forfait heure</option>
+                      <option value="I" selected>Paie à la journée</option>
+                      <option value="P" selected>Paie à la pige</option>
+                      <option value="T" selected>Paie à la tache</option>
+                      <option value="V" selected>Paie à la vacation</option>
+                    </select>
+                  </div>
+                </div>
+                <br>
+                <h3>Régime spécial de cotisation</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Régime spécial</label>
+                    <select formControlName="regimeSpecial" required>
+                      <option value="" disabled selected>Sélectionnez un régime</option>
+                      <option value="01" selected>Régime SPE CADRE</option>
+                      <option value="AA" selected>Régime Alpha</option>
+                      <option value="BB" selected>Régime Beta</option>
+                      <option value="DD" selected>Régime Delta</option>
+                      <option value="EE" selected>Régime Epsilon</option>
+                      <option value="GG" selected>Régime Gamma</option>
+                      <option value="HH" selected>Régime Eta</option>
+                      <option value="KK" selected>Régime Kappa</option>
+                      <option value="LL" selected>Régime Lota</option>
+                      <option value="OO" selected>Régime Omega</option>
+                      <option value="TT" selected>Régime Theta</option>
+                      <option value="ZZ" selected>Régime Zeta</option>
+                    </select>
+                  </div>
+                </div>
+                <br>
+                <h3>Contrat</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Nature</label>
+                    <input type="text" formControlName="natureContrat" required readonly (click)="openNatureContratpopup()">
+                  </div>
+                  <div class="form-field">
+                    <label>Type</label>
+                    <select formControlName="typeContrat" required>
+                      <option value="" disabled selected>Sélectionnez un type</option>
+                      <option value="AP">Apprenti</option>
+                      <option value="DD">Durée dététerminée</option>
+                      <option value="DI">Durée indététerminée</option>
+                      <option value="FO">Formateur occasionnel</option>
+                      <option value="HO">Honoraires seuls</option>
+                      <option value="IS">Contrat intermittent</option>
+                      <option value="ST">Stagiaire</option>
+                      <option value="TT">Travail temporaire</option>
+                      <option value="VA">Vacataire</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Durée</label>
+                    <input type="text" formControlName="duree" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Date de fin prévue</label>
+                    <input type="date" formControlName="dateFinPrevue" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Date de début d'essai</label>
+                    <input type="date" formControlName="dateDebutEssai" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Date de fin d'essai</label>
+                    <input type="date" formControlName="dateFinEssai" required>
+                  </div>
+                </div>
+                <br>
+                <h3>Temps contractuel</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Type</label>
+                    <select formControlName="typeTemps" required>
+                      <option value="" disabled selected>Sélectionnez un type</option>
+                      <option value="00">Temps plein</option>
+                      <option value="01">Temps partiel</option>
+                      <option value="CP">convenance personnelle</option>
+                      <option value="EM">Temps partiel employeur multiple</option>
+                      <option value="MI">Mi-temps thérapeutique</option>
+                      <option value="PL">Préretraite progressive AVEC levée d'option</option>
+                      <option value="PR">Préretraite progressive SANS levée d'option</option>
+                      <option value="TP">Temps partiel suivi d'embauche</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label>Modalité horaire</label>
+                    <input type="text" formControlName="modaliteHoraire" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Cadre au forfait jours</label>
+                    <input type="number" formControlName="forfaitJours" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Forfait annuel heures</label>
+                    <input type="number" formControlName="forfaitHeures" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Surcotisation</label>
+                    <select formControlName="surcotisation" required>
+                      <option value="" disabled selected>Sélectionnez une cotisation</option>
+                      <option value="00">cotisation normale</option>
+                      <option value="01">retraite temps plein </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Heures travaillées</label>
+                    <input type="text" formControlName="heuresTravaillees" required>
+                  </div>
+                  <div class="form-field">
+                    <label>Heures payées</label>
+                    <input type="text" formControlName="heuresPayees" required>
+                  </div>
+                </div>
+                <br>
+                <h3>Contrat d'apprentissage</h3>
+                <div class="form-row">
+                  <div class="form-field">
+                    <label>Date de début d'apprentissage</label>
+                    <input type="date" formControlName="dateDebutApprentissage" required>
+                  </div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="action-btn enabled" [disabled]="!careerForm.valid">Enregistrer</button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
+      </ng-container>
+
+      <!-- Historical Data Section -->
+      <ng-container *ngIf="viewMode === 'historique'">
+        <div class="historique-section">
+          <div class="action-buttons">
+            <button class="action-btn enabled" (click)="clearSelection()">Effacer la sélection</button>
+          </div>
+          <!-- Dossiers Table -->
+          <h1>Dossiers :</h1>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Date de Recrutement</th>
+              <th>Code Société</th>
+              <th>Établissement</th>
+              <th>Matricule Salarié</th>
+              <th>Date de Création</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let dossier of allDossiers" (click)="selectDossier(dossier.matriculeSalarie)" [ngClass]="{'highlighted': selectedMatricule === dossier.matriculeSalarie}">
+              <td>{{ dossier.dateRecrutement | date:'mediumDate' }}</td>
+              <td>{{ dossier.codeSociete }}</td>
+              <td>{{ dossier.etablissement }}</td>
+              <td>{{ dossier.matriculeSalarie }}</td>
+              <td>{{ dossier.dateCreation | date:'mediumDate' }}</td>
+            </tr>
+            </tbody>
+          </table>
+          <hr>
+          <h1>Renseignements individuels :</h1>
+          <!-- Identité Table -->
+          <h2>Identité</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Qualité</th>
+              <th>Nom Usuel</th>
+              <th>Nom Patronymique</th>
+              <th>Prénom</th>
+              <th>2ème Prénom</th>
+              <th>Sexe</th>
+              <th>Numéro INSEE</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rens of allRenseignements" [ngClass]="{'highlighted': selectedMatricule === rens.matriculeSalarie}">
+              <td>{{ rens.matriculeSalarie }}</td>
+              <td>{{ rens.qualite }}</td>
+              <td>{{ rens.nomUsuel }}</td>
+              <td>{{ rens.nomPatronymique }}</td>
+              <td>{{ rens.prenom }}</td>
+              <td>{{ rens.deuxiemePrenom }}</td>
+              <td>{{ rens.sexe }}</td>
+              <td>{{ rens.numeroInsee }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- Naissance Table -->
+          <h2>Naissance</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Date de Naissance</th>
+              <th>Ville de Naissance</th>
+              <th>Département de Naissance</th>
+              <th>Pays de Naissance</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rens of allRenseignements" [ngClass]="{'highlighted': selectedMatricule === rens.matriculeSalarie}">
+              <td>{{ rens.matriculeSalarie }}</td>
+              <td>{{ rens.dateNaissance | date:'mediumDate' }}</td>
+              <td>{{ rens.villeNaissance }}</td>
+              <td>{{ rens.departementNaissance }}</td>
+              <td>{{ rens.paysNaissance }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- Nationalité Table -->
+          <h2>Nationalité / Situation familiale</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Pays</th>
+              <th>Nationalité Principale</th>
+              <th>État Familial</th>
+              <th>Date d'Effet(Etat .Famil)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let rens of allRenseignements" [ngClass]="{'highlighted': selectedMatricule === rens.matriculeSalarie}">
+              <td>{{ rens.matriculeSalarie }}</td>
+              <td>{{ rens.pays }}</td>
+              <td>{{ rens.natPrincipale ? 'Oui' : 'Non' }}</td>
+              <td>{{ rens.etatFamilial }}</td>
+              <td>{{ rens.dateEffet | date:'mediumDate' }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <hr>
+          <h1>Adresses :</h1>
+          <!-- Adresse Table -->
+          <h2>Adresse</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Pays</th>
+              <th>Type d'Adresse</th>
+              <th>Adresse Principale</th>
+              <th>Valable du</th>
+              <th>Valable au</th>
+              <th>Complément d'adresse 1</th>
+              <th>Complément d'adresse 2</th>
+              <th>Lieu-dit</th>
+              <th>Code Postal</th>
+              <th>Commune</th>
+              <th>Code INSEE Commune</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let adresse of allAdresses" [ngClass]="{'highlighted': selectedMatricule === adresse.matriculeSalarie}">
+              <td>{{ adresse.matriculeSalarie }}</td>
+              <td>{{ adresse.pays }}</td>
+              <td>{{ adresse.typeAdresse }}</td>
+              <td>{{ adresse.adressePrincipale ? 'Oui' : 'Non' }}</td>
+              <td>{{ adresse.valableDu | date:'mediumDate' }}</td>
+              <td>{{ adresse.valableAu | date:'mediumDate' }}</td>
+              <td>{{ adresse.complement1 }}</td>
+              <td>{{ adresse.complement2 }}</td>
+              <td>{{ adresse.lieuDit }}</td>
+              <td>{{ adresse.codePostal }}</td>
+              <td>{{ adresse.commune }}</td>
+              <td>{{ adresse.codeInseeCommune }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- Téléphone/Fixe Table -->
+          <h2>Téléphone/Fixe</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Nature et Nom de la Voie</th>
+              <th>Voie (Numéro)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let adresse of allAdresses" [ngClass]="{'highlighted': selectedMatricule === adresse.matriculeSalarie}">
+              <td>{{ adresse.matriculeSalarie }}</td>
+              <td>{{ adresse.natureVoie }}</td>
+              <td>{{ adresse.numeroVoie }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <hr>
+          <h1>Affectations :</h1>
+          <!-- Entrée Table -->
+          <h2>Entrée/Affectation</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Catégorie d'Entrée</th>
+              <th>Motif d'Entrée</th>
+              <th>Poste</th>
+              <th>Emploi</th>
+              <th>Unité Organisationnelle</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let affectation of allAffectations" [ngClass]="{'highlighted': selectedMatricule === affectation.matriculeSalarie}">
+              <td>{{ affectation.matriculeSalarie }}</td>
+              <td>{{ affectation.categorieEntree }}</td>
+              <td>{{ affectation.motifEntree }}</td>
+              <td>{{ affectation.poste }}</td>
+              <td>{{ affectation.emploi }}</td>
+              <td>{{ affectation.uniteOrganisationnelle }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+
+          <!-- Calendrier Table -->
+          <h2>Calendrier/Cycles de Travail</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Calendrier de Paie</th>
+              <th>Code .Cycle</th>
+              <th>Indexé .Cycle</th>
+              <th>Modalité de Gestion</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let affectation of allAffectations" [ngClass]="{'highlighted': selectedMatricule === affectation.matriculeSalarie}">
+              <td>{{ affectation.matriculeSalarie }}</td>
+              <td>{{ affectation.calendrierPaie }}</td>
+              <td>{{ affectation.codeCycle }}</td>
+              <td>{{ affectation.indexe ? 'Oui' : 'Non' }}</td>
+              <td>{{ affectation.modaliteGestion }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <hr>
+          <h1>Carrière :</h1>
+
+          <!-- Suivi Conventionnel Table -->
+          <h2>Suivi Conventionnel/Régime</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Convention Collective</th>
+              <th>Accord Entreprise</th>
+              <th>Qualification</th>
+              <th>Type de Paie</th>
+              <th>Régime Spécial</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let carriere of allCarrieres" [ngClass]="{'highlighted': selectedMatricule === carriere.matriculeSalarie}">
+              <td>{{ carriere.matriculeSalarie }}</td>
+              <td>{{ carriere.conventionCollective }}</td>
+              <td>{{ carriere.accordEntreprise }}</td>
+              <td>{{ carriere.qualification }}</td>
+              <td>{{ carriere.typePaie }}</td>
+              <td>{{ carriere.regimeSpecial }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- Contrat Table -->
+          <h2>Contrat</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Nature</th>
+              <th>Type</th>
+              <th>Durée</th>
+              <th>Date de Fin Prévue</th>
+              <th>Date de Début d'Essai</th>
+              <th>Date de Fin d'Essai</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let carriere of allCarrieres" [ngClass]="{'highlighted': selectedMatricule === carriere.matriculeSalarie}">
+              <td>{{ carriere.matriculeSalarie }}</td>
+              <td>{{ carriere.natureContrat }}</td>
+              <td>{{ carriere.typeContrat }}</td>
+              <td>{{ carriere.duree }}</td>
+              <td>{{ carriere.dateFinPrevue | date:'mediumDate' }}</td>
+              <td>{{ carriere.dateDebutEssai | date:'mediumDate' }}</td>
+              <td>{{ carriere.dateFinEssai | date:'mediumDate' }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- Temps Contractuel Table -->
+          <h2>Temps Contractuel</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Type</th>
+              <th>Modalité Horaire</th>
+              <th>Cadre au Forfait Jours</th>
+              <th>Forfait Annuel Heures</th>
+              <th>Surcotisation</th>
+              <th>Heures Travaillées</th>
+              <th>Heures Payées</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let carriere of allCarrieres" [ngClass]="{'highlighted': selectedMatricule === carriere.matriculeSalarie}">
+              <td>{{ carriere.matriculeSalarie }}</td>
+              <td>{{ carriere.typeTemps }}</td>
+              <td>{{ carriere.modaliteHoraire }}</td>
+              <td>{{ carriere.forfaitJours }}</td>
+              <td>{{ carriere.forfaitHeures }}</td>
+              <td>{{ carriere.surcotisation }}</td>
+              <td>{{ carriere.heuresTravaillees }}</td>
+              <td>{{ carriere.heuresPayees }}</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <!-- Contrat d'Apprentissage Table -->
+          <h2>Contrat d'Apprentissage</h2>
+          <table class="nature-heures-table">
+            <thead>
+            <tr>
+              <th>Matricule Salarié</th>
+              <th>Date de Début d'Apprentissage</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let carriere of allCarrieres" [ngClass]="{'highlighted': selectedMatricule === carriere.matriculeSalarie}">
+              <td>{{ carriere.matriculeSalarie }}</td>
+              <td>{{ carriere.dateDebutApprentissage | date:'mediumDate' }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
     </div>
   </div>
 
@@ -569,9 +891,9 @@
   <div class="right-section">
     <!-- Top Sub-Section (Progress Indicators/Buttons) -->
     <div class="progress-section">
-      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}">Créer</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Créer'}" (click)="toggleViewMode('form')">Créer</button>
       <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'En Cours'}">En Cours</button>
-      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Historique'}">Historique</button>
+      <button class="progress-button" [ngClass]="{'active': activeProgressButton === 'Historique'}" (click)="toggleViewMode('historique')">Historique</button>
     </div>
 
     <!-- Bottom Sub-Section (Suggestions) -->

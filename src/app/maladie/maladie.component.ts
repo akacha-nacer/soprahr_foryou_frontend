@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef} from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
@@ -63,6 +63,21 @@ export class MaladieComponent implements OnInit {
   allNotifications: NotificationDTO[] = [];
   allDeclarations: { declaration: AbsenceDeclarationDTO, notificationId: number }[] = [];
   allJustifications: { justification: JustificationDTO, declarationId: number }[] = [];
+  // Pagination properties for notifications
+  notificationsCurrentPage: number = 1;
+  notificationsItemsPerPage: number = 5;
+  notificationsTotalPages: number = 1;
+  filteredNotifications: NotificationDTO[] = [];
+  // Pagination properties for declarations
+  declarationsCurrentPage: number = 1;
+  declarationsItemsPerPage: number = 5;
+  declarationsTotalPages: number = 1;
+  filteredDeclarations: { declaration: AbsenceDeclarationDTO, notificationId: number }[] = [];
+  // Pagination properties for justifications
+  justificationsCurrentPage: number = 1;
+  justificationsItemsPerPage: number = 5;
+  justificationsTotalPages: number = 1;
+  filteredJustifications: { justification: JustificationDTO, declarationId: number }[] = [];
   selectedNotificationId: number | null = null;
   selectedDeclarationId: number | null = null;
   selectedJustificationId: number | null = null;
@@ -79,7 +94,8 @@ export class MaladieComponent implements OnInit {
     private fb: FormBuilder,
     private maladieService: MaladieService,
     private dialog: MatDialog,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.notifyForm = this.fb.group({
       message: ['Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01', [Validators.required]],
@@ -90,7 +106,7 @@ export class MaladieComponent implements OnInit {
       isProlongation: [false],
       dateDebut: ['', [Validators.required]],
       dateFin: ['', [Validators.required]]
-    });
+    }, { validators: this.dateRangeValidator });
 
     this.justifyForm = this.fb.group({
       justificatif: ['', [Validators.required]],
@@ -147,6 +163,24 @@ export class MaladieComponent implements OnInit {
         this.justifyForm.get('dateAccident')?.clearValidators();
       }
       this.justifyForm.get('dateAccident')?.updateValueAndValidity();
+    });
+
+    this.declareForm.get('dateDebut')?.valueChanges.subscribe(value => {
+      const dateFinControl = this.declareForm.get('dateFin');
+      if (value && dateFinControl?.value) { // Only validate if both fields have values
+        const debut = new Date(value);
+        dateFinControl.setValidators([
+          Validators.required,
+          (control) => {
+            const fin = new Date(control.value);
+            return fin >= debut ? null : { invalidDateRange: true };
+          }
+        ]);
+        dateFinControl.updateValueAndValidity();
+      } else {
+        dateFinControl?.setValidators([Validators.required]);
+        dateFinControl?.updateValueAndValidity();
+      }
     });
 
     this.maladieService.getActiveNotification(this.employeeId).subscribe({
@@ -227,7 +261,12 @@ export class MaladieComponent implements OnInit {
     this.maladieService.getAllNotifications(this.employeeId).subscribe({
       next: (notifications) => {
         this.allNotifications = notifications;
+        this.filteredNotifications = [...notifications]; // Initialize filtered data
+        this.updateNotificationsPagination();
         this.processNotifications();
+        this.updateDeclarationsPagination();
+        this.updateJustificationsPagination();
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching notifications:', error);
@@ -241,6 +280,7 @@ export class MaladieComponent implements OnInit {
     this.maladieService.getActiveNotification(this.employeeId).subscribe({
       next: (notification) => {
         this.activeNotification = notification;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching active notification:', error);
@@ -252,6 +292,7 @@ export class MaladieComponent implements OnInit {
       next: (declaration) => {
         this.activeDeclaration = declaration;
         console.log(this.activeDeclaration?.validated);
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching active declaration:', error);
@@ -260,7 +301,102 @@ export class MaladieComponent implements OnInit {
     });
   }
 
+  // Pagination methods for notifications
+  get paginatedNotifications(): NotificationDTO[] {
+    const startIndex = (this.notificationsCurrentPage - 1) * this.notificationsItemsPerPage;
+    const endIndex = startIndex + this.notificationsItemsPerPage;
+    return this.filteredNotifications.slice(startIndex, endIndex);
+  }
 
+  updateNotificationsPagination(): void {
+    this.notificationsTotalPages = Math.ceil(this.filteredNotifications.length / this.notificationsItemsPerPage);
+    if (this.notificationsCurrentPage > this.notificationsTotalPages) {
+      this.notificationsCurrentPage = this.notificationsTotalPages > 0 ? this.notificationsTotalPages : 1;
+    }
+  }
+
+  get notificationsPageNumbers(): number[] {
+    return Array.from({ length: this.notificationsTotalPages }, (_, i) => i + 1);
+  }
+
+  goToNotificationsPage(page: number): void {
+    if (page >= 1 && page <= this.notificationsTotalPages) {
+      this.notificationsCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
+
+  dateRangeValidator(form: FormGroup): { [key: string]: boolean } | null {
+    const dateDebut = form.get('dateDebut')?.value;
+    const dateFin = form.get('dateFin')?.value;
+    const currentYear = 2025; // Based on provided date of July 21, 2025
+
+    if (dateDebut && dateFin) { // Only validate if both fields have values
+      const debut = new Date(dateDebut);
+      const fin = new Date(dateFin);
+
+      // Check if dates are within the current year
+      if (debut.getFullYear() !== currentYear || fin.getFullYear() !== currentYear) {
+        return { invalidYear: true };
+      }
+
+      // Check if dateFin is not before dateDebut
+      if (fin < debut) {
+        return { invalidDateRange: true };
+      }
+    }
+    return null;
+  }
+
+  // Pagination methods for declarations
+  get paginatedDeclarations(): { declaration: AbsenceDeclarationDTO, notificationId: number }[] {
+    const startIndex = (this.declarationsCurrentPage - 1) * this.declarationsItemsPerPage;
+    const endIndex = startIndex + this.declarationsItemsPerPage;
+    return this.filteredDeclarations.slice(startIndex, endIndex);
+  }
+
+  updateDeclarationsPagination(): void {
+    this.declarationsTotalPages = Math.ceil(this.filteredDeclarations.length / this.declarationsItemsPerPage);
+    if (this.declarationsCurrentPage > this.declarationsTotalPages) {
+      this.declarationsCurrentPage = this.declarationsTotalPages > 0 ? this.declarationsTotalPages : 1;
+    }
+  }
+
+  get declarationsPageNumbers(): number[] {
+    return Array.from({ length: this.declarationsTotalPages }, (_, i) => i + 1);
+  }
+
+  goToDeclarationsPage(page: number): void {
+    if (page >= 1 && page <= this.declarationsTotalPages) {
+      this.declarationsCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Pagination methods for justifications
+  get paginatedJustifications(): { justification: JustificationDTO, declarationId: number }[] {
+    const startIndex = (this.justificationsCurrentPage - 1) * this.justificationsItemsPerPage;
+    const endIndex = startIndex + this.justificationsItemsPerPage;
+    return this.filteredJustifications.slice(startIndex, endIndex);
+  }
+
+  updateJustificationsPagination(): void {
+    this.justificationsTotalPages = Math.ceil(this.filteredJustifications.length / this.justificationsItemsPerPage);
+    if (this.justificationsCurrentPage > this.justificationsTotalPages) {
+      this.justificationsCurrentPage = this.justificationsTotalPages > 0 ? this.justificationsTotalPages : 1;
+    }
+  }
+
+  get justificationsPageNumbers(): number[] {
+    return Array.from({ length: this.justificationsTotalPages }, (_, i) => i + 1);
+  }
+
+  goToJustificationsPage(page: number): void {
+    if (page >= 1 && page <= this.justificationsTotalPages) {
+      this.justificationsCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
 
   private processNotifications(): void {
     this.allDeclarations = [];
@@ -273,12 +409,15 @@ export class MaladieComponent implements OnInit {
         });
       });
     });
+    this.filteredDeclarations = [...this.allDeclarations]; // Initialize filtered declarations
+    this.filteredJustifications = [...this.allJustifications]; // Initialize filtered justifications
   }
 
   selectNotification(id: number): void {
     this.selectedNotificationId = id;
     this.selectedDeclarationId = null;
     this.selectedJustificationId = null;
+    this.cdr.detectChanges();
   }
 
   selectDeclaration(id: number): void {
@@ -288,6 +427,7 @@ export class MaladieComponent implements OnInit {
     if (decl) {
       this.selectedNotificationId = decl.notificationId;
     }
+    this.cdr.detectChanges();
   }
 
   selectJustification(id: number): void {
@@ -300,6 +440,7 @@ export class MaladieComponent implements OnInit {
         this.selectedNotificationId = decl.notificationId;
       }
     }
+    this.cdr.detectChanges();
   }
 
   toggleForm(sectionId: string): void {

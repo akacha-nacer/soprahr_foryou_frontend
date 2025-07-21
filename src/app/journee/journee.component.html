@@ -262,7 +262,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let absence of absences">
+              <tr *ngFor="let absence of paginatedAbsences">
                 <td>{{ absence.code }}</td>
                 <td>{{ absence.libelle }}</td>
                 <td>{{ absence.matin }}</td>
@@ -277,6 +277,15 @@
               </tr>
               </tbody>
             </table>
+            <div class="pagination-controls" *ngIf="filteredAbsences.length > absencesItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToAbsencesPage(1); $event.preventDefault()" [class.active]="absencesCurrentPage === 1">«</a>
+                <a *ngFor="let page of absencesPageNumbers" (click)="goToAbsencesPage(page); $event.preventDefault()" [class.active]="absencesCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToAbsencesPage(absencesTotalPages); $event.preventDefault()" [class.active]="absencesCurrentPage === absencesTotalPages">»</a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -293,7 +302,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let anomaly of allAnomalies">
+              <tr *ngFor="let anomaly of paginatedAnomalies">
                 <td>{{ anomaly.dateAnomalie }}</td>
                 <td>{{ anomaly.details }}</td>
                 <td>{{ anomaly.poid }}</td>
@@ -305,6 +314,15 @@
               </tr>
               </tbody>
             </table>
+            <div class="pagination-controls" *ngIf="filteredAnomalies.length > anomaliesItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToAnomaliesPage(1); $event.preventDefault()" [class.active]="anomaliesCurrentPage === 1">«</a>
+                <a *ngFor="let page of anomaliesPageNumbers" (click)="goToAnomaliesPage(page); $event.preventDefault()" [class.active]="anomaliesCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToAnomaliesPage(anomaliesTotalPages); $event.preventDefault()" [class.active]="anomaliesCurrentPage === anomaliesTotalPages">»</a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -323,7 +341,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let natureheure of allNatureHeures">
+              <tr *ngFor="let natureheure of paginatedNatureHeures">
                 <td>{{ natureheure.nature_heure }}</td>
                 <td>{{ natureheure.date }}</td>
                 <td>{{ natureheure.heureDebut }}</td>
@@ -340,6 +358,15 @@
               </tr>
               </tbody>
             </table>
+            <div class="pagination-controls" *ngIf="filteredNatureHeures.length > natureHeuresItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToNatureHeuresPage(1); $event.preventDefault()" [class.active]="natureHeuresCurrentPage === 1">«</a>
+                <a *ngFor="let page of natureHeuresPageNumbers" (click)="goToNatureHeuresPage(page); $event.preventDefault()" [class.active]="natureHeuresCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToNatureHeuresPage(natureHeuresTotalPages); $event.preventDefault()" [class.active]="natureHeuresCurrentPage === natureHeuresTotalPages">»</a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -357,7 +384,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let pointage of allPointages">
+              <tr *ngFor="let pointage of paginatedPointages">
                 <td>{{ pointage.createdAt }}</td>
                 <td>{{ pointage.heure }}</td>
                 <td>{{ pointage.sens }}</td>
@@ -370,6 +397,15 @@
               </tr>
               </tbody>
             </table>
+            <div class="pagination-controls" *ngIf="filteredPointages.length > pointagesItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToPointagesPage(1); $event.preventDefault()" [class.active]="pointagesCurrentPage === 1">«</a>
+                <a *ngFor="let page of pointagesPageNumbers" (click)="goToPointagesPage(page); $event.preventDefault()" [class.active]="pointagesCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToPointagesPage(pointagesTotalPages); $event.preventDefault()" [class.active]="pointagesCurrentPage === pointagesTotalPages">»</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

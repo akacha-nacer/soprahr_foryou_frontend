@@ -81,16 +81,31 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Depuis</label>
-                    <input type="date" formControlName="dateDebut" required [disabled]="isDeclarationFormDisabled">
+                    <input type="date" formControlName="dateDebut" required [disabled]="isDeclarationFormDisabled" min="2025-01-01" max="2025-12-31">
+                    <div *ngIf="declareForm.get('dateDebut')?.value && declareForm.get('dateFin')?.value && declareForm.get('dateDebut')?.hasError('required')" class="error-message">
+                      La date de début est requise.
+                    </div>
+                    <div *ngIf="declareForm.get('dateDebut')?.value && declareForm.get('dateFin')?.value && declareForm.hasError('invalidYear')" class="error-message">
+                      La date doit être en 2025.
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Jusqu'à</label>
-                    <input type="date" formControlName="dateFin" required [disabled]="isDeclarationFormDisabled">
+                    <input type="date" formControlName="dateFin" required [disabled]="isDeclarationFormDisabled" [min]="declareForm.get('dateDebut')?.value || '2025-01-01'" max="2025-12-31">
+                    <div *ngIf="declareForm.get('dateDebut')?.value && declareForm.get('dateFin')?.value && declareForm.get('dateFin')?.hasError('required')" class="error-message">
+                      La date de fin est requise.
+                    </div>
+                    <div *ngIf="declareForm.get('dateDebut')?.value && declareForm.get('dateFin')?.value && (declareForm.hasError('invalidDateRange') || declareForm.get('dateFin')?.hasError('invalidDateRange'))" class="error-message">
+                      La date de fin doit être postérieure ou égale à la date de début.
+                    </div>
+                    <div *ngIf="declareForm.get('dateDebut')?.value && declareForm.get('dateFin')?.value && declareForm.hasError('invalidYear')" class="error-message">
+                      La date doit être en 2025.
+                    </div>
                   </div>
                 </div>
               </div>
               <div class="form-actions">
-                <button type="submit" class="action-btn" [ngClass]="{'enabled': !isDeclarationFormDisabled, 'disabled': isDeclarationFormDisabled}" [disabled]="!declareForm.valid || isDeclarationFormDisabled">Envoyer</button>
+                <button type="submit" class="action-btn" [ngClass]="{'enabled': !isDeclarationFormDisabled && declareForm.valid, 'disabled': isDeclarationFormDisabled || !declareForm.valid}" [disabled]="!declareForm.valid || isDeclarationFormDisabled">Envoyer</button>
               </div>
             </form>
             <div class="disable-message" *ngIf="isDeclarationFormDisabled">
@@ -157,71 +172,104 @@
       <div class="historique-section">
         <div class="table-wrapper">
           <h2>Notifications</h2>
-          <table class="nature-heures-table">
-            <thead>
-            <tr>
-              <th>Message</th>
-              <th>Retard</th>
-              <th>Clôturée</th>
-              <th>Créé le</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let notification of allNotifications" (click)="selectNotification(notification.id)" [class.selected]="selectedNotificationId === notification.id">
-              <td>{{ notification.message }}</td>
-              <td>{{ notification.retard ? 'Oui' : 'Non' }}</td>
-              <td>{{ notification.cloturee ? 'Oui' : 'Non' }}</td>
-              <td>{{ notification.createdAt | date:'medium' }}</td>
-            </tr>
-            </tbody>
-          </table>
+          <div class="nature-heures-container">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Message</th>
+                <th>Retard</th>
+                <th>Clôturée</th>
+                <th>Créé le</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let notification of paginatedNotifications" (click)="selectNotification(notification.id)" [class.selected]="selectedNotificationId === notification.id">
+                <td>{{ notification.message }}</td>
+                <td>{{ notification.retard ? 'Oui' : 'Non' }}</td>
+                <td>{{ notification.cloturee ? 'Oui' : 'Non' }}</td>
+                <td>{{ notification.createdAt | date:'medium' }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="pagination-controls" *ngIf="filteredNotifications.length > notificationsItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToNotificationsPage(1); $event.preventDefault()" [class.active]="notificationsCurrentPage === 1">«</a>
+                <a *ngFor="let page of notificationsPageNumbers" (click)="goToNotificationsPage(page); $event.preventDefault()" [class.active]="notificationsCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToNotificationsPage(notificationsTotalPages); $event.preventDefault()" [class.active]="notificationsCurrentPage === notificationsTotalPages">»</a>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="table-wrapper">
           <h2>Déclarations d'Absence</h2>
-          <table class="nature-heures-table">
-            <thead>
-            <tr>
-              <th>Prolongation</th>
-              <th>Date Début</th>
-              <th>Date Fin</th>
-              <th>Clôturée</th>
-              <th>Validée</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let decl of allDeclarations" (click)="selectDeclaration(decl.declaration.id)" [class.highlighted]="selectedNotificationId === decl.notificationId" [class.selected]="selectedDeclarationId === decl.declaration.id">
-              <td>{{ decl.declaration.isProlongation ? 'Oui' : 'Non' }}</td>
-              <td>{{ decl.declaration.dateDebut | date:'mediumDate' }}</td>
-              <td>{{ decl.declaration.dateFin | date:'mediumDate' }}</td>
-              <td>{{ decl.declaration.cloturee ? 'Oui' : 'Non' }}</td>
-              <td>{{ decl.declaration.isValidated ? 'Oui' : 'Non' }}</td>
-            </tr>
-            </tbody>
-          </table>
+          <div class="nature-heures-container">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Prolongation</th>
+                <th>Date Début</th>
+                <th>Date Fin</th>
+                <th>Clôturée</th>
+                <th>Validée</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let decl of paginatedDeclarations" (click)="selectDeclaration(decl.declaration.id)" [class.highlighted]="selectedNotificationId === decl.notificationId" [class.selected]="selectedDeclarationId === decl.declaration.id">
+                <td>{{ decl.declaration.isProlongation ? 'Oui' : 'Non' }}</td>
+                <td>{{ decl.declaration.dateDebut | date:'mediumDate' }}</td>
+                <td>{{ decl.declaration.dateFin | date:'mediumDate' }}</td>
+                <td>{{ decl.declaration.cloturee ? 'Oui' : 'Non' }}</td>
+                <td>{{ decl.declaration.isValidated ? 'Oui' : 'Non' }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="pagination-controls" *ngIf="filteredDeclarations.length > declarationsItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToDeclarationsPage(1); $event.preventDefault()" [class.active]="declarationsCurrentPage === 1">«</a>
+                <a *ngFor="let page of declarationsPageNumbers" (click)="goToDeclarationsPage(page); $event.preventDefault()" [class.active]="declarationsCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToDeclarationsPage(declarationsTotalPages); $event.preventDefault()" [class.active]="declarationsCurrentPage === declarationsTotalPages">»</a>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="table-wrapper">
           <h2>Justifications</h2>
-          <table class="nature-heures-table">
-            <thead>
-            <tr>
-              <th>Original Déposé</th>
-              <th>Accident de Travail</th>
-              <th>Date Accident</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let just of allJustifications" (click)="selectJustification(just.justification.id)" [class.highlighted]="selectedDeclarationId === just.declarationId" [class.selected]="selectedJustificationId === just.justification.id">
-              <td>{{ just.justification.originalDepose ? 'Oui' : 'Non' }}</td>
-              <td>{{ just.justification.accidentTravail ? 'Oui' : 'Non' }}</td>
-              <td>{{ just.justification.dateAccident | date:'mediumDate' }}</td>
-            </tr>
-            </tbody>
-          </table>
+          <div class="nature-heures-container">
+            <table class="nature-heures-table">
+              <thead>
+              <tr>
+                <th>Original Déposé</th>
+                <th>Accident de Travail</th>
+                <th>Date Accident</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let just of paginatedJustifications" (click)="selectJustification(just.justification.id)" [class.highlighted]="selectedDeclarationId === just.declarationId" [class.selected]="selectedJustificationId === just.justification.id">
+                <td>{{ just.justification.originalDepose ? 'Oui' : 'Non' }}</td>
+                <td>{{ just.justification.accidentTravail ? 'Oui' : 'Non' }}</td>
+                <td>{{ just.justification.dateAccident | date:'mediumDate' }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="pagination-controls" *ngIf="filteredJustifications.length > justificationsItemsPerPage">
+              <div class="pagination">
+                <a (click)="goToJustificationsPage(1); $event.preventDefault()" [class.active]="justificationsCurrentPage === 1">«</a>
+                <a *ngFor="let page of justificationsPageNumbers" (click)="goToJustificationsPage(page); $event.preventDefault()" [class.active]="justificationsCurrentPage === page">
+                  {{ page }}
+                </a>
+                <a (click)="goToJustificationsPage(justificationsTotalPages); $event.preventDefault()" [class.active]="justificationsCurrentPage === justificationsTotalPages">»</a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </ng-container>
 
-    <!-- En Cours View (Placeholder) -->
+    <!-- En Cours View -->
     <ng-container *ngIf="viewMode === 'enCours'">
       <div class="historique-section">
         <div class="table-wrapper">

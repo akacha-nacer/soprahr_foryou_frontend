@@ -20,4 +20,7 @@ export class EmbaucheService {
     return this.http.get<DepartementNaiss[]>(`${this.apiUrl}/get_dep`);
   }
 
+  getAllDossiers(): Observable<DossierModel[]> {
+    return this.http.get<DossierModel[]>(`${this.apiUrl}/get_dossiers`);
+  }
 }

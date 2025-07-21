@@ -62,6 +62,26 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   absences = [
     { code: 'ABR', libelle: 'absence diverse', matin: '-', apresMidi: '-', debut: '09:00', fin: '17:00' }
   ];
+  // Pagination properties for absences
+  absencesCurrentPage: number = 1;
+  absencesItemsPerPage: number = 5;
+  absencesTotalPages: number = 1;
+  filteredAbsences: any[] = [];
+  // Pagination properties for anomalies
+  anomaliesCurrentPage: number = 1;
+  anomaliesItemsPerPage: number = 5;
+  anomaliesTotalPages: number = 1;
+  filteredAnomalies: Anomalies[] = [];
+  // Pagination properties for nature heures
+  natureHeuresCurrentPage: number = 1;
+  natureHeuresItemsPerPage: number = 5;
+  natureHeuresTotalPages: number = 1;
+  filteredNatureHeures: NatureHeure[] = [];
+  // Pagination properties for pointages
+  pointagesCurrentPage: number = 1;
+  pointagesItemsPerPage: number = 5;
+  pointagesTotalPages: number = 1;
+  filteredPointages: Pointage[] = [];
   activeProgressButton: string = 'Créer';
   timelineHours = Array.from({ length: 25 }, (_, i) => (i === 0 ? '00:00' : `${i}:00`));
   hasAnomaly = false;
@@ -69,7 +89,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   private timelineInitialized = false;
   private selectedDate: Date = new Date();
   private destroy$ = new Subject<void>();
-  private anomaliesGenerated = false; // Flag to prevent duplicate anomaly generation
+  private anomaliesGenerated = false;
 
   constructor(
     private fb: FormBuilder,
@@ -123,7 +143,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (this.userId) {
       this.fetchCurrentViewData();
-      // Generate anomalies only once
       if (!this.anomaliesGenerated) {
         const today = new Date().toISOString().split('T')[0];
         this.anomaliesGenerated = true;
@@ -185,7 +204,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
 
-    // Remove duplicate generateAnomaliesForUser call
     this.fetchAnomalies();
   }
 
@@ -196,6 +214,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: (value) => {
           this.allNatureHeures = value;
+          this.filteredNatureHeures = [...value]; // Initialize filtered data
+          this.updateNatureHeuresPagination();
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -207,6 +227,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: (value) => {
           this.allPointages = value;
+          this.filteredPointages = [...value]; // Initialize filtered data
+          this.updatePointagesPagination();
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -218,12 +240,17 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: (value) => {
           this.allAnomalies = value;
+          this.filteredAnomalies = [...value]; // Initialize filtered data
+          this.updateAnomaliesPagination();
           this.cdr.detectChanges();
         },
         error: (error) => {
           console.error('Error fetching all anomalies:', error);
         }
       });
+
+    this.filteredAbsences = [...this.absences]; // Initialize filtered absences
+    this.updateAbsencesPagination();
   }
 
   private fetchEnCoursData(): void {
@@ -266,6 +293,106 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
       });
   }
 
+  // Pagination methods for absences
+  get paginatedAbsences(): any[] {
+    const startIndex = (this.absencesCurrentPage - 1) * this.absencesItemsPerPage;
+    const endIndex = startIndex + this.absencesItemsPerPage;
+    return this.filteredAbsences.slice(startIndex, endIndex);
+  }
+
+  updateAbsencesPagination(): void {
+    this.absencesTotalPages = Math.ceil(this.filteredAbsences.length / this.absencesItemsPerPage);
+    if (this.absencesCurrentPage > this.absencesTotalPages) {
+      this.absencesCurrentPage = this.absencesTotalPages > 0 ? this.absencesTotalPages : 1;
+    }
+  }
+
+  get absencesPageNumbers(): number[] {
+    return Array.from({ length: this.absencesTotalPages }, (_, i) => i + 1);
+  }
+
+  goToAbsencesPage(page: number): void {
+    if (page >= 1 && page <= this.absencesTotalPages) {
+      this.absencesCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Pagination methods for anomalies
+  get paginatedAnomalies(): Anomalies[] {
+    const startIndex = (this.anomaliesCurrentPage - 1) * this.anomaliesItemsPerPage;
+    const endIndex = startIndex + this.anomaliesItemsPerPage;
+    return this.filteredAnomalies.slice(startIndex, endIndex);
+  }
+
+  updateAnomaliesPagination(): void {
+    this.anomaliesTotalPages = Math.ceil(this.filteredAnomalies.length / this.anomaliesItemsPerPage);
+    if (this.anomaliesCurrentPage > this.anomaliesTotalPages) {
+      this.anomaliesCurrentPage = this.anomaliesTotalPages > 0 ? this.anomaliesTotalPages : 1;
+    }
+  }
+
+  get anomaliesPageNumbers(): number[] {
+    return Array.from({ length: this.anomaliesTotalPages }, (_, i) => i + 1);
+  }
+
+  goToAnomaliesPage(page: number): void {
+    if (page >= 1 && page <= this.anomaliesTotalPages) {
+      this.anomaliesCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Pagination methods for nature heures
+  get paginatedNatureHeures(): NatureHeure[] {
+    const startIndex = (this.natureHeuresCurrentPage - 1) * this.natureHeuresItemsPerPage;
+    const endIndex = startIndex + this.natureHeuresItemsPerPage;
+    return this.filteredNatureHeures.slice(startIndex, endIndex);
+  }
+
+  updateNatureHeuresPagination(): void {
+    this.natureHeuresTotalPages = Math.ceil(this.filteredNatureHeures.length / this.natureHeuresItemsPerPage);
+    if (this.natureHeuresCurrentPage > this.natureHeuresTotalPages) {
+      this.natureHeuresCurrentPage = this.natureHeuresTotalPages > 0 ? this.natureHeuresTotalPages : 1;
+    }
+  }
+
+  get natureHeuresPageNumbers(): number[] {
+    return Array.from({ length: this.natureHeuresTotalPages }, (_, i) => i + 1);
+  }
+
+  goToNatureHeuresPage(page: number): void {
+    if (page >= 1 && page <= this.natureHeuresTotalPages) {
+      this.natureHeuresCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // Pagination methods for pointages
+  get paginatedPointages(): Pointage[] {
+    const startIndex = (this.pointagesCurrentPage - 1) * this.pointagesItemsPerPage;
+    const endIndex = startIndex + this.pointagesItemsPerPage;
+    return this.filteredPointages.slice(startIndex, endIndex);
+  }
+
+  updatePointagesPagination(): void {
+    this.pointagesTotalPages = Math.ceil(this.filteredPointages.length / this.pointagesItemsPerPage);
+    if (this.pointagesCurrentPage > this.pointagesTotalPages) {
+      this.pointagesCurrentPage = this.pointagesTotalPages > 0 ? this.pointagesTotalPages : 1;
+    }
+  }
+
+  get pointagesPageNumbers(): number[] {
+    return Array.from({ length: this.pointagesTotalPages }, (_, i) => i + 1);
+  }
+
+  goToPointagesPage(page: number): void {
+    if (page >= 1 && page <= this.pointagesTotalPages) {
+      this.pointagesCurrentPage = page;
+      this.cdr.detectChanges();
+    }
+  }
+
   toggleViewMode(mode: 'current' | 'historique' | 'enCours'): void {
     this.activeProgressButton = mode === 'current' ? 'Créer' : mode === 'historique' ? 'Historique' : 'En Cours';
     this.viewMode = mode;
@@ -291,8 +418,6 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.cdr.detectChanges();
   }
-
-  // ... rest of the methods remain unchanged ...
 
   ngAfterViewInit(): void {
     if (this.sectionVisibility['section5']) {
@@ -388,7 +513,9 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     console.log('Container found:', container);
     console.log('Container dimensions:', container.offsetWidth, 'x', container.offsetHeight);
-    const items = new DataSet(this.getTimelineItems());
+    const
+
+      items = new DataSet(this.getTimelineItems());
     console.log('All items in DataSet:', items.get());
     const options: TimelineOptions = this.getTimelineOptions();
     try {
@@ -788,7 +915,9 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
               this.journeeService.getNatureHeures(this.userId!)
                 .subscribe({
                   next: (value) => {
-                    this.natureHeures = this.filterByDate(value, this.selectedDate, nh => nh.nature_heure?.toLowerCase() === 'déjeuner');
+                    this.allNatureHeures = value;
+                    this.filteredNatureHeures = [...value]; // Update filtered data
+                    this.updateNatureHeuresPagination();
                     this.cdr.detectChanges();
                     if (this.sectionVisibility['section5'] && this.timeline) {
                       setTimeout(() => {

@@ -4,7 +4,9 @@ export interface DossierModel {
   codeSociete: string;
   etablissement: string;
   matriculeSalarie: string;
+  dateCreation: string;
   departementId: string;
+  departementLibelle: string;
   renseignementsIndividuels: RenseignementsIndividuels;
   adresses: Adresses[];
   affectations: Affectations[];
