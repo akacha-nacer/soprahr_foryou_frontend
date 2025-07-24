@@ -31,6 +31,10 @@
                   <div class="form-field">
                     <label class="label1">Date de Recrutement</label>
                     <input type="date" formControlName="dateRecrutement" required>
+                    <div class="error-message" *ngIf="dossierForm.get('dateRecrutement')?.invalid && (dossierForm.get('dateRecrutement')?.dirty || dossierForm.get('dateRecrutement')?.touched)">
+                      <div *ngIf="dossierForm.get('dateRecrutement')?.errors?.['required']">La date de recrutement est requise.</div>
+                      <div *ngIf="dossierForm.get('dateRecrutement')?.errors?.['futureDate']">La date ne peut pas être dans le futur.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label class="label1">Code Société</label>
@@ -83,22 +87,37 @@
                   <div class="form-field">
                     <label>Nom usuel</label>
                     <input type="text" formControlName="nomUsuel" required>
+                    <div class="error-message" *ngIf="individualInfoForm.get('nomUsuel')?.invalid && (individualInfoForm.get('nomUsuel')?.dirty || individualInfoForm.get('nomUsuel')?.touched)">
+                      <div *ngIf="individualInfoForm.get('nomUsuel')?.errors?.['required']">Le nom usuel est requis.</div>
+                      <div *ngIf="individualInfoForm.get('nomUsuel')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>Nom patronymique</label>
                     <input type="text" formControlName="nomPatronymique" required>
+                    <div class="error-message" *ngIf="individualInfoForm.get('nomPatronymique')?.invalid && (individualInfoForm.get('nomPatronymique')?.dirty || individualInfoForm.get('nomPatronymique')?.touched)">
+                      <div *ngIf="individualInfoForm.get('nomPatronymique')?.errors?.['required']">Le nom patronymique est requis.</div>
+                      <div *ngIf="individualInfoForm.get('nomPatronymique')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Prénom</label>
                     <input type="text" formControlName="prenom" required>
+                    <div class="error-message" *ngIf="individualInfoForm.get('prenom')?.invalid && (individualInfoForm.get('prenom')?.dirty || individualInfoForm.get('prenom')?.touched)">
+                      <div *ngIf="individualInfoForm.get('prenom')?.errors?.['required']">Le prénom est requis.</div>
+                      <div *ngIf="individualInfoForm.get('prenom')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>2ème prénom</label>
                     <input type="text" formControlName="deuxiemePrenom" required>
+                    <div class="error-message" *ngIf="individualInfoForm.get('deuxiemePrenom')?.invalid && (individualInfoForm.get('deuxiemePrenom')?.dirty || individualInfoForm.get('deuxiemePrenom')?.touched)">
+                      <div *ngIf="individualInfoForm.get('deuxiemePrenom')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Sexe</label>
@@ -121,10 +140,18 @@
                   <div class="form-field">
                     <label>Date de naissance</label>
                     <input type="date" formControlName="dateNaissance" required>
+                    <div class="error-message" *ngIf="individualInfoForm.get('dateNaissance')?.invalid && (individualInfoForm.get('dateNaissance')?.dirty || individualInfoForm.get('dateNaissance')?.touched)">
+                      <div *ngIf="individualInfoForm.get('dateNaissance')?.errors?.['required']">La date de naissance est requise.</div>
+                      <div *ngIf="individualInfoForm.get('dateNaissance')?.errors?.['futureDate']">La date ne peut pas être dans le futur.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Ville de naissance</label>
                     <input type="text" formControlName="villeNaissance" required>
+                    <div class="error-message" *ngIf="individualInfoForm.get('villeNaissance')?.invalid && (individualInfoForm.get('villeNaissance')?.dirty || individualInfoForm.get('villeNaissance')?.touched)">
+                      <div *ngIf="individualInfoForm.get('villeNaissance')?.errors?.['required']">La ville de naissance est requise.</div>
+                      <div *ngIf="individualInfoForm.get('villeNaissance')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -134,7 +161,10 @@
                   </div>
                   <div class="form-field">
                     <label>Pays de naissance</label>
-                    <input type="text" formControlName="paysNaissance" required>
+                    <select formControlName="paysNaissance" required>
+                      <option value="" disabled selected>Sélectionnez un pays</option>
+                      <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                    </select>
                   </div>
                 </div>
                 <br>
@@ -240,6 +270,9 @@
                         <input type="date" formControlName="valableAu" required>
                       </div>
                     </div>
+                    <div class="error-message" *ngIf="addressForm.hasError('invalidDateRange') && (addressForm.get('valableDu')?.touched || addressForm.get('valableAu')?.touched)">
+                      La date de début doit être avant la date de fin.
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -260,12 +293,20 @@
                   <div class="form-field">
                     <label>Code postal</label>
                     <input type="text" formControlName="codePostal" required>
+                    <div class="error-message" *ngIf="addressForm.get('codePostal')?.invalid && (addressForm.get('codePostal')?.dirty || addressForm.get('codePostal')?.touched)">
+                      <div *ngIf="addressForm.get('codePostal')?.errors?.['required']">Le code postal est requis.</div>
+                      <div *ngIf="addressForm.get('codePostal')?.errors?.['pattern']">5 chiffres requis.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>Commune</label>
                     <input type="text" formControlName="commune" required>
+                    <div class="error-message" *ngIf="addressForm.get('commune')?.invalid && (addressForm.get('commune')?.dirty || addressForm.get('commune')?.touched)">
+                      <div *ngIf="addressForm.get('commune')?.errors?.['required']">La commune est requise.</div>
+                      <div *ngIf="addressForm.get('commune')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Code INSEE commune</label>
@@ -489,6 +530,10 @@
                   <div class="form-field">
                     <label>Date de fin prévue</label>
                     <input type="date" formControlName="dateFinPrevue" required>
+                    <div class="error-message" *ngIf="careerForm.get('dateFinPrevue')?.invalid && (careerForm.get('dateFinPrevue')?.dirty || careerForm.get('dateFinPrevue')?.touched)">
+                      <div *ngIf="careerForm.get('dateFinPrevue')?.errors?.['required']">La date de fin est requise.</div>
+                      <div *ngIf="careerForm.get('dateFinPrevue')?.errors?.['pastDate']">La date doit être dans le futur.</div>
+                    </div>
                   </div>
                 </div>
                 <div class="form-row">
@@ -500,6 +545,9 @@
                     <label>Date de fin d'essai</label>
                     <input type="date" formControlName="dateFinEssai" required>
                   </div>
+                </div>
+                <div class="error-message" *ngIf="careerForm.hasError('invalidDateRange') && (careerForm.get('dateDebutEssai')?.touched || careerForm.get('dateFinEssai')?.touched)">
+                  La date de début d'essai doit être avant la date de fin.
                 </div>
                 <br>
                 <h3>Temps contractuel</h3>
@@ -527,10 +575,18 @@
                   <div class="form-field">
                     <label>Cadre au forfait jours</label>
                     <input type="number" formControlName="forfaitJours" required>
+                    <div class="error-message" *ngIf="careerForm.get('forfaitJours')?.invalid && (careerForm.get('forfaitJours')?.dirty || careerForm.get('forfaitJours')?.touched)">
+                      <div *ngIf="careerForm.get('forfaitJours')?.errors?.['required']">Le forfait jours est requis.</div>
+                      <div *ngIf="careerForm.get('forfaitJours')?.errors?.['min']">La valeur ne peut pas être négative.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Forfait annuel heures</label>
                     <input type="number" formControlName="forfaitHeures" required>
+                    <div class="error-message" *ngIf="careerForm.get('forfaitHeures')?.invalid && (careerForm.get('forfaitHeures')?.dirty || careerForm.get('forfaitHeures')?.touched)">
+                      <div *ngIf="careerForm.get('forfaitHeures')?.errors?.['required']">Le forfait heures est requis.</div>
+                      <div *ngIf="careerForm.get('forfaitHeures')?.errors?.['min']">La valeur ne peut pas être négative.</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Surcotisation</label>
@@ -545,10 +601,18 @@
                   <div class="form-field">
                     <label>Heures travaillées</label>
                     <input type="text" formControlName="heuresTravaillees" required>
+                    <div class="error-message" *ngIf="careerForm.get('heuresTravaillees')?.invalid && (careerForm.get('heuresTravaillees')?.dirty || careerForm.get('heuresTravaillees')?.touched)">
+                      <div *ngIf="careerForm.get('heuresTravaillees')?.errors?.['required']">Les heures travaillées sont requises.</div>
+                      <div *ngIf="careerForm.get('heuresTravaillees')?.errors?.['pattern']">Nombre positif requis (ex: 35 ou 35.5).</div>
+                    </div>
                   </div>
                   <div class="form-field">
                     <label>Heures payées</label>
                     <input type="text" formControlName="heuresPayees" required>
+                    <div class="error-message" *ngIf="careerForm.get('heuresPayees')?.invalid && (careerForm.get('heuresPayees')?.dirty || careerForm.get('heuresPayees')?.touched)">
+                      <div *ngIf="careerForm.get('heuresPayees')?.errors?.['required']">Les heures payées sont requises.</div>
+                      <div *ngIf="careerForm.get('heuresPayees')?.errors?.['pattern']">Nombre positif requis (ex: 35 ou 35.5).</div>
+                    </div>
                   </div>
                 </div>
                 <br>
@@ -757,7 +821,6 @@
             </tr>
             </tbody>
           </table>
-
 
           <!-- Calendrier Table -->
           <h2>Calendrier/Cycles de Travail</h2>

@@ -435,6 +435,8 @@
   background-color: #5ab9bf;
   margin-right: 10px;
   position: relative;
+  align-content: center;
+  justify-content: right;
   display: inline-block;
   overflow: visible;
   vertical-align: middle;
@@ -457,6 +459,7 @@
 .icon img {
   width: 100%;
   height: 100%;
+  padding: 2px;
   object-fit: cover;
   border-radius: 50%;
   position: relative;

@@ -13,11 +13,14 @@
 
 }
 
+.navbar-options{
+  padding: 0 16px;
+}
+
 .navbar a {
   color: white;
   text-align: center;
   text-decoration: none;
-  padding: 0 16px;
   margin: 0;
   height: 100%;
   display: flex;
@@ -64,6 +67,8 @@
 
 .navbar a.search-link:hover {
   background-color: #8e8e8e;
+  padding: 0 16px;
+
 }
 
 .dropdown .dropbtn:hover {

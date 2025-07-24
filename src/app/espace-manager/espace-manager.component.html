@@ -36,7 +36,7 @@
         <div class="notif-search-container">
           <img src="assets/images/arrowLeft.png" class="arrowLeft" (click)="goBackFromDemands()" alt="Back Button">
           <div class="search-input-container">
-            <input type="text" placeholder="Entrer un nom" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheItems()">
+            <input type="text" placeholder="Entrer un nom" class="search-bar" >
             <img src="assets/images/filtre.png" class="search-icon" alt="Search Icon">
           </div>
         </div>
@@ -241,9 +241,19 @@
       </div>
     </div>
     <div class="right-section">
-      <input type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheItems()">
-      <div class="demarches-section">
+      <input *ngIf="this.userRole == 'MANAGER' " type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheItems()">
+      <input *ngIf="this.userRole != 'MANAGER' " type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheEmplItems()">
+      <div class="demarches-section" *ngIf="this.userRole == 'MANAGER' ">
         <div class="demarche-item" *ngFor="let item of filteredDemarcheItems">
+          <span class="icon">
+            <img [src]="getImageForDemarcheItem(item)" [class.big]="item === 'Je gère le planning de mon équipe'">
+          </span>
+          {{ item }}
+        </div>
+      </div>
+
+      <div class="demarches-section" *ngIf="this.userRole != 'MANAGER'">
+        <div class="demarche-item" *ngFor="let item of filteredDemarcheEmplItems">
           <span class="icon">
             <img [src]="getImageForDemarcheItem(item)" [class.big]="item === 'Je gère le planning de mon équipe'">
           </span>

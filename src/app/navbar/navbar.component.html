@@ -50,7 +50,7 @@
         <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png" class="dropdown-option-icon" (click)="logout()"> Déconnexion</a>
       </div>
     </div>
-    <a href="#home" routerLink="/espace_manager">
+    <a href="#home" routerLink="/espace_manager" class="navbar-options">
       <img src="assets/images/4you_naceur_black.png" alt="Home Icon" class="home-icon">
     </a>
     <div class="toggle-container" (click)="toggleSwitch()" *ngIf="userRole == 'GESTIONNAIRE' ">
@@ -69,10 +69,10 @@
         <input type="text" class="search-input" placeholder="Rechercher une page..." (click)="onInputClick($event)" />
       </div>
     </a>
-    <a (click)="openPopupQuestionRH($event)">
+    <a (click)="openPopupQuestionRH($event)" class="navbar-options">
       <img src="assets/images/wha.png" class="home-icon">
     </a>
-    <a (click)="logout()">
+    <a (click)="logout()" class="navbar-options">
       <img src="assets/images/disconnect.png" class="home-icon">
     </a>
   </div>

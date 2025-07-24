@@ -1,6 +1,14 @@
 // embauche.component.ts
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators, FormArray, ReactiveFormsModule} from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormArray,
+  ReactiveFormsModule,
+  ValidatorFn,
+  AbstractControl, ValidationErrors
+} from '@angular/forms';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import {EmbaucheService} from '../services/embauche.service';
 import { DossierModel, RenseignementsIndividuels, Adresses, Affectations, Carriere, Nationalite } from '../models/DossierModel';
@@ -124,9 +132,45 @@ export class EmbaucheComponent implements OnInit {
     'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
   ];
 
+  private namePattern = /^[a-zA-ZÀ-ÿ\s-]+$/;
+
+  // Custom validator for dates not in the future
+  notFutureDateValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      const inputDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return inputDate > today ? { futureDate: true } : null;
+    };
+  }
+
+  // Custom validator for dates in the future
+  futureDateValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      const inputDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return inputDate <= today ? { pastDate: true } : null;
+    };
+  }
+
+  dateRangeValidator(startControlName: string, endControlName: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const group = control as FormGroup;
+      const start = group.get(startControlName)?.value;
+      const end = group.get(endControlName)?.value;
+      if (start && end && new Date(start) >= new Date(end)) {
+        return { invalidDateRange: true };
+      }
+      return null;
+    };
+  }
+
   constructor(private fb: FormBuilder, private dossierService: EmbaucheService, private dialog: MatDialog) {
     this.dossierForm = this.fb.group({
-      dateRecrutement: ['', [Validators.required]],
+      dateRecrutement: ['', [Validators.required, this.notFutureDateValidator()]],
       codeSociete: ['', [Validators.required]],
       etablissement: ['', [Validators.required]],
       matriculeSalarie: ['', [Validators.required]]
@@ -134,14 +178,14 @@ export class EmbaucheComponent implements OnInit {
 
     this.individualInfoForm = this.fb.group({
       qualite: ['', [Validators.required]],
-      nomUsuel: ['', [Validators.required]],
-      nomPatronymique: ['', [Validators.required]],
-      prenom: ['', [Validators.required]],
-      deuxiemePrenom: ['', [Validators.required]],
+      nomUsuel: ['', [Validators.required, Validators.pattern(this.namePattern)]],
+      nomPatronymique: ['', [Validators.required, Validators.pattern(this.namePattern)]],
+      prenom: ['', [Validators.required, Validators.pattern(this.namePattern)]],
+      deuxiemePrenom: ['', [ Validators.pattern(this.namePattern)]],
       sexe: ['', [Validators.required]],
       numeroInsee: ['', [Validators.required]],
-      dateNaissance: ['', [Validators.required]],
-      villeNaissance: ['', [Validators.required]],
+      dateNaissance: ['', [Validators.required, this.notFutureDateValidator()]],
+      villeNaissance: ['', [Validators.required, Validators.pattern(this.namePattern)]],
       departementNaissance: ['', [Validators.required]],
       paysNaissance: ['', [Validators.required]],
       nationalites: this.fb.array([this.createNationality()]),
@@ -155,15 +199,15 @@ export class EmbaucheComponent implements OnInit {
       adressePrincipale: ['', [Validators.required]],
       valableDu: ['', [Validators.required]],
       valableAu: ['', [Validators.required]],
-      numeroVoie: ['', [Validators.required]],
+      numeroVoie: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       natureVoie: ['', [Validators.required]],
       complement1: ['', [Validators.required]],
       complement2: ['', [Validators.required]],
       lieuDit: ['', [Validators.required]],
-      codePostal: ['', [Validators.required]],
-      commune: ['', [Validators.required]],
+      codePostal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
+      commune: ['', [Validators.required, Validators.pattern(this.namePattern)]],
       codeInseeCommune: ['', [Validators.required]]
-    });
+    }, { validators: this.dateRangeValidator('valableDu', 'valableAu') });
 
     this.assignmentForm = this.fb.group({
       categorieEntree: ['', [Validators.required]],
@@ -186,18 +230,18 @@ export class EmbaucheComponent implements OnInit {
       natureContrat: ['', [Validators.required]],
       typeContrat: ['', [Validators.required]],
       duree: ['', [Validators.required]],
-      dateFinPrevue: ['', [Validators.required]],
+      dateFinPrevue: ['', [Validators.required, this.futureDateValidator()]],
       dateDebutEssai: ['', [Validators.required]],
       dateFinEssai: ['', [Validators.required]],
       typeTemps: ['', [Validators.required]],
       modaliteHoraire: ['', [Validators.required]],
-      forfaitJours: ['', [Validators.required]],
+      forfaitJours: ['', [Validators.required, Validators.min(0)]],
       forfaitHeures: ['', [Validators.required, Validators.min(0)]],
       surcotisation: ['', [Validators.required]],
-      heuresTravaillees: ['', [Validators.required]],
-      heuresPayees: ['', [Validators.required]],
+      heuresTravaillees: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+      heuresPayees: ['', [Validators.required, Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
       dateDebutApprentissage: ['', [Validators.required]]
-    });
+    }, { validators: this.dateRangeValidator('dateDebutEssai', 'dateFinEssai') });
   }
 
   ngOnInit(): void {

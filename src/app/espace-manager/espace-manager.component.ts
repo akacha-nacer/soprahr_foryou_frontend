@@ -76,7 +76,19 @@ export class EspaceManagerComponent implements OnInit {
     'Mon mode de transport',
     'Mon déménagement'
   ];
+  demarcheItemsEmpl: string[] = [
+    'Mes questions RH',
+    'Le planning de mes collègues',
+    'Mes congés',
+    'Ma journée',
+    'Mon planning hebdomadaire',
+    'Mes attestations',
+    'Je suis malade',
+    'Mon mode de transport',
+    'Mon déménagement'
+  ];
   filteredDemarcheItems: string[] = [...this.demarcheItems];
+  filteredDemarcheEmplItems: string[] = [...this.demarcheItemsEmpl];
 
   constructor(private cdr: ChangeDetectorRef, private maladieService: MaladieService, private authService: AuthService,private  journeeService :JourneeService) {}
 
@@ -429,7 +441,15 @@ export class EspaceManagerComponent implements OnInit {
 
   filterDemarcheItems() {
     const search = this.searchTerm.toLowerCase().trim();
-    this.filteredDemarcheItems = this.demarcheItems.filter(item =>
+      this.filteredDemarcheItems = this.demarcheItems.filter(item =>
+        item.toLowerCase().includes(search)
+      );
+    this.cdr.detectChanges();
+  }
+
+  filterDemarcheEmplItems() {
+    const search = this.searchTerm.toLowerCase().trim();
+    this.filteredDemarcheEmplItems = this.demarcheItemsEmpl.filter(item =>
       item.toLowerCase().includes(search)
     );
     this.cdr.detectChanges();
@@ -441,7 +461,29 @@ export class EspaceManagerComponent implements OnInit {
       case 'Le planning de mes collègues':
         return 'assets/images/plc1.png';
       case 'Je gère le planning de mon équipe':
-        return 'assets/images/calender.png';
+        return 'assets/images/planningE1.png';
+      case 'Je gère le temps de travail de mon équipe':
+        return 'assets/images/tempsD.png';
+      case 'Je consulte les compteurs de mon équipe':
+        return 'assets/images/compteurD.png';
+      case 'Je gère les fins de période d\'essai de mon équipe':
+        return 'assets/images/periodeD.png';
+      case 'Je gère les fins de contrats de mon équipe':
+        return 'assets/images/contratD.png';
+      case 'Je gère les départs de mon équipe':
+        return 'assets/images/leaveD.png';
+      case 'Ma journée':
+        return 'assets/images/journeeD.png';
+      case 'Mon planning hebdomadaire':
+        return 'assets/images/hebdoD.png';
+      case 'Mes attestations':
+        return 'assets/images/attestationD.png';
+      case 'Je suis malade':
+        return 'assets/images/maladeD.png';
+      case 'Mon mode de transport':
+        return 'assets/images/transportD.png';
+      case 'Mon déménagement':
+        return 'assets/images/demeD.png';
       default:
         return 'assets/images/conge2.png';
     }

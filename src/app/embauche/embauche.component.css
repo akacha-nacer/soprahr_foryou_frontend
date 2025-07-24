@@ -487,3 +487,9 @@ h1{
   background-color: #ddd;
   border-radius: 5px;
 }
+
+.error-message {
+  color: red;
+  font-size: 0.875em;
+  margin-top: 0.25em;
+}
