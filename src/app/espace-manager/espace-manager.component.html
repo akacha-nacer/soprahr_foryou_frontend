@@ -25,7 +25,7 @@
            (@notificationSlide.start)="animationStart($event)"
            (@notificationSlide.done)="animationDone($event)">
         <div class="notification-item">Mes tâches (0) <span>24/05/2025</span></div>
-        <div class="notification-item warning" (click)="toggleDemands()" *ngIf="userRole == 'MANAGER' ">
+        <div class="notification-item warning" (click)="toggleDemands()" *ngIf="userRole != 'EMPLOYEE' ">
           Les notifications de mon équipe ({{ notifications.length + natureHeureRequests.length + natureHeureDeletionRequests.length+ natureHeureModificationRequests.length }}) <span>29/05/2025</span>
         </div>
       </div>
@@ -244,20 +244,24 @@
       <input *ngIf="this.userRole == 'MANAGER' " type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheItems()">
       <input *ngIf="this.userRole != 'MANAGER' " type="text" placeholder="Rechercher" class="search-bar" [(ngModel)]="searchTerm" (ngModelChange)="filterDemarcheEmplItems()">
       <div class="demarches-section" *ngIf="this.userRole == 'MANAGER' ">
-        <div class="demarche-item" *ngFor="let item of filteredDemarcheItems">
+        <div class="demarche-item" *ngFor="let item of filteredDemarcheItems" >
+          <div (click)="demarcheItemsRedirection(item)">
           <span class="icon">
             <img [src]="getImageForDemarcheItem(item)" [class.big]="item === 'Je gère le planning de mon équipe'">
           </span>
           {{ item }}
+          </div>
         </div>
       </div>
 
       <div class="demarches-section" *ngIf="this.userRole != 'MANAGER'">
         <div class="demarche-item" *ngFor="let item of filteredDemarcheEmplItems">
+          <div (click)="demarcheItemsRedirection(item)">
           <span class="icon">
             <img [src]="getImageForDemarcheItem(item)" [class.big]="item === 'Je gère le planning de mon équipe'">
           </span>
           {{ item }}
+          </div>
         </div>
       </div>
     </div>

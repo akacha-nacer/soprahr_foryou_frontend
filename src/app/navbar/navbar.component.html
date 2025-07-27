@@ -36,7 +36,7 @@
           <a href="#">Embaucher un candidat <i class="fa bi-window-fullscreen"></i> </a>
           <a href="#">Embauche/Réembauche modélisée <i class="fa bi-window-fullscreen"></i> </a>
           <a href="#">Embauche/Réembauche par étape <i class="fa bi-window-fullscreen"></i> </a>
-          <a href="#" (click)="navigateToPage('/embauche')">Embauche détaillée <i class="fa bi-window-fullscreen"></i> </a>
+          <a  (click)="navigateToPage()">Embauche détaillée <i class="fa bi-window-fullscreen"></i> </a>
           <a href="#">Réembaucher un salarié <i class="fa bi-window-fullscreen"></i> </a>
           <a href="#">Accueillir un expatrié <i class="fa bi-window-fullscreen"></i> </a>
           <a href="#">Corriger les entrées <i class="fa bi-window-fullscreen"></i> </a>
@@ -47,10 +47,10 @@
         <a href="#" routerLink="/link5"><img src="assets/images/preferences.png" class="dropdown-option-icon">Mes préférences <i class="fa fa-caret-right"></i></a>
         <a href="#" routerLink="/link6"><img src="assets/images/accessibility.png" class="dropdown-option-icon"> Accessibilité </a>
         <a href="#" routerLink="/link7"><img src="assets/images/steria.png" class="dropdown-option-icon"> À propos</a>
-        <a href="#" routerLink="/link8" class="logout-option"><img src="assets/images/disconnect.png" class="dropdown-option-icon" (click)="logout()"> Déconnexion</a>
+        <a class="logout-option" (click)="logout()"><img src="assets/images/disconnect.png" class="dropdown-option-icon" > Déconnexion</a>
       </div>
     </div>
-    <a href="#home" routerLink="/espace_manager" class="navbar-options">
+    <a href="#home" routerLink="/4you/mon-espace" class="navbar-options">
       <img src="assets/images/4you_naceur_black.png" alt="Home Icon" class="home-icon">
     </a>
     <div class="toggle-container" (click)="toggleSwitch()" *ngIf="userRole == 'GESTIONNAIRE' ">

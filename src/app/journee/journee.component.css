@@ -850,3 +850,8 @@
   background-color: #ddd;
   border-radius: 5px;
 }
+
+.anomaly-message{
+  color: #D01414;
+  font-size: 15px;
+}

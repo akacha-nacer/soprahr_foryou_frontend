@@ -13,6 +13,8 @@ import {LoginResponseDTO} from '../models/LoginResponseDTO';
 import {NotificationDTO} from '../models/NotificationDTOModel';
 import {AbsenceDeclarationDTO} from '../models/AbsenceDeclarationDTOModel';
 import {JustificationDTO} from '../models/JustificationDTO';
+import {ToastrService} from 'ngx-toastr';
+
 
 @Component({
   selector: 'app-maladie',
@@ -95,7 +97,8 @@ export class MaladieComponent implements OnInit {
     private maladieService: MaladieService,
     private dialog: MatDialog,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
   ) {
     this.notifyForm = this.fb.group({
       message: ['Bonjour,\nJe suis malade aujourd\'hui. Je vous donne plus de précisions après ma visite chez le médecin.\nQ11CONGE01', [Validators.required]],
@@ -451,7 +454,7 @@ export class MaladieComponent implements OnInit {
 
   onSubmit(sectionId: string): void {
     if (!this.employeeId) {
-      alert('Erreur : Aucun ID d\'employé trouvé. Veuillez vous connecter.');
+      this.toastr.error('Veuillez vous connecter.', 'Erreur : Aucun ID d\'employé trouvé');
       return;
     }
 
@@ -482,7 +485,7 @@ export class MaladieComponent implements OnInit {
       });
     } else {
       this.sectionValidationStates[sectionId] = false;
-      console.log(`Formulaire ${sectionId} invalide`);
+      this.toastr.error(`Veuillez remplir tous les champs requis pour ${sectionId}.`, 'Formulaire Invalide');
     }
   }
 
@@ -494,7 +497,7 @@ export class MaladieComponent implements OnInit {
     if (sectionId === 'section1') {
       this.maladieService.saveNotification(this.maladieData.notification, this.employeeId).subscribe({
         next: (response: Notification) => {
-          console.log('Notification submitted:', response);
+          this.toastr.success('Notification soumise avec succès.', 'Succès');
           this.sectionValidationStates[sectionId] = true;
           this.sectionVisibility[sectionId] = false;
           this.isNotificationFormDisabled = true;
@@ -505,15 +508,14 @@ export class MaladieComponent implements OnInit {
           }
         },
         error: (error: any) => {
-          console.error('Error submitting notification:', error);
-          alert('Erreur lors de la soumission de la notification.');
+          this.toastr.error('Erreur lors de la soumission de la notification.', 'Erreur');
           this.sectionValidationStates[sectionId] = false;
         }
       });
     } else if (sectionId === 'section2') {
       this.maladieService.saveAbsenceDeclaration(this.maladieData.absenceDeclaration, this.employeeId).subscribe({
         next: (response: AbsenceDeclaration) => {
-          console.log('Absence declaration submitted:', response);
+          this.toastr.success('Déclaration d\'absence soumise avec succès.', 'Succès');
           this.absenceDeclarationId = response.id;
           this.sectionValidationStates[sectionId] = true;
           this.sectionVisibility[sectionId] = false;
@@ -521,8 +523,7 @@ export class MaladieComponent implements OnInit {
           this.declareForm.disable();
         },
         error: (error: any) => {
-          console.error('Error submitting absence declaration:', error);
-          alert('Erreur lors de la soumission de la déclaration d\'absence.');
+          this.toastr.error('Erreur lors de la soumission de la déclaration d\'absence.', 'Erreur');
           this.sectionValidationStates[sectionId] = false;
         }
       });
@@ -532,16 +533,14 @@ export class MaladieComponent implements OnInit {
           next: (declaration) => {
             if (declaration && declaration.id) {
               this.absenceDeclarationId = declaration.id;
-              console.log(this.absenceDeclarationId);
               this.submitJustification(sectionId);
             } else {
-              alert('Erreur : Aucune déclaration d\'absence active.');
+              this.toastr.error('Aucune déclaration d\'absence active.', 'Erreur');
               this.sectionValidationStates[sectionId] = false;
             }
           },
           error: (error) => {
-            console.error('Error fetching active absence declaration:', error);
-            alert('Erreur : Impossible de récupérer la déclaration d\'absence active.');
+            this.toastr.error('Impossible de récupérer la déclaration d\'absence active.', 'Erreur');
             this.sectionValidationStates[sectionId] = false;
           }
         });
@@ -567,13 +566,12 @@ export class MaladieComponent implements OnInit {
 
     this.maladieService.saveJustification(formData, this.absenceDeclarationId).subscribe({
       next: (response: string) => {
-        console.log('Justification submitted:', response);
+        this.toastr.success('Justificatif soumis avec succès.', 'Succès');
         this.sectionValidationStates[sectionId] = true;
         this.sectionVisibility[sectionId] = false;
       },
       error: (error: any) => {
-        console.error('Error submitting justification:', error);
-        alert('Erreur lors de la soumission de la justification.');
+        this.toastr.error('Erreur lors de la soumission de la justification.', 'Erreur');
         this.sectionValidationStates[sectionId] = false;
       }
     });
@@ -607,7 +605,7 @@ export class MaladieComponent implements OnInit {
     if (this.employeeId) {
       this.maladieService.closeSickLeave(this.employeeId).subscribe({
         next: () => {
-          alert('Succès de la clôturation');
+          this.toastr.success('Arrêt maladie clôturé avec succès.', 'Succès');
           this.resetForms();
           this.isNotificationFormDisabled = false;
           this.isDeclarationFormDisabled = false;
@@ -616,11 +614,11 @@ export class MaladieComponent implements OnInit {
           this.declareForm.enable();
         },
         error: () => {
-          alert('Erreur lors de la clôturation');
+          this.toastr.error('Erreur lors de la clôturation de l\'arrêt maladie.', 'Erreur');
         }
       });
     } else {
-      alert('Erreur lors de la clôturation');
+      this.toastr.error('Erreur lors de la clôturation : Aucun ID d\'employé trouvé.', 'Erreur');
     }
   }
 

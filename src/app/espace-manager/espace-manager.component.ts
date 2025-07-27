@@ -11,6 +11,8 @@ import {NatureHeureModificationRequest} from '../models/journee/NatureHeureModif
 import {JourneeNotificationDTO} from '../models/journee/JourneeNotificationDTO';
 import {NatureHeureDeletionRequest} from '../models/journee/NatureHeureDeletionRequestModel';
 import {NatureHeureDeleteDTO} from '../models/journee/NatureHeureDeleteDTO';
+import {Router} from '@angular/router';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-espace-manager',
@@ -90,12 +92,10 @@ export class EspaceManagerComponent implements OnInit {
   filteredDemarcheItems: string[] = [...this.demarcheItems];
   filteredDemarcheEmplItems: string[] = [...this.demarcheItemsEmpl];
 
-  constructor(private cdr: ChangeDetectorRef, private maladieService: MaladieService, private authService: AuthService,private  journeeService :JourneeService) {}
+  constructor(private cdr: ChangeDetectorRef,private toastr: ToastrService, private maladieService: MaladieService, private authService: AuthService,private  journeeService :JourneeService, private  router:Router) {}
 
   ngOnInit() {
     const storedUser = sessionStorage.getItem('user');
-    console.log('Stored user from sessionStorage:', storedUser);
-
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
@@ -104,12 +104,11 @@ export class EspaceManagerComponent implements OnInit {
         this.userIdentifiant = user.identifiant !== undefined && user.identifiant !== null ? user.identifiant : null;
         this.userPoste = user.poste !== undefined && user.poste !== null ? user.poste : null;
         this.userRole = user.role !== undefined && user.role !== null ? user.role : null;
-        console.log(this.managerId);
       } catch (e) {
-        console.error('Error parsing user from sessionStorage:', e);
+        this.toastr.error('Erreur lors de l’analyse des données utilisateur.', 'Erreur');
       }
     } else {
-      console.warn('No user found in sessionStorage');
+      this.toastr.warning('Aucun utilisateur trouvé dans sessionStorage.', 'Avertissement');
     }
 
     if (this.managerId !== null) {
@@ -119,7 +118,7 @@ export class EspaceManagerComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error fetching profile picture:', err);
+          this.toastr.error('Erreur lors de la récupération de la photo de profil.', 'Erreur');
           this.profilePicture = null;
           this.cdr.detectChanges();
         }
@@ -127,8 +126,6 @@ export class EspaceManagerComponent implements OnInit {
       this.maladieService.getNotificationsWithDeclarations(this.managerId).subscribe({
         next: (notifications) => {
           this.notifications = notifications;
-          console.log('Notifications:', notifications);
-          // Fetch profile picture for each employee
           notifications.forEach(notification => {
             if (notification.employeeId && !this.employeePictures.has(notification.employeeId)) {
               this.authService.getProfilePicture(notification.employeeId).subscribe({
@@ -137,7 +134,7 @@ export class EspaceManagerComponent implements OnInit {
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for employeeId ${notification.employeeId}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération de la photo pour l’employé ${notification.employeeId}.`, 'Erreur');
                   this.employeePictures.set(notification.employeeId, null);
                   this.cdr.detectChanges();
                 }
@@ -147,28 +144,22 @@ export class EspaceManagerComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error fetching notifications:', err);
-          alert('Erreur lors de la récupération des notifications.');
+          this.toastr.error('Erreur lors de la récupération des notifications.', 'Erreur');
         }
       });
 
       this.journeeService.getPendingRequests(this.managerId).subscribe({
         next: (natureHeureRequest) => {
           this.natureHeureRequests = natureHeureRequest;
-          console.log('natureHeureRequests:', natureHeureRequest);
-          console.log('Number of requests:', natureHeureRequest.length);
           natureHeureRequest.forEach((request, index) => {
-            console.log(`Request ${index}:`, request);
-            console.log(`Request ${index} userid:`, request.userid);
             if (request.userid) {
-              console.log("teest:", request.userid);
               this.authService.getProfilePicture(request.userid).subscribe({
                 next: (picture) => {
                   this.employeePictures.set(request.userid, picture);
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération de la photo pour l’utilisateur ${request.userid}.`, 'Erreur');
                   this.employeePictures.set(request.userid, null);
                   this.cdr.detectChanges();
                 }
@@ -176,34 +167,29 @@ export class EspaceManagerComponent implements OnInit {
 
               this.authService.retrieveUser(request.userid).subscribe({
                 next: (user) => {
-                  request.userFirstname = user.firstname ;
-                  request.userlastname = user.lastname ;
-                  request.identifiant = user.identifiant ;
+                  request.userFirstname = user.firstname;
+                  request.userlastname = user.lastname;
+                  request.identifiant = user.identifiant;
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération des informations pour l’utilisateur ${request.userid}.`, 'Erreur');
                   this.employeePictures.set(request.userid, null);
                   this.cdr.detectChanges();
                 }
               });
-            } else {
-              console.warn(`No userid for request ${index}`);
             }
           });
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error fetching natureHeureRequests:', err);
-          alert('Erreur lors de la récupération des demandes de nature d\'heures.');
+          this.toastr.error('Erreur lors de la récupération des demandes de nature d’heures.', 'Erreur');
         }
       });
-
 
       this.journeeService.getPendingModificationRequests(this.managerId).subscribe({
         next: (natureHeureModifRequest) => {
           this.natureHeureModificationRequests = natureHeureModifRequest;
-          console.log(natureHeureModifRequest);
           natureHeureModifRequest.forEach((request, index) => {
             if (request.userid) {
               this.authService.getProfilePicture(request.userid).subscribe({
@@ -212,7 +198,7 @@ export class EspaceManagerComponent implements OnInit {
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération de la photo pour l’utilisateur ${request.userid}.`, 'Erreur');
                   this.employeePictures.set(request.userid, null);
                   this.cdr.detectChanges();
                 }
@@ -220,33 +206,29 @@ export class EspaceManagerComponent implements OnInit {
 
               this.authService.retrieveUser(request.userid).subscribe({
                 next: (user) => {
-                  request.userFirstname = user.firstname ;
-                  request.userlastname = user.lastname ;
-                  request.identifiant = user.identifiant ;
+                  request.userFirstname = user.firstname;
+                  request.userlastname = user.lastname;
+                  request.identifiant = user.identifiant;
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for userid ${request.userid}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération des informations pour l’utilisateur ${request.userid}.`, 'Erreur');
                   this.employeePictures.set(request.userid, null);
                   this.cdr.detectChanges();
                 }
               });
-            } else {
-              console.warn(`No userid for request ${index}`);
             }
           });
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error fetching natureHeureRequests:', err);
-          alert('Erreur lors de la récupération des demandes de nature d\'heures.');
+          this.toastr.error('Erreur lors de la récupération des demandes de modification de nature d’heures.', 'Erreur');
         }
       });
 
       this.journeeService.getPendingDeletionRequests(this.managerId).subscribe({
         next: (natureHeuredelRequest) => {
           this.natureHeureDeletionRequests = natureHeuredelRequest;
-          console.log(natureHeuredelRequest);
           natureHeuredelRequest.forEach((request, index) => {
             if (request.requestedById) {
               this.authService.getProfilePicture(request.requestedById).subscribe({
@@ -255,7 +237,7 @@ export class EspaceManagerComponent implements OnInit {
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for userid ${request.requestedById}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération de la photo pour l’utilisateur ${request.requestedById}.`, 'Erreur');
                   this.employeePictures.set(request.requestedById, null);
                   this.cdr.detectChanges();
                 }
@@ -263,49 +245,41 @@ export class EspaceManagerComponent implements OnInit {
 
               this.authService.retrieveUser(request.requestedById).subscribe({
                 next: (user) => {
-                  request.userFirstname = user.firstname ;
-                  request.userlastname = user.lastname ;
-                  request.identifiant = user.identifiant ;
+                  request.userFirstname = user.firstname;
+                  request.userlastname = user.lastname;
+                  request.identifiant = user.identifiant;
                   this.cdr.detectChanges();
                 },
                 error: (err) => {
-                  console.error(`Error fetching picture for userid ${request.requestedById}:`, err);
+                  this.toastr.error(`Erreur lors de la récupération des informations pour l’utilisateur ${request.requestedById}.`, 'Erreur');
                   this.employeePictures.set(request.requestedById, null);
                   this.cdr.detectChanges();
                 }
               });
-            } else {
-              console.warn(`No userid for request ${index}`);
             }
           });
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error fetching natureHeureRequests:', err);
-          alert('Erreur lors de la récupération des demandes de nature d\'heures.');
+          this.toastr.error('Erreur lors de la récupération des demandes de suppression de nature d’heures.', 'Erreur');
         }
       });
-
-
     } else {
-      console.warn('Cannot fetch notifications: managerId is null');
+      this.toastr.warning('Impossible de récupérer les données : ID du manager non défini.', 'Avertissement');
     }
-
-
-
   }
 
-  refuser_fermer_Notif(notification : NotificationDTO){
+  refuser_fermer_Notif(notification: NotificationDTO) {
     if (this.isAnimating) return;
     this.maladieService.refuseNotification(notification.id).subscribe({
       next: () => {
         notification.isValidated = true;
+        this.toastr.success('Notification refusée avec succès.', 'Succès');
         this.cdr.detectChanges();
         location.reload();
       },
       error: (err) => {
-        console.error('Error declining notification:', err);
-        alert('Erreur lors du refus de la notification.');
+        this.toastr.error('Erreur lors du refus de la notification.', 'Erreur');
       }
     });
   }
@@ -345,32 +319,32 @@ export class EspaceManagerComponent implements OnInit {
   }
 
 
+
   approveAddRequest(request: NatureHeureRequest) {
     if (this.isAnimating || request.status !== 'PENDING') return;
     this.journeeService.approveNatureHeureRequest(request.id!, this.managerId).subscribe({
       next: () => {
         request.status = 'APPROVED';
+        this.toastr.success('Demande de nature d’heure approuvée avec succès.', 'Succès');
         this.cdr.markForCheck();
-        alert('Demande approuvée avec succès.');
       },
       error: (err) => {
-        console.error('Error approving request:', err);
-        alert('Erreur lors de l\'approbation de la demande.');
+        this.toastr.error('Erreur lors de l’approbation de la demande de nature d’heure.', 'Erreur');
       }
     });
   }
+
 
   approveModifRequest(request: JourneeNotificationDTO) {
     if (this.isAnimating || request.status !== 'PENDING') return;
     this.journeeService.approveModificationRequest(request.id!, this.managerId).subscribe({
       next: () => {
         request.status = 'APPROVED';
+        this.toastr.success('Demande de modification approuvée avec succès.', 'Succès');
         this.cdr.markForCheck();
-        alert('Demande approuvée avec succès.');
       },
       error: (err) => {
-        console.error('Error approving request:', err);
-        alert('Erreur lors de l\'approbation de la demande.');
+        this.toastr.error('Erreur lors de l’approbation de la demande de modification.', 'Erreur');
       }
     });
   }
@@ -381,12 +355,11 @@ export class EspaceManagerComponent implements OnInit {
       next: () => {
         request.approved = true;
         request.rejected = false;
+        this.toastr.success('Demande de suppression approuvée avec succès.', 'Succès');
         this.cdr.markForCheck();
-        alert('Demande approuvée avec succès.');
       },
       error: (err) => {
-        console.error('Error approving request:', err);
-        alert('Erreur lors de l\'approbation de la demande.');
+        this.toastr.error('Erreur lors de l’approbation de la demande de suppression.', 'Erreur');
       }
     });
   }
@@ -397,13 +370,11 @@ export class EspaceManagerComponent implements OnInit {
       next: () => {
         request.approved = false;
         request.rejected = true;
+        this.toastr.success('Demande de suppression rejetée avec succès.', 'Succès');
         this.cdr.markForCheck();
-        console.log(" id : ",request.id);
-        alert('Demande rejetée avec succès.');
       },
       error: (err) => {
-        console.error('Error rejecting request:', err);
-        alert('Erreur lors du rejet de la demande.');
+        this.toastr.error('Erreur lors du rejet de la demande de suppression.', 'Erreur');
       }
     });
   }
@@ -414,13 +385,11 @@ export class EspaceManagerComponent implements OnInit {
     this.journeeService.rejectModificationRequest(request.id!, this.managerId).subscribe({
       next: () => {
         request.status = 'REJECTED';
+        this.toastr.success('Demande de modification rejetée avec succès.', 'Succès');
         this.cdr.markForCheck();
-        console.log(" id : ",request.id);
-        alert('Demande rejetée avec succès.');
       },
       error: (err) => {
-        console.error('Error rejecting request:', err);
-        alert('Erreur lors du rejet de la demande.');
+        this.toastr.error('Erreur lors du rejet de la demande de modification.', 'Erreur');
       }
     });
   }
@@ -429,12 +398,11 @@ export class EspaceManagerComponent implements OnInit {
     this.journeeService.rejectNatureHeureRequest(request.id!, this.managerId).subscribe({
       next: () => {
         request.status = 'REJECTED';
+        this.toastr.success('Demande de nature d’heure rejetée avec succès.', 'Succès');
         this.cdr.markForCheck();
-        alert('Demande rejetée avec succès.');
       },
       error: (err) => {
-        console.error('Error rejecting request:', err);
-        alert('Erreur lors du rejet de la demande.');
+        this.toastr.error('Erreur lors du rejet de la demande de nature d’heure.', 'Erreur');
       }
     });
   }
@@ -576,8 +544,7 @@ export class EspaceManagerComponent implements OnInit {
     if (this.isAnimating) return;
 
     if (!notification.absenceDeclarations || notification.absenceDeclarations.length === 0) {
-      console.error('No absence declarations found for notification:', notification);
-      alert('Erreur : Aucune déclaration d\'absence associée.');
+      this.toastr.error('Aucune déclaration d’absence associée.', 'Erreur');
       return;
     }
 
@@ -586,11 +553,11 @@ export class EspaceManagerComponent implements OnInit {
       next: () => {
         notification.absenceDeclarations[0].isValidated = true;
         notification.isValidated = true;
+        this.toastr.success('Déclaration validée avec succès.', 'Succès');
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error validating declaration:', err);
-        alert('Erreur lors de la validation de la déclaration.');
+        this.toastr.error('Erreur lors de la validation de la déclaration.', 'Erreur');
       }
     });
   }
@@ -619,6 +586,19 @@ export class EspaceManagerComponent implements OnInit {
 
   getEmployeePicture(employeeId: number | null): string | null {
     return employeeId ? this.employeePictures.get(employeeId) || null : null;
+  }
+
+
+  demarcheItemsRedirection(item: string){
+      switch (item){
+        case  "Ma journée" :
+          return this.router.navigate(['/4you/journee']);
+        case  "Je suis malade" :
+          return this.router.navigate(['/4you/maladie']);
+        default:
+          return this.router.navigate(['/4you/mon-espace']);
+      }
+
   }
 
 

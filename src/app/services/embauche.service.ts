@@ -16,6 +16,11 @@ export class EmbaucheService {
     return this.http.post(`${this.apiUrl}/save_emb`, dossier, { responseType: 'text' });
   }
 
+  getFieldExplanation(fieldName: string): Observable<string> {
+    return this.http.get(`${this.apiUrl}/api/field-explanation`, { params: { fieldName }, responseType: 'text' });
+  }
+
+
   RetrieveDepartementNaiss(): Observable<DepartementNaiss[]> {
     return this.http.get<DepartementNaiss[]>(`${this.apiUrl}/get_dep`);
   }

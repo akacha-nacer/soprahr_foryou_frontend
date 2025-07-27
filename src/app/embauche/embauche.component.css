@@ -128,6 +128,7 @@
 
 .action-btn {
   padding: 8px 16px;
+  margin-bottom: 10px;
   border: none;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
   border-radius: 20px;
@@ -493,3 +494,75 @@ h1{
   font-size: 0.875em;
   margin-top: 0.25em;
 }
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  margin-left: 10px;
+}
+.toggle-switch {
+  width: 60px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 15px;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+.toggle-on {
+  background-color: #4a90e2;
+}
+.toggle-circle {
+  width: 26px;
+  height: 26px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+}
+.toggle-slide-on {
+  transform: translateX(30px);
+}
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.toggle-text {
+  margin-left: 10px;
+  font-size: 16px;
+}
+.suggestions-section {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  min-height: 100px;
+}
+.suggestions-section h3 {
+  margin-top: 10px;
+  margin-bottom: 50px;
+  font-size: 20px;
+  color: #333;
+}
+.suggestions-section p {
+  margin: 10px 0;
+  font-size: 17px;
+  color: #555;
+  white-space: pre-wrap;
+  font-family: OpenSans;
+}
+
+.toggle-icon {
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+
+

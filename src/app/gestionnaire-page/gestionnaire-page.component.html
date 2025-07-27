@@ -1,0 +1,118 @@
+<div class="dashboard-container">
+
+<div class="header-section">
+  <div class="background-image">
+    <img src="assets/images/bg_nacer.png" alt="Background Image" class="header-bg">
+  </div>
+  <div class="user-info-container">
+    <div class="user-info-section">
+      <div class="circular-image-placeholder">
+        <img *ngIf="!profilePicture" class="img1" src="assets/images/blank-avatar-women.jpg">
+        <img *ngIf="profilePicture" class="img1" [src]="profilePicture">
+      </div>
+      <div class="user-details">
+        <span class="nameId" *ngIf="userFirstname && userIdentifiant">{{userFirstname}} {{userIdentifiant}}</span>
+        <span class="position1" *ngIf="userPoste">{{userPoste}}</span>
+        <span class="folder1">0 <img src="assets/images/folder.png" alt="Profile Picture" class="folderIcon"></span>
+      </div>
+    </div>
+  </div>
+  <img src="assets/images/arrow.png" class="round-button" alt="Arrow Button">
+</div>
+  <div class="main-content">
+  <!-- Activités Card -->
+  <div class="card activities-card">
+    <div class="card-header">
+      <h2 class="card-title">ACTIVITÉS</h2>
+    </div>
+    <div class="card-content">
+      <div class="top-row">
+        <div class="activity-section">
+          <div class="section-header">
+            <span class="section-title">MES ACTIVITÉS</span>
+            <span class="section-count">0</span>
+          </div>
+          <div class="icon-row">
+            <div class="icon red-icon">
+              <div class="icon-triangle"></div>
+            </div>
+            <div class="icon">
+              <div class="icon-flag"></div>
+            </div>
+            <div class="icon">
+              <div class="icon-warning"></div>
+            </div>
+            <div class="icon">
+              <div class="icon-comment"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="activity-section">
+          <div class="section-header">
+            <span class="section-title">ACTIVITÉS NON ATTRIBUÉES</span>
+            <span class="section-count">3</span>
+          </div>
+          <div class="icon-row">
+            <div class="icon red-icon">
+              <div class="icon-triangle"></div>
+            </div>
+            <div class="icon">
+              <div class="icon-flag"></div>
+            </div>
+            <div class="icon">
+              <div class="icon-warning"></div>
+            </div>
+            <div class="icon">
+              <div class="icon-comment"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="activity-section bottom-section">
+        <div class="section-header">
+          <span class="section-title">ACTIVITÉS ATTRIBUÉES AUX AUTRES</span>
+          <span class="section-count">0</span>
+        </div>
+        <div class="icon-row">
+          <div class="icon red-icon">
+            <div class="icon-triangle"></div>
+          </div>
+          <div class="icon">
+            <div class="icon-flag"></div>
+          </div>
+          <div class="icon">
+            <div class="icon-warning"></div>
+          </div>
+          <div class="icon">
+            <div class="icon-comment"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NIR À CONTRÔLER Card -->
+  <div class="card control-card">
+    <div class="card-header">
+      <h2 class="card-title">NIR À CONTRÔLER</h2>
+    </div>
+    <div class="center-section">
+      <div class="center-number">22</div>
+      <div class="center-text">Dossier(s)</div>
+    </div>
+  </div>
+
+  <!-- HABILITATIONS À ÉCHÉANCE Card -->
+  <div class="card qualifications-card">
+    <div class="card-header">
+      <h2 class="card-title">HABILITATIONS À ÉCHÉANCE</h2>
+    </div>
+    <div class="center-section">
+      <div class="center-number">22</div>
+      <div class="center-text">Dossier(s)</div>
+    </div>
+  </div>
+</div>
+</div>

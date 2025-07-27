@@ -155,6 +155,11 @@ export class NavbarComponent implements OnInit{
 
   toggleSwitch() {
     this.isToggleOn = !this.isToggleOn;
+    if (!this.isToggleOn){
+      this.router.navigate(['/4you/mon-espace']);
+    }else {
+      this.router.navigate(['/4you/espace-gestionnaire']);
+    }
     console.log('Toggle switched:', this.isToggleOn);
   }
 
@@ -211,14 +216,14 @@ export class NavbarComponent implements OnInit{
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.authServcie.logout();
-        this.router.navigate(['/auth']);
+        this.router.navigate(['/4you/auth']);
         sessionStorage.clear();
       }
     });
   }
 
-  navigateToPage(route: string) {
-    this.router.navigate([route]);
+  navigateToPage() {
+    this.router.navigate(['/4you/embauche']);
 
     this.isDropdownOpen = false;
     this.isSubDropdownOpen = false;

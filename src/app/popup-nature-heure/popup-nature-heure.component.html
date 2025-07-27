@@ -37,11 +37,29 @@
       </div>
     </div>
     <div *ngIf="data.type === 'detail'">
+      <div class="form-row">
+        <div class="form-field">
       <p><strong>Nature:</strong> {{ natureHeure.nature_heure || 'N/A' }}</p>
-      <p><strong>Début:</strong> {{ natureHeure.heureDebut || 'N/A' }}</p>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+        <p><strong>Début:</strong> {{ natureHeure.heureDebut || 'N/A' }}</p>
+        </div>
+          <div class="form-field">
       <p><strong>Fin:</strong> {{ natureHeure.heureFin || 'N/A' }}</p>
-      <p><strong>Durée:</strong> {{ natureHeure.duree || 'N/A' }}</p>
+          </div>
+      </div>
+      <div class="form-row">
+      <div class="form-field">
+        <p><strong>Durée:</strong> {{ natureHeure.duree || 'N/A' }}</p>
+      </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field">
       <p><strong>Commentaire:</strong> {{ natureHeure.commentaire || 'N/A' }}</p>
+        </div>
+      </div>
     </div>
   </div>
   <br>

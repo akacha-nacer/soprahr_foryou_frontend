@@ -141,6 +141,7 @@
   font-size: 14px;
   color: black;
   transition: background-color 0.3s ease;
+  margin-bottom: 10px;
 }
 
 .action-btn.enabled {
@@ -250,7 +251,7 @@
 .form-field label {
   font-size: 14px;
   color: #666;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
   font-family: OpenSans, sans-serif;
 }
 
@@ -349,6 +350,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 15px;
+  margin-top: 5px;
 }
 
 .manager-photo {

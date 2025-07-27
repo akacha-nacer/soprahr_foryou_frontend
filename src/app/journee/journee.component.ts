@@ -15,6 +15,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { NatureHeureRequest } from '../models/journee/NatureHeureRequestModel';
 import { NatureHeureModificationRequest } from '../models/journee/NatureHeureModificationRequestModel';
 import { NatureHeureDeletionRequest } from '../models/journee/NatureHeureDeletionRequestModel';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-journee',
@@ -95,7 +96,8 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     private fb: FormBuilder,
     public dialog: MatDialog,
     public journeeService: JourneeService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private toastr: ToastrService
   ) {
     this.natureHeuresForm = this.fb.group({
       date: ['', [Validators.required]],
@@ -764,13 +766,18 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onSubmit(sectionId: string): void {
+    if (!this.userId) {
+      this.toastr.error('Veuillez vous connecter.', 'Erreur : Aucun ID d\'utilisateur trouvé');
+      return;
+    }
+
     if (sectionId === 'section3' && this.natureHeuresForm.valid) {
       this.sectionValidationStates[sectionId] = true;
-      console.log(`Formulaire ${sectionId} soumis avec succès :`, this.natureHeuresForm.value);
+      this.toastr.success(`Formulaire ${sectionId} soumis avec succès.`, 'Succès');
       this.sectionVisibility[sectionId] = false;
     } else {
       this.sectionValidationStates[sectionId] = false;
-      console.log(`Formulaire ${sectionId} invalide`);
+      this.toastr.error(`Veuillez remplir tous les champs requis pour ${sectionId}.`, 'Formulaire Invalide');
     }
   }
 
@@ -782,11 +789,10 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(formResult => {
       if (formResult && this.userId) {
         if (!formResult.nature_heure || !formResult.heureDebut || !formResult.heureFin) {
-          console.error('Validation failed: Missing required fields');
+          this.toastr.error('Champs requis manquants : nature, heure de début ou heure de fin.', 'Erreur');
           return;
         }
         formResult.date = this.selectedDate.toISOString().split('T')[0];
-        console.log('Form result before saving:', formResult);
         const confirmDialogRef = this.dialog.open(PopupConfMaladieComponent, {
           data: {
             message: this.userRole === 'MANAGER'
@@ -798,7 +804,11 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
           if (confirmResult) {
             this.journeeService.saveNatureHeure(formResult, this.userId!).subscribe({
               next: (response) => {
-                console.log('NatureHeure saved:', response);
+                if (this.userRole === 'EMPLOYEE') {
+                  this.toastr.success(`Demande d'ajout pour "${formResult.nature_heure}" envoyée avec succès.`, 'Succès');}else {
+                  this.toastr.success(`Nature d’heure "${formResult.nature_heure}" ajoutée avec succès.`, 'Succès');
+
+                }
                 this.journeeService.getNatureHeures(this.userId!)
                   .subscribe({
                     next: (value) => {
@@ -815,12 +825,12 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
                       }
                     },
                     error: (error) => {
-                      console.error('Error fetching nature heures:', error);
+                      this.toastr.error('Erreur lors de la récupération des natures d’heures.', 'Erreur');
                     }
                   });
               },
               error: (error) => {
-                console.error('Error saving natureHeure:', error);
+                this.toastr.error(`Erreur lors de l’ajout de la nature d’heure "${formResult.nature_heure}".`, 'Erreur');
               }
             });
           }
@@ -841,7 +851,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openEdit(natureHeure: NatureHeure): void {
     if (!natureHeure.id) {
-      console.error('Invalid natureHeure ID');
+      this.toastr.error('ID de nature d’heure invalide.', 'Erreur');
       return;
     }
     const dialogRef = this.dialog.open(PopupNatureHeureComponent, {
@@ -850,7 +860,7 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(formResult => {
       if (formResult && this.userId) {
         if (!formResult.nature_heure || !formResult.heureDebut || !formResult.heureFin || !formResult.date) {
-          console.error('Validation failed: Missing required fields');
+          this.toastr.error('Champs requis manquants : nature, heure de début, heure de fin ou date.', 'Erreur');
           return;
         }
         const confirmDialogRef = this.dialog.open(PopupConfMaladieComponent, {
@@ -864,7 +874,10 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
           if (confirmResult) {
             this.journeeService.updateNatureHeure(natureHeure.id!, formResult, this.userId!).subscribe({
               next: (response) => {
-                console.log('NatureHeure updated:', response);
+                if (this.userRole === 'EMPLOYEE') {
+                  this.toastr.success(`Demande de  modification pour "${formResult.nature_heure}" envoyée avec succès.`, 'Succès');}else {
+                  this.toastr.success(`Nature d’heure "${formResult.nature_heure}" modifiée avec succès.`, 'Succès');
+                }
                 this.journeeService.getNatureHeures(this.userId!)
                   .subscribe({
                     next: (value) => {
@@ -881,12 +894,12 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
                       }
                     },
                     error: (error) => {
-                      console.error('Error fetching nature heures:', error);
+                      this.toastr.error('Erreur lors de la récupération des natures d’heures.', 'Erreur');
                     }
                   });
               },
               error: (error) => {
-                console.error('Error updating natureHeure:', error);
+                this.toastr.error(`Erreur lors de la modification de la nature d’heure "${formResult.nature_heure}".`, 'Erreur');
               }
             });
           }
@@ -897,11 +910,11 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   deleteItem(natureHeure: NatureHeure): void {
     if (!natureHeure.id || !this.userId) {
-      console.error('Invalid natureHeure ID or user ID');
+      this.toastr.error('ID de nature d’heure ou d’utilisateur invalide.', 'Erreur');
       return;
     }
     const message = this.userRole === 'MANAGER'
-      ? `Voulez-vous vraiment supprimer la nature d'heure "${natureHeure.nature_heure}"?`
+      ? `Voulez-vous vraiment supprimer la nature d'heure "${natureHeure.nature_heure}" ?`
       : `Voulez-vous soumettre une demande de suppression pour la nature d'heure "${natureHeure.nature_heure}" ?`;
     const dialogRef = this.dialog.open(PopupConfMaladieComponent, {
       data: { message }
@@ -911,12 +924,13 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.userRole === 'MANAGER') {
           this.journeeService.deleteNatureHeure(natureHeure.id!, this.userId).subscribe({
             next: (response) => {
-              console.log('NatureHeure deleted:', response);
+              if (this.userRole === 'MANAGER') {
+              this.toastr.success(`Nature d’heure "${natureHeure.nature_heure}" supprimée avec succès.`, 'Succès');}
               this.journeeService.getNatureHeures(this.userId!)
                 .subscribe({
                   next: (value) => {
                     this.allNatureHeures = value;
-                    this.filteredNatureHeures = [...value]; // Update filtered data
+                    this.filteredNatureHeures = [...value];
                     this.updateNatureHeuresPagination();
                     this.cdr.detectChanges();
                     if (this.sectionVisibility['section5'] && this.timeline) {
@@ -930,19 +944,23 @@ export class JourneeComponent implements OnInit, AfterViewInit, OnDestroy {
                     }
                   },
                   error: (error) => {
-                    console.error('Error fetching nature heures:', error);
+                    this.toastr.error('Erreur lors de la récupération des natures d’heures.', 'Erreur');
                   }
                 });
             },
-            error: (error) => console.error('Error deleting natureHeure:', error)
+            error: (error) => {
+              this.toastr.error(`Erreur lors de la suppression de la nature d’heure "${natureHeure.nature_heure}".`, 'Erreur');
+            }
           });
         } else {
           this.journeeService.requestNatureHeureDeletion(natureHeure.id!, this.userId).subscribe({
             next: (response) => {
-              console.log('Deletion request submitted:', response);
+              this.toastr.success(`Demande de suppression pour "${natureHeure.nature_heure}" soumise avec succès.`, 'Succès');
               this.cdr.detectChanges();
             },
-            error: (error) => console.error('Error submitting deletion request:', error)
+            error: (error) => {
+              this.toastr.error(`Erreur lors de la soumission de la demande de suppression pour "${natureHeure.nature_heure}".`, 'Erreur');
+            }
           });
         }
       }

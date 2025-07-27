@@ -4,7 +4,7 @@
   padding: 24px;
   position: relative;
   max-width: 80vw; /* 90% de la largeur de l'écran */
-  min-width: 300px; /* Largeur minimale pour éviter qu'il ne devienne trop petit */
+  min-width: 450px; /* Largeur minimale pour éviter qu'il ne devienne trop petit */
   margin: 0 auto; /* Centrage horizontal */
 }
 

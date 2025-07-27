@@ -1,17 +1,28 @@
 <div class="embauche-container">
   <!-- Left Section (Main Container) -->
   <div class="main-section">
+    <!-- Toggle Button for Help Mode -->
+
+
     <!-- Description Section -->
     <div class="description-section">
       <p>Cette page vous permet de créer un dossier d’embauche pour un nouvel employé. Commencez par remplir le formulaire initial ci-dessous pour enregistrer les informations de base. Une fois soumis, vous pourrez compléter les sections supplémentaires pour finaliser le dossier. Vous pouvez également recommencer ou quitter à tout moment.</p>
       <div class="action-buttons">
         <button class="action-btn enabled" (click)="onFinalSubmit()" [disabled]="!areAllSectionsValid()">Valider le dossier</button>
-        <button class="action-btn enabled">Recommencer</button>
+        <button class="action-btn enabled" (click)="resetForms()">Recommencer</button>
         <button class="action-btn enabled" (click)="resetForms()">Quitter</button>
       </div>
       <hr>
     </div>
     <div class="form-placeholder">
+      <div class="toggle-container" (click)="toggleSwitch()" >
+        <div class="toggle-switch" [ngClass]="{'toggle-on': isHelpModeActive}">
+          <div class="toggle-circle" [@slideToggle]="isHelpModeActive ? 'on' : 'off'">
+
+          </div>
+        </div>
+        <span class="toggle-text">{{ isHelpModeActive ? 'Mode : Aide ' : 'Mode : Par défaut' }}</span>
+      </div>
       <ng-container *ngIf="viewMode === 'form'">
         <!-- Form Section 1: Créer le dossier d'une personne -->
         <div class="form-section" sectionId="section1">
@@ -38,7 +49,7 @@
                   </div>
                   <div class="form-field">
                     <label class="label1">Code Société</label>
-                    <input type="text" formControlName="codeSociete" placeholder="Code société" required>
+                    <input type="text" formControlName="codeSociete" placeholder="Code société" required (click)="onFieldClick('codeSociete')">
                   </div>
                 </div>
                 <div class="form-row">
@@ -48,7 +59,7 @@
                   </div>
                   <div class="form-field">
                     <label>Matricule Salarié</label>
-                    <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required>
+                    <input type="text" formControlName="matriculeSalarie" placeholder="Matricule salarié" required (click)="onFieldClick('matriculeSalarie')">
                   </div>
                 </div>
               </div>
@@ -86,7 +97,7 @@
                   </div>
                   <div class="form-field">
                     <label>Nom usuel</label>
-                    <input type="text" formControlName="nomUsuel" required>
+                    <input type="text" formControlName="nomUsuel" required (click)="onFieldClick('nomUsuel')">
                     <div class="error-message" *ngIf="individualInfoForm.get('nomUsuel')?.invalid && (individualInfoForm.get('nomUsuel')?.dirty || individualInfoForm.get('nomUsuel')?.touched)">
                       <div *ngIf="individualInfoForm.get('nomUsuel')?.errors?.['required']">Le nom usuel est requis.</div>
                       <div *ngIf="individualInfoForm.get('nomUsuel')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
@@ -96,7 +107,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Nom patronymique</label>
-                    <input type="text" formControlName="nomPatronymique" required>
+                    <input type="text" formControlName="nomPatronymique" required (click)="onFieldClick('nomPatronymique')">
                     <div class="error-message" *ngIf="individualInfoForm.get('nomPatronymique')?.invalid && (individualInfoForm.get('nomPatronymique')?.dirty || individualInfoForm.get('nomPatronymique')?.touched)">
                       <div *ngIf="individualInfoForm.get('nomPatronymique')?.errors?.['required']">Le nom patronymique est requis.</div>
                       <div *ngIf="individualInfoForm.get('nomPatronymique')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
@@ -104,7 +115,7 @@
                   </div>
                   <div class="form-field">
                     <label>Prénom</label>
-                    <input type="text" formControlName="prenom" required>
+                    <input type="text" formControlName="prenom" required (click)="onFieldClick('prenom')">
                     <div class="error-message" *ngIf="individualInfoForm.get('prenom')?.invalid && (individualInfoForm.get('prenom')?.dirty || individualInfoForm.get('prenom')?.touched)">
                       <div *ngIf="individualInfoForm.get('prenom')?.errors?.['required']">Le prénom est requis.</div>
                       <div *ngIf="individualInfoForm.get('prenom')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
@@ -114,7 +125,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>2ème prénom</label>
-                    <input type="text" formControlName="deuxiemePrenom" required>
+                    <input type="text" formControlName="deuxiemePrenom" (click)="onFieldClick('deuxiemePrenom')">
                     <div class="error-message" *ngIf="individualInfoForm.get('deuxiemePrenom')?.invalid && (individualInfoForm.get('deuxiemePrenom')?.dirty || individualInfoForm.get('deuxiemePrenom')?.touched)">
                       <div *ngIf="individualInfoForm.get('deuxiemePrenom')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
                     </div>
@@ -131,7 +142,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Numéro INSEE</label>
-                    <input type="text" formControlName="numeroInsee" required>
+                    <input type="text" formControlName="numeroInsee" required (click)="onFieldClick('numeroInsee')">
                   </div>
                 </div>
                 <br>
@@ -147,7 +158,7 @@
                   </div>
                   <div class="form-field">
                     <label>Ville de naissance</label>
-                    <input type="text" formControlName="villeNaissance" required>
+                    <input type="text" formControlName="villeNaissance" required (click)="onFieldClick('villeNaissance')">
                     <div class="error-message" *ngIf="individualInfoForm.get('villeNaissance')?.invalid && (individualInfoForm.get('villeNaissance')?.dirty || individualInfoForm.get('villeNaissance')?.touched)">
                       <div *ngIf="individualInfoForm.get('villeNaissance')?.errors?.['required']">La ville de naissance est requise.</div>
                       <div *ngIf="individualInfoForm.get('villeNaissance')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
@@ -278,21 +289,21 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Complément d'adresse 1</label>
-                    <input type="text" formControlName="complement1" required>
+                    <input type="text" formControlName="complement1" required (click)="onFieldClick('complement1')">
                   </div>
                   <div class="form-field">
                     <label>Complément d'adresse 2</label>
-                    <input type="text" formControlName="complement2" required>
+                    <input type="text" formControlName="complement2" required (click)="onFieldClick('complement2')">
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>Lieu-dit</label>
-                    <input type="text" formControlName="lieuDit" required>
+                    <input type="text" formControlName="lieuDit" required (click)="onFieldClick('lieuDit')">
                   </div>
                   <div class="form-field">
                     <label>Code postal</label>
-                    <input type="text" formControlName="codePostal" required>
+                    <input type="text" formControlName="codePostal" required (click)="onFieldClick('codePostal')">
                     <div class="error-message" *ngIf="addressForm.get('codePostal')?.invalid && (addressForm.get('codePostal')?.dirty || addressForm.get('codePostal')?.touched)">
                       <div *ngIf="addressForm.get('codePostal')?.errors?.['required']">Le code postal est requis.</div>
                       <div *ngIf="addressForm.get('codePostal')?.errors?.['pattern']">5 chiffres requis.</div>
@@ -302,7 +313,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Commune</label>
-                    <input type="text" formControlName="commune" required>
+                    <input type="text" formControlName="commune" required (click)="onFieldClick('commune')">
                     <div class="error-message" *ngIf="addressForm.get('commune')?.invalid && (addressForm.get('commune')?.dirty || addressForm.get('commune')?.touched)">
                       <div *ngIf="addressForm.get('commune')?.errors?.['required']">La commune est requise.</div>
                       <div *ngIf="addressForm.get('commune')?.errors?.['pattern']">Lettres, espaces ou tirets uniquement.</div>
@@ -310,7 +321,7 @@
                   </div>
                   <div class="form-field">
                     <label>Code INSEE commune</label>
-                    <input type="text" formControlName="codeInseeCommune" required>
+                    <input type="text" formControlName="codeInseeCommune" required (click)="onFieldClick('codeInseeCommune')">
                   </div>
                 </div>
                 <br>
@@ -322,7 +333,7 @@
                   </div>
                   <div class="form-field">
                     <label>Voie (numéro)</label>
-                    <input type="text" formControlName="numeroVoie" required>
+                    <input type="text" formControlName="numeroVoie" required (click)="onFieldClick('numeroVoie')">
                   </div>
                 </div>
               </div>
@@ -354,9 +365,9 @@
                     <label>Catégorie d'entrée</label>
                     <select formControlName="categorieEntree" required>
                       <option value="" disabled selected>Sélectionnez une categorie</option>
-                      <option value="STANDA" selected>Standard</option>
-                      <option value="ACTIVE" selected>En activité</option>
-                      <option value="TECNIC" selected>Catégorie technique</option>
+                      <option value="STANDA">Standard</option>
+                      <option value="ACTIVE">En activité</option>
+                      <option value="TECNIC">Catégorie technique</option>
                     </select>
                   </div>
                   <div class="form-field">
@@ -369,17 +380,17 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Poste</label>
-                    <input type="text" formControlName="poste" required>
+                    <input type="text" formControlName="poste" required (click)="onFieldClick('poste')">
                   </div>
                   <div class="form-field">
                     <label>Emploi</label>
-                    <input type="text" formControlName="emploi" required>
+                    <input type="text" formControlName="emploi" required (click)="onFieldClick('emploi')">
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>Unité organisationnelle</label>
-                    <input type="text" formControlName="uniteOrganisationnelle" required>
+                    <input type="text" formControlName="uniteOrganisationnelle" required (click)="onFieldClick('uniteOrganisationnelle')">
                   </div>
                 </div>
                 <br>
@@ -389,8 +400,8 @@
                     <label>Calendrier de paie</label>
                     <select formControlName="calendrierPaie" required>
                       <option value="" disabled selected>Sélectionnez un calendrier</option>
-                      <option value="CSN" selected>Calendrier standard national</option>
-                      <option value="CAM" selected>Calendrier Alsace-Moselle</option>
+                      <option value="CSN">Calendrier standard national</option>
+                      <option value="CAM">Calendrier Alsace-Moselle</option>
                     </select>
                   </div>
                 </div>
@@ -399,7 +410,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Code</label>
-                    <input type="text" formControlName="codeCycle" required>
+                    <input type="text" formControlName="codeCycle" required (click)="onFieldClick('codeCycle')">
                   </div>
                   <div class="form-field">
                     <label>Indexé</label>
@@ -415,9 +426,9 @@
                     <label>Modalité de gestion de temps</label>
                     <select formControlName="modaliteGestion" required>
                       <option value="" disabled selected>Sélectionnez une modalité</option>
-                      <option value="cycle" selected>Cycle</option>
-                      <option value="horaire" selected>Horaire individualisé par tâche</option>
-                      <option value="cycleHoraire" selected>Cycle+Horaire individualisé par tâche</option>
+                      <option value="cycle">Cycle</option>
+                      <option value="horaire">Horaire individualisé par tâche</option>
+                      <option value="cycleHoraire">Cycle+Horaire individualisé par tâche</option>
                     </select>
                   </div>
                 </div>
@@ -452,7 +463,7 @@
                   </div>
                   <div class="form-field">
                     <label>Accord entreprise</label>
-                    <input type="text" formControlName="accordEntreprise" required>
+                    <input type="text" formControlName="accordEntreprise" required (click)="onFieldClick('accordEntreprise')">
                   </div>
                 </div>
                 <div class="form-row">
@@ -464,16 +475,16 @@
                     <label>Type de paie</label>
                     <select formControlName="typePaie" required>
                       <option value="" disabled selected>Sélectionnez un type de paie</option>
-                      <option value="3" selected>Mensuel</option>
-                      <option value="4" selected>Horaire</option>
-                      <option value="C" selected>Cachet isolé</option>
-                      <option value="D" selected>Cachet groupés</option>
-                      <option value="F" selected>Forfait jour cadres</option>
-                      <option value="G" selected>Forfait heure</option>
-                      <option value="I" selected>Paie à la journée</option>
-                      <option value="P" selected>Paie à la pige</option>
-                      <option value="T" selected>Paie à la tache</option>
-                      <option value="V" selected>Paie à la vacation</option>
+                      <option value="3">Mensuel</option>
+                      <option value="4">Horaire</option>
+                      <option value="C">Cachet isolé</option>
+                      <option value="D">Cachet groupés</option>
+                      <option value="F">Forfait jour cadres</option>
+                      <option value="G">Forfait heure</option>
+                      <option value="I">Paie à la journée</option>
+                      <option value="P">Paie à la pige</option>
+                      <option value="T">Paie à la tâche</option>
+                      <option value="V">Paie à la vacation</option>
                     </select>
                   </div>
                 </div>
@@ -484,18 +495,18 @@
                     <label>Régime spécial</label>
                     <select formControlName="regimeSpecial" required>
                       <option value="" disabled selected>Sélectionnez un régime</option>
-                      <option value="01" selected>Régime SPE CADRE</option>
-                      <option value="AA" selected>Régime Alpha</option>
-                      <option value="BB" selected>Régime Beta</option>
-                      <option value="DD" selected>Régime Delta</option>
-                      <option value="EE" selected>Régime Epsilon</option>
-                      <option value="GG" selected>Régime Gamma</option>
-                      <option value="HH" selected>Régime Eta</option>
-                      <option value="KK" selected>Régime Kappa</option>
-                      <option value="LL" selected>Régime Lota</option>
-                      <option value="OO" selected>Régime Omega</option>
-                      <option value="TT" selected>Régime Theta</option>
-                      <option value="ZZ" selected>Régime Zeta</option>
+                      <option value="01">Régime SPE CADRE</option>
+                      <option value="AA">Régime Alpha</option>
+                      <option value="BB">Régime Beta</option>
+                      <option value="DD">Régime Delta</option>
+                      <option value="EE">Régime Epsilon</option>
+                      <option value="GG">Régime Gamma</option>
+                      <option value="HH">Régime Eta</option>
+                      <option value="KK">Régime Kappa</option>
+                      <option value="LL">Régime Lota</option>
+                      <option value="OO">Régime Omega</option>
+                      <option value="TT">Régime Theta</option>
+                      <option value="ZZ">Régime Zeta</option>
                     </select>
                   </div>
                 </div>
@@ -511,8 +522,8 @@
                     <select formControlName="typeContrat" required>
                       <option value="" disabled selected>Sélectionnez un type</option>
                       <option value="AP">Apprenti</option>
-                      <option value="DD">Durée dététerminée</option>
-                      <option value="DI">Durée indététerminée</option>
+                      <option value="DD">Durée déterminée</option>
+                      <option value="DI">Durée indéterminée</option>
                       <option value="FO">Formateur occasionnel</option>
                       <option value="HO">Honoraires seuls</option>
                       <option value="IS">Contrat intermittent</option>
@@ -525,7 +536,7 @@
                 <div class="form-row">
                   <div class="form-field">
                     <label>Durée</label>
-                    <input type="text" formControlName="duree" required>
+                    <input type="text" formControlName="duree" required (click)="onFieldClick('duree')">
                   </div>
                   <div class="form-field">
                     <label>Date de fin prévue</label>
@@ -558,7 +569,7 @@
                       <option value="" disabled selected>Sélectionnez un type</option>
                       <option value="00">Temps plein</option>
                       <option value="01">Temps partiel</option>
-                      <option value="CP">convenance personnelle</option>
+                      <option value="CP">Convenance personnelle</option>
                       <option value="EM">Temps partiel employeur multiple</option>
                       <option value="MI">Mi-temps thérapeutique</option>
                       <option value="PL">Préretraite progressive AVEC levée d'option</option>
@@ -568,13 +579,13 @@
                   </div>
                   <div class="form-field">
                     <label>Modalité horaire</label>
-                    <input type="text" formControlName="modaliteHoraire" required>
+                    <input type="text" formControlName="modaliteHoraire" required (click)="onFieldClick('modaliteHoraire')">
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>Cadre au forfait jours</label>
-                    <input type="number" formControlName="forfaitJours" required>
+                    <input type="number" formControlName="forfaitJours" required (click)="onFieldClick('forfaitJours')">
                     <div class="error-message" *ngIf="careerForm.get('forfaitJours')?.invalid && (careerForm.get('forfaitJours')?.dirty || careerForm.get('forfaitJours')?.touched)">
                       <div *ngIf="careerForm.get('forfaitJours')?.errors?.['required']">Le forfait jours est requis.</div>
                       <div *ngIf="careerForm.get('forfaitJours')?.errors?.['min']">La valeur ne peut pas être négative.</div>
@@ -582,7 +593,7 @@
                   </div>
                   <div class="form-field">
                     <label>Forfait annuel heures</label>
-                    <input type="number" formControlName="forfaitHeures" required>
+                    <input type="number" formControlName="forfaitHeures" required (click)="onFieldClick('forfaitHeures')">
                     <div class="error-message" *ngIf="careerForm.get('forfaitHeures')?.invalid && (careerForm.get('forfaitHeures')?.dirty || careerForm.get('forfaitHeures')?.touched)">
                       <div *ngIf="careerForm.get('forfaitHeures')?.errors?.['required']">Le forfait heures est requis.</div>
                       <div *ngIf="careerForm.get('forfaitHeures')?.errors?.['min']">La valeur ne peut pas être négative.</div>
@@ -592,15 +603,15 @@
                     <label>Surcotisation</label>
                     <select formControlName="surcotisation" required>
                       <option value="" disabled selected>Sélectionnez une cotisation</option>
-                      <option value="00">cotisation normale</option>
-                      <option value="01">retraite temps plein </option>
+                      <option value="00">Cotisation normale</option>
+                      <option value="01">Retraite temps plein</option>
                     </select>
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-field">
                     <label>Heures travaillées</label>
-                    <input type="text" formControlName="heuresTravaillees" required>
+                    <input type="text" formControlName="heuresTravaillees" required (click)="onFieldClick('heuresTravaillees')">
                     <div class="error-message" *ngIf="careerForm.get('heuresTravaillees')?.invalid && (careerForm.get('heuresTravaillees')?.dirty || careerForm.get('heuresTravaillees')?.touched)">
                       <div *ngIf="careerForm.get('heuresTravaillees')?.errors?.['required']">Les heures travaillées sont requises.</div>
                       <div *ngIf="careerForm.get('heuresTravaillees')?.errors?.['pattern']">Nombre positif requis (ex: 35 ou 35.5).</div>
@@ -608,7 +619,7 @@
                   </div>
                   <div class="form-field">
                     <label>Heures payées</label>
-                    <input type="text" formControlName="heuresPayees" required>
+                    <input type="text" formControlName="heuresPayees" required (click)="onFieldClick('heuresPayees')">
                     <div class="error-message" *ngIf="careerForm.get('heuresPayees')?.invalid && (careerForm.get('heuresPayees')?.dirty || careerForm.get('heuresPayees')?.touched)">
                       <div *ngIf="careerForm.get('heuresPayees')?.errors?.['required']">Les heures payées sont requises.</div>
                       <div *ngIf="careerForm.get('heuresPayees')?.errors?.['pattern']">Nombre positif requis (ex: 35 ou 35.5).</div>
@@ -961,7 +972,12 @@
 
     <!-- Bottom Sub-Section (Suggestions) -->
     <div class="suggestions-section">
-      <!-- Placeholder for future suggestions -->
+      <h3>Suggestions</h3>
+      <div class="suggestions-section">
+      <p *ngIf="isHelpModeActive && viewMode === 'form' && displayedExplanation" [innerHTML]="displayedExplanation"></p>
+      <p *ngIf="isHelpModeActive && viewMode === 'form' && !displayedExplanation">Cliquez sur un champ pour obtenir des conseils.</p>
+      <p *ngIf="!isHelpModeActive || viewMode !== 'form'">Activez le mode aide et sélectionnez un champ dans le formulaire pour voir les suggestions.</p>
+    </div>
     </div>
   </div>
 </div>

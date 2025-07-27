@@ -1,0 +1,358 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.main-content {
+  display: flex;
+  gap: 50px;
+  padding: 10px;
+  margin-top: 15px;
+
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-height: 400px;
+}
+
+
+.card-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-content {
+  padding: 24px;
+}
+
+.activity-section {
+  margin-bottom: 20px;
+}
+
+.top-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.top-row .activity-section {
+  flex: 1;
+  background: #f0f0f0;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 0;
+}
+
+.bottom-section {
+  background: #f0f0f0;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.section-count {
+  background: #6b7280;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.icon-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.icon-triangle {
+  background: #ef4444;
+  color: white;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  position: relative;
+}
+
+.icon-triangle::before {
+  content: "!";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+}
+
+.icon-flag {
+  background: #374151;
+  color: white;
+  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
+}
+
+.icon-warning {
+  background: #374151;
+  color: white;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  position: relative;
+}
+
+.icon-warning::before {
+  content: "!";
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: bold;
+}
+
+.icon-comment {
+  background: #374151;
+  color: white;
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-comment::before {
+  content: "💬";
+  font-size: 12px;
+}
+
+.icon-comment::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 6px;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #374151;
+}
+
+.red-icon .icon-triangle,
+.red-icon .icon-flag,
+.red-icon .icon-warning,
+.red-icon .icon-comment {
+  background: #ef4444;
+}
+
+.red-icon .icon-comment::after {
+  border-top-color: #ef4444;
+}
+
+.center-section {
+  text-align: center;
+  padding: 60px 24px;
+}
+
+.center-number {
+  font-size: 48px;
+  font-weight: 300;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.center-text {
+  font-size: 14px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+/* Card specific styles */
+.activities-card .section-count {
+  background: #6b7280;
+}
+
+.control-card .section-count {
+  background: #6b7280;
+}
+
+.qualifications-card .section-count {
+  background: #6b7280;
+}
+
+.control-card .center-section,
+.qualifications-card .center-section {
+  background: #f8f9fa;
+  border-radius: 0 0 8px 8px;
+}
+
+.dashboard-container {
+  font-family: 'OpenSansSemi', sans-serif;
+}
+
+.header-section {
+  position: relative;
+  height: 200px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.background-image {
+  width: 67%;
+  height: 100%;
+  position: relative;
+}
+
+.header-bg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info-container {
+  width: 35%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding: 10px;
+  background-color: #000;
+  color: #fff;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.user-info-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  width: 100%;
+}
+
+.circular-image-placeholder {
+  width: 70px;
+  height: 70px;
+  background-color: #3bcab9;
+  border-radius: 50%;
+  margin-right: 10px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.circular-image-placeholder::before {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 1px;
+  background: linear-gradient(to left, #3bcab9 0%, #3bcab9 70%, transparent 100%);
+  left: -120px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.circular-image-placeholder .img1 {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.user-details {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 70px;
+}
+
+.user-details span {
+  display: block;
+}
+
+.nameId {
+  font-family: 'OpenSans', sans-serif;
+  font-size: 24px;
+  line-height: 25px;
+}
+
+.position1 {
+  font-size: 15px;
+  line-height: 15px;
+  margin-top: 5px;
+}
+
+.folder1 {
+  font-family: 'OpenSans', sans-serif;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.folder1 img {
+  margin-left: 2px;
+}
+
+.round-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  bottom: 20px;
+  object-fit: cover;
+  padding: 0;
+}
+
+.round-button:hover {
+  transition: background-color 0.3s ease;
+  transform: scale(1.1);
+}
+
+
+.folderIcon {
+  height: 20px;
+  width: 20px;
+}

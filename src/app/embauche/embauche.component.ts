@@ -25,6 +25,7 @@ import {PopupMotifEntreeComponent} from './popups/popup-motif-entree/popup-motif
 import {PopupConventionComponent} from './popups/popup-convention/popup-convention.component';
 import {PopupQualifComponent} from './popups/popup-qualif/popup-qualif.component';
 import {PopupNatureContratComponent} from './popups/popup-nature-contrat/popup-nature-contrat.component';
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
   selector: 'app-embauche',
@@ -47,6 +48,11 @@ import {PopupNatureContratComponent} from './popups/popup-nature-contrat/popup-n
       state('hidden', style({ transform: 'translateY(-100%)', opacity: 0, height: '0px', overflow: 'hidden' })),
       state('visible', style({ transform: 'translateY(0)', opacity: 1, height: '*', overflow: 'hidden' })),
       transition('hidden => visible', [animate('300ms ease-in-out')])
+    ]),
+    trigger('slideToggle', [
+      state('off', style({ transform: 'translateX(0)' })),
+      state('on', style({ transform: 'translateX(30px)' })),
+      transition('off <=> on', animate('0.3s ease-in-out'))
     ])
   ]
 })
@@ -72,6 +78,12 @@ export class EmbaucheComponent implements OnInit {
   allAffectations: any[] = []; // Added for processed assignments
   allCarrieres: any[] = []; // Added for processed careers
   selectedMatricule: string | null = null;
+  isHelpModeActive: boolean = false;
+  fieldExplanation: string  = '';
+  displayedExplanation: string = '';
+  private typingInterval: any;
+  displayedExplanationLines: string[] = [];
+  private isApiCallInProgress: boolean = false;
 
   tableVisibility: { [key: string]: boolean } = {
     'historique-dossiers': true,
@@ -168,7 +180,7 @@ export class EmbaucheComponent implements OnInit {
     };
   }
 
-  constructor(private fb: FormBuilder, private dossierService: EmbaucheService, private dialog: MatDialog) {
+  constructor(private fb: FormBuilder, private dossierService: EmbaucheService, private dialog: MatDialog,private toastr: ToastrService) {
     this.dossierForm = this.fb.group({
       dateRecrutement: ['', [Validators.required, this.notFutureDateValidator()]],
       codeSociete: ['', [Validators.required]],
@@ -201,8 +213,8 @@ export class EmbaucheComponent implements OnInit {
       valableAu: ['', [Validators.required]],
       numeroVoie: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
       natureVoie: ['', [Validators.required]],
-      complement1: ['', [Validators.required]],
-      complement2: ['', [Validators.required]],
+      complement1: ['' ],
+      complement2: ['' ],
       lieuDit: ['', [Validators.required]],
       codePostal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
       commune: ['', [Validators.required, Validators.pattern(this.namePattern)]],
@@ -362,18 +374,18 @@ export class EmbaucheComponent implements OnInit {
           this.dossierService.saveDossier(this.dossierData).subscribe({
             next: (response) => {
               console.log('Dossier saved:', response);
-              alert('Dossier soumis avec succès!');
+              this.toastr.success('Dossier soumis avec succès!', 'Succès');
               this.resetForms();
             },
             error: (error) => {
               console.error('Error saving dossier:', error);
-              alert('Erreur lors de la soumission du dossier.');
+              this.toastr.error('Erreur lors de la soumission du dossier.', 'Erreur');
             }
           });
         }
       });
     } else {
-      alert('Veuillez valider toutes les sections avant de soumettre.');
+      this.toastr.warning('Veuillez valider toutes les sections avant de soumettre.', 'Avertissement');
     }
   }
 
@@ -423,6 +435,10 @@ export class EmbaucheComponent implements OnInit {
       carriere: []
     };
     this.activeProgressButton = 'Créer';
+    this.isHelpModeActive = false;
+    this.fieldExplanation = '';
+    this.displayedExplanation = ''; // Reset displayed text
+    this.stopTypingAnimation();
   }
 
   openetablissementpopup(): void {
@@ -618,6 +634,9 @@ export class EmbaucheComponent implements OnInit {
     if (mode === 'historique') {
       this.fetchHistoriqueData();
     }
+    this.fieldExplanation = '';
+    this.displayedExplanation = '';
+    this.stopTypingAnimation();
   }
 
   // Added method to fetch historical data
@@ -673,6 +692,63 @@ export class EmbaucheComponent implements OnInit {
         ...carriere,
       }))
     );
+  }
+
+  toggleSwitch(): void {
+    this.isHelpModeActive = !this.isHelpModeActive;
+    if (!this.isHelpModeActive) {
+      this.fieldExplanation = '';
+      this.displayedExplanation = '';
+      this.stopTypingAnimation();
+    }
+  }
+
+  onFieldClick(fieldName: string): void {
+    if (this.isHelpModeActive && this.viewMode === 'form' && !this.isApiCallInProgress) {
+      this.isApiCallInProgress = true; // Set flag to block further calls
+      this.stopTypingAnimation(); // Stop any previous animation
+      this.dossierService.getFieldExplanation(fieldName).subscribe({
+        next: (explanation) => {
+          console.log('Raw explanation from backend:', explanation); // Debug raw text
+          this.fieldExplanation = explanation;
+          this.startTypingAnimation(explanation); // Start typewriter animation
+          this.isApiCallInProgress = false; // Reset flag after completion
+        },
+        error: (err) => {
+          console.error('Error fetching explanation:', err);
+          this.fieldExplanation = 'Erreur lors de la récupération de l’explication.';
+          this.startTypingAnimation(this.fieldExplanation); // Animate error message
+          this.isApiCallInProgress = false; // Reset flag on error
+        }
+      });
+    }
+  }
+
+  private startTypingAnimation(text: string): void {
+    console.log('Starting animation with text:', text); // Debug input text
+    this.displayedExplanation = ''; // Reset displayed text
+    // Replace \n with <br> for HTML rendering
+    const htmlText = text.replace(/\n/g, '<br>');
+    console.log('Transformed HTML text:', htmlText); // Debug transformed text
+    let index = 0;
+    const speed = 15; // Milliseconds per character
+
+    this.typingInterval = setInterval(() => {
+      if (index < htmlText.length) {
+        this.displayedExplanation += htmlText.charAt(index);
+        console.log('Current displayedExplanation:', this.displayedExplanation); // Debug progress
+        index++;
+      } else {
+        this.stopTypingAnimation(); // Stop when done
+      }
+    }, speed);
+  }
+
+  private stopTypingAnimation(): void {
+    if (this.typingInterval) {
+      clearInterval(this.typingInterval);
+      this.typingInterval = null;
+    }
   }
 
   toggleTable(section: string): void {
